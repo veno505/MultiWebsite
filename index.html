@@ -25,44 +25,44 @@
                     },
                     colors: {
                         brand: {
-                            50: '#FAF9F6', // Soft Cream background tint
-                            100: '#F0EDE6', // Soft Cream border/light
-                            200: '#E6E2DA', // Soft Cream main base
-                            500: '#A6824A', // Antique Gold
-                            600: '#906F3E', // Antique Gold Darker
-                            700: '#5D1E21', // Deep Burgundy
+                            50: 'var(--color-brand-50)',
+                            100: 'var(--color-brand-100)',
+                            200: 'var(--color-brand-200)',
+                            500: 'var(--color-brand-500)',
+                            600: 'var(--color-brand-600)',
+                            700: 'var(--color-brand-700)',
                         },
                         slate: {
-                            50: '#FAF9F6', // Soft Cream body bg
-                            100: '#F0EDE6', // Soft Cream borders
-                            200: '#E6E2DA',
-                            300: '#D5CFC5',
-                            400: '#8E8170',
-                            500: '#706556',
-                            600: '#5A5043',
-                            700: '#40382E',
-                            800: '#101111', // Charcoal Black
-                            900: '#101111', // Charcoal Black
+                            50: 'var(--color-slate-50)',
+                            100: 'var(--color-slate-100)',
+                            200: 'var(--color-slate-200)',
+                            300: 'var(--color-slate-300)',
+                            400: 'var(--color-slate-400)',
+                            500: 'var(--color-slate-500)',
+                            600: 'var(--color-slate-600)',
+                            700: 'var(--color-slate-700)',
+                            800: 'var(--color-slate-800)',
+                            900: 'var(--color-slate-900)',
                         },
                         green: {
-                            50: '#E8F0EC',
-                            100: '#D1E1D9',
-                            500: '#154230', // Emerald Green
-                            600: '#0F3224',
+                            50: 'var(--color-brand-50)',
+                            100: 'var(--color-brand-100)',
+                            500: 'var(--color-green-500)',
+                            600: 'var(--color-green-600)',
                         },
                         emerald: {
-                            50: '#E8F0EC',
-                            100: '#D1E1D9',
-                            500: '#154230', // Emerald Green
-                            600: '#0F3224',
-                            700: '#0F3224',
+                            50: 'var(--color-brand-50)',
+                            100: 'var(--color-brand-100)',
+                            500: 'var(--color-emerald-500)',
+                            600: 'var(--color-emerald-600)',
+                            700: 'var(--color-emerald-600)',
                         },
                         blue: {
-                            50: '#F9F5F5',
-                            100: '#F1E6E6',
-                            500: '#5D1E21', // Deep Burgundy
-                            600: '#4C181a',
-                            700: '#4C181a',
+                            50: 'var(--color-brand-50)',
+                            100: 'var(--color-brand-100)',
+                            500: 'var(--color-blue-500)',
+                            600: 'var(--color-blue-600)',
+                            700: 'var(--color-blue-600)',
                         }
                     }
                 }
@@ -70,6 +70,54 @@
         };
     </script>
     <style>
+        :root {
+            /* Default: Soft Cream & Antique Gold */
+            --color-brand-50: #FAF9F6;
+            --color-brand-100: #F0EDE6;
+            --color-brand-200: #E6E2DA;
+            --color-brand-500: #A6824A;
+            --color-brand-600: #906F3E;
+            --color-brand-700: #5D1E21;
+
+            --color-slate-50: #FAF9F6;
+            --color-slate-100: #F0EDE6;
+            --color-slate-200: #E6E2DA;
+            --color-slate-300: #D5CFC5;
+            --color-slate-400: #8E8170;
+            --color-slate-500: #706556;
+            --color-slate-600: #5A5043;
+            --color-slate-700: #40382E;
+            --color-slate-800: #101111;
+            --color-slate-900: #101111;
+
+            --color-green-500: #154230;
+            --color-green-600: #0F3224;
+            --color-emerald-500: #154230;
+            --color-emerald-600: #0F3224;
+            --color-blue-500: #5D1E21;
+            --color-blue-600: #4C181A;
+
+            --color-navbar-bg: rgba(255, 255, 255, 0.95);
+            --color-navbar-border: rgba(230, 226, 218, 0.8);
+        }
+
+        .theme-select-btn.active {
+            border-color: var(--color-brand-500);
+            background-color: var(--color-brand-50);
+            box-shadow: 0 0 0 2px rgba(166, 130, 74, 0.15);
+        }
+
+        .bg-wa {
+            background-color: #25D366 !important;
+            color: #ffffff !important;
+        }
+        .bg-wa:hover {
+            background-color: #128C7E !important;
+        }
+        .text-wa {
+            color: #25D366 !important;
+        }
+
         /* Custom scrollbar untuk tampilan lebih bersih */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -77,9 +125,9 @@
         ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
         
         .glass-effect {
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--color-navbar-bg, rgba(255, 255, 255, 0.9));
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            border-bottom: 1px solid var(--color-navbar-border, rgba(226, 232, 240, 0.8));
         }
 
         .line-clamp-2 {
@@ -178,10 +226,10 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
     <!-- ADMIN OVERLAY -->
-    <div id="admin-overlay" class="fixed inset-0 z-[70] bg-slate-900/50 backdrop-blur-sm" onclick="closeAdminPanel()"></div>
+    <div id="admin-overlay" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm" onclick="closeAdminPanel()"></div>
 
     <!-- ADMIN PANEL DRAWER -->
-    <aside id="admin-panel" class="fixed top-0 right-0 h-full w-full max-w-2xl z-[80] bg-white shadow-2xl flex flex-col">
+    <aside id="admin-panel" class="fixed top-0 right-0 h-full w-full max-w-2xl z-[80] bg-slate-100 shadow-2xl flex flex-col">
       <!-- Drawer Header -->
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 flex-shrink-0">
         <div class="flex items-center gap-3">
@@ -249,7 +297,7 @@
       <!-- MAIN ADMIN CONTAINER (Shown when logged in) -->
       <div id="admin-main-container" class="flex-1 flex flex-col hidden overflow-hidden">
         <!-- Tabs Navigation -->
-        <div class="flex border-b border-slate-100 px-4 bg-white flex-shrink-0 overflow-x-auto">
+        <div class="flex border-b border-slate-200 px-4 bg-slate-100 flex-shrink-0 overflow-x-auto">
           <button id="tab-customers" class="admin-tab active" onclick="switchTab('customers')">
             <i class="fa-solid fa-users mr-1.5"></i>Data Customer
           </button>
@@ -453,6 +501,49 @@
                 <input type="email" id="setting-store-email" class="form-input" placeholder="cs@domain.com">
               </div>
             </div>
+            <!-- Theme Selection Section -->
+            <div class="space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+              <label class="form-label"><i class="fa-solid fa-palette text-brand-500 mr-1"></i>Tema Warna Website</label>
+              <p class="text-[10px] text-slate-400 leading-tight">Pilih skema warna etalase website Anda. Warna akan otomatis menyesuaikan.</p>
+              <div class="grid grid-cols-5 gap-2 pt-1">
+                <button onclick="selectTheme('default')" id="theme-btn-default" class="theme-select-btn active flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#A6824A]" title="Gold"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#FAF9F6] border border-slate-200" title="Cream"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Soft Gold</span>
+                </button>
+                <button onclick="selectTheme('porsche')" id="theme-btn-porsche" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#800C1F]" title="Porsche Red"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#5C7896]" title="Slate Blue"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Porsche</span>
+                </button>
+                <button onclick="selectTheme('sunset')" id="theme-btn-sunset" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#451952]" title="Purple"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#F39F5A]" title="Peach"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Sunset</span>
+                </button>
+                <button onclick="selectTheme('bluegold')" id="theme-btn-bluegold" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#14213D]" title="Navy"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#FCA311]" title="Gold"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Luxury</span>
+                </button>
+                <button onclick="selectTheme('emerald')" id="theme-btn-emerald" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#0B2B26]" title="Teal"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#8EB69B]" title="Sage"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Emerald</span>
+                </button>
+              </div>
+            </div>
+
             <button onclick="saveStoreSettings()" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
               <i class="fa-solid fa-floppy-disk"></i> Simpan Info Toko
             </button>
@@ -474,12 +565,12 @@
 
     <!-- MODAL CUSTOMER FORM -->
     <div id="customer-form-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeCustomerForm()"></div>
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md modal-animate overflow-hidden">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCustomerForm()"></div>
+      <div class="relative bg-slate-100 rounded-2xl shadow-2xl w-full max-w-md modal-animate overflow-hidden">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-slate-100 flex items-start gap-3 bg-slate-50">
           <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="fa-brands fa-whatsapp text-green-600 text-xl"></i>
+            <i class="fa-brands fa-whatsapp text-xl" style="color: #25D366;"></i>
           </div>
           <div>
             <h3 class="font-bold text-slate-800 text-base">Isi Data Pemesanan</h3>
@@ -534,8 +625,8 @@
 
     <!-- MODAL PRODUK FORM -->
     <div id="product-form-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeProductForm()"></div>
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg modal-animate overflow-hidden">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeProductForm()"></div>
+      <div class="relative bg-slate-100 rounded-2xl shadow-2xl w-full max-w-lg modal-animate overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
           <h3 class="font-bold text-slate-800 text-base" id="form-modal-title">Tambah Produk Baru</h3>
           <button onclick="closeProductForm()" class="w-8 h-8 rounded-lg bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
@@ -590,8 +681,8 @@
 
     <!-- MODAL HAPUS -->
     <div id="confirm-delete-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeConfirmDelete()"></div>
-      <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center modal-animate">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeConfirmDelete()"></div>
+      <div class="relative bg-slate-100 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center modal-animate">
         <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl"></i>
         </div>
@@ -632,7 +723,7 @@
                 
                 <!-- Admin Button (Desktop) -->
                 <div class="hidden md:flex items-center ml-4">
-                    <button onclick="openAdminPanel()" title="Panel Admin" class="w-10 h-10 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-600 flex items-center justify-center transition border border-brand-100 flex-shrink-0">
+                    <button onclick="openAdminPanel()" title="Panel Admin" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-500 flex items-center justify-center transition border border-slate-200 flex-shrink-0">
                         <i class="fa-solid fa-user-tie text-sm"></i>
                     </button>
                 </div>
@@ -641,13 +732,13 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fa-solid fa-search text-slate-400"></i>
                         </div>
-                        <input type="text" id="searchInputDesktop" onkeyup="handleSearch(this.value)" class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-full leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 sm:text-sm transition-all shadow-inner" placeholder="Cari barang apa hari ini?">
+                        <input type="text" id="searchInputDesktop" onkeyup="handleSearch(this.value)" class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-full leading-5 bg-slate-100 placeholder-slate-400 focus:outline-none focus:bg-slate-200 focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 sm:text-sm transition-all shadow-inner" placeholder="Cari barang apa hari ini?">
                     </div>
                 </div>
 
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center gap-2">
-                    <button onclick="openAdminPanel()" class="w-9 h-9 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100" title="Panel Admin">
+                    <button onclick="openAdminPanel()" class="w-9 h-9 rounded-xl bg-slate-100 text-brand-500 flex items-center justify-center border border-slate-200 hover:bg-slate-200 transition" title="Panel Admin">
                         <i class="fa-solid fa-user-tie text-sm"></i>
                     </button>
                     <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none">
@@ -668,7 +759,7 @@
         </div>
 
         <!-- Mobile Menu Dropdown (Hidden by default) -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full">
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-100 border-t border-slate-200 shadow-lg absolute w-full">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#beranda" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Beranda</a>
                 <a href="#katalog" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Katalog Produk</a>
@@ -680,7 +771,7 @@
     <!-- Hero Section -->
     <section id="beranda" class="pt-32 pb-16 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
         <div class="w-full md:w-1/2 space-y-6 text-center md:text-left">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 text-brand-600 text-sm font-medium border border-brand-100">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-brand-500 text-sm font-medium border border-slate-200">
                 <span class="relative flex h-2 w-2">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
@@ -697,8 +788,8 @@
                 <a href="#katalog" class="px-8 py-3.5 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-medium transition-all shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2">
                     Mulai Belanja <i class="fa-solid fa-arrow-right"></i>
                 </a>
-                <a href="#kontak" class="px-8 py-3.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-full font-medium transition-all flex items-center justify-center gap-2 shadow-sm">
-                    Hubungi Admin <i class="fa-brands fa-whatsapp text-green-500"></i>
+                <a href="#kontak" class="px-8 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-full font-medium transition-all flex items-center justify-center gap-2 shadow-sm">
+                    Hubungi Admin <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
                 </a>
             </div>
         </div>
@@ -713,7 +804,7 @@
     </section>
 
     <!-- Catalog Section -->
-    <section id="katalog" class="py-16 bg-white border-t border-slate-100">
+    <section id="katalog" class="py-16 bg-slate-50 border-t border-slate-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <div class="text-center mb-10 space-y-3">
@@ -750,21 +841,21 @@
     <section class="py-16 bg-brand-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div class="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <div class="p-6 bg-slate-100 rounded-2xl shadow-sm border border-slate-200">
                     <div class="w-14 h-14 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                         <i class="fa-solid fa-truck-fast"></i>
                     </div>
                     <h3 class="font-bold text-lg text-slate-800 mb-2">Pengiriman Cepat</h3>
                     <p class="text-slate-500 text-sm">Pesanan diproses di hari yang sama untuk kepuasan pelanggan.</p>
                 </div>
-                <div class="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <div class="p-6 bg-slate-100 rounded-2xl shadow-sm border border-slate-200">
                     <div class="w-14 h-14 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <h3 class="font-bold text-lg text-slate-800 mb-2">Transaksi Aman</h3>
                     <p class="text-slate-500 text-sm">Pembayaran & komunikasi langsung melalui WhatsApp admin kami.</p>
                 </div>
-                <div class="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
+                <div class="p-6 bg-slate-100 rounded-2xl shadow-sm border border-slate-200">
                     <div class="w-14 h-14 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
                         <i class="fa-solid fa-headset"></i>
                     </div>
@@ -776,7 +867,7 @@
     </section>
 
     <!-- Footer -->
-    <footer id="kontak" class="bg-slate-900 text-white pt-16 pb-8">
+    <footer id="kontak" class="text-slate-300 pt-16 pb-8" style="background-color: #0d0f12; border-top: 1px solid rgba(255,255,255,0.06);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
                 
@@ -854,14 +945,14 @@
     </footer>
 
     <!-- Floating WhatsApp Button -->
-    <a href="#" id="floating-wa" target="_blank" class="fixed bottom-6 right-6 w-14 h-14 bg-green-500 text-white rounded-full flex items-center justify-center text-3xl shadow-lg shadow-green-500/30 hover:bg-green-600 hover:scale-110 transition-transform duration-300 z-50">
+    <a href="#" id="floating-wa" target="_blank" class="fixed bottom-6 right-6 w-14 h-14 bg-wa text-white rounded-full flex items-center justify-center text-3xl shadow-lg shadow-green-500/20 hover:scale-110 transition-transform duration-300 z-50">
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
     <!-- Modal Image Preview (Quick View) -->
-    <div id="image-modal" class="fixed inset-0 z-[60] hidden bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white p-2 rounded-2xl max-w-3xl w-full relative shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
-            <button onclick="closeModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg hover:bg-slate-100 transition z-10">
+    <div id="image-modal" class="fixed inset-0 z-[60] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-100 p-2 rounded-2xl max-w-3xl w-full relative shadow-2xl transform scale-95 transition-transform duration-300" id="modal-content">
+            <button onclick="closeModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-slate-100 text-slate-800 rounded-full flex items-center justify-center shadow-lg hover:bg-slate-200 transition z-10">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
             <img id="modal-image" src="" alt="Preview" class="w-full h-auto rounded-xl object-contain max-h-[80vh]">
@@ -892,8 +983,8 @@
             nama: "CommerceHub",
             deskripsi: "Layanan jasa pembuatan website profesional, cepat, responsif, dan SEO-friendly. Sangat cocok untuk landing page, profil bisnis perusahaan, portofolio kreatif, hingga toko online (e-commerce).",
             whatsapp: "6281229923834",
-            alamat: "Gedung Cyber, Lt. 5, Jl. Kuningan Barat No. 8, Jakarta Selatan",
-            email: "hello@commercehub.co.id",
+            alamat: "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah",
+            email: "marveynopramaditya@gmail.com",
             mataUang: "Rp",
             pesanPembuka: "Halo Admin CommerceHub, saya tertarik untuk memesan paket jasa pembuatan website berikut:"
         };
@@ -906,7 +997,7 @@
                 nama: "Landing Page Startup/SaaS",
                 kategori: "Unggulan",
                 harga: 990000,
-                gambar: "landing_page_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Landing page modern dengan konversi tinggi, animasi interaktif, integrasi form email, dan responsif di semua perangkat."
             },
             {
@@ -914,7 +1005,7 @@
                 nama: "Website E-Commerce Luxury",
                 kategori: "Terlaris",
                 harga: 2490000,
-                gambar: "ecommerce_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Toko online premium dengan keranjang belanja, integrasi WhatsApp checkout, halaman katalog, dan panel admin mandiri."
             },
             {
@@ -922,7 +1013,7 @@
                 nama: "Company Profile Perusahaan",
                 kategori: "Unggulan",
                 harga: 1490000,
-                gambar: "corporate_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Website profil perusahaan profesional untuk membangun kredibilitas bisnis, lengkap dengan halaman kontak, visi misi, & karir."
             },
             {
@@ -930,7 +1021,7 @@
                 nama: "Portofolio Kreatif & CV",
                 kategori: "Promo",
                 harga: 490000,
-                gambar: "portfolio_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Desain portofolio pribadi interaktif untuk desainer, developer, fotografer, atau CV digital profesional untuk melamar kerja."
             },
             {
@@ -938,7 +1029,7 @@
                 nama: "Landing Page Event / Seminar",
                 kategori: "Promo",
                 harga: 390000,
-                gambar: "landing_page_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Halaman pendaftaran satu halaman khusus untuk webinar, konser, reuni, acara amal, atau seminar bisnis Anda."
             },
             {
@@ -946,7 +1037,7 @@
                 nama: "Website Portal Berita / Blog",
                 kategori: "Terbaru",
                 harga: 1190000,
-                gambar: "corporate_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Media portal berita atau blog pribadi dengan CMS mudah, kategori artikel dinamis, tata letak modern, dan Adsense-ready."
             },
             {
@@ -954,7 +1045,7 @@
                 nama: "Website Instansi & Sekolah",
                 kategori: "Unggulan",
                 harga: 1990000,
-                gambar: "corporate_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Situs web resmi sekolah, universitas, pesantren, atau yayasan lengkap dengan fitur pengumuman dan kalender akademik."
             },
             {
@@ -962,7 +1053,7 @@
                 nama: "Sistem Informasi Custom",
                 kategori: "Terbaru",
                 harga: 4990000,
-                gambar: "ecommerce_mockup.png",
+                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
                 deskripsi: "Pengembangan sistem web custom, database relasional, dashboard monitoring, cetak laporan, sesuai dengan kebutuhan bisnis Anda."
             }
         ];
@@ -1140,6 +1231,10 @@
             const linkInput = document.getElementById("setting-store-link");
             if (linkInput) linkInput.value = shareLink;
             
+            // Select active theme button
+            selectedTheme = TOKO_CONFIG.tema || "default";
+            selectTheme(selectedTheme);
+
             // Fill inputs
             if (document.getElementById("setting-store-name")) document.getElementById("setting-store-name").value = TOKO_CONFIG.nama || "";
             if (document.getElementById("setting-store-wa")) document.getElementById("setting-store-wa").value = TOKO_CONFIG.whatsapp || "";
@@ -1167,6 +1262,7 @@
             TOKO_CONFIG.deskripsi = desc;
             TOKO_CONFIG.alamat = address;
             TOKO_CONFIG.email = email;
+            TOKO_CONFIG.tema = selectedTheme;
             
             await saveData(true);
             showToast("Informasi toko berhasil disimpan!", "success");
@@ -1226,13 +1322,169 @@
             el.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${cClass} flex-shrink-0"></span> ${text}`;
         }
 
+        // --- THEME COLOR SCHEMES CONFIG (FROM IMAGES) ---
+        const THEMES = {
+            default: {
+                "--color-brand-50": "#FAF9F6",
+                "--color-brand-100": "#F0EDE6",
+                "--color-brand-200": "#E6E2DA",
+                "--color-brand-500": "#A6824A",
+                "--color-brand-600": "#906F3E",
+                "--color-brand-700": "#5D1E21",
+                "--color-slate-50": "#FAF9F6",
+                "--color-slate-100": "#F0EDE6",
+                "--color-slate-200": "#E6E2DA",
+                "--color-slate-300": "#D5CFC5",
+                "--color-slate-400": "#8E8170",
+                "--color-slate-500": "#706556",
+                "--color-slate-600": "#5A5043",
+                "--color-slate-700": "#40382E",
+                "--color-slate-800": "#101111",
+                "--color-slate-900": "#101111",
+                "--color-green-500": "#154230",
+                "--color-green-600": "#0F3224",
+                "--color-emerald-500": "#154230",
+                "--color-emerald-600": "#0F3224",
+                "--color-blue-500": "#5D1E21",
+                "--color-blue-600": "#4C181A",
+                "--color-navbar-bg": "rgba(255, 255, 255, 0.95)",
+                "--color-navbar-border": "rgba(230, 226, 218, 0.8)"
+            },
+            porsche: {
+                "--color-brand-50": "#202D36", // Slate Dark Header
+                "--color-brand-100": "#5C7896", // Slate Blue
+                "--color-brand-200": "#7598B9", // Light Slate Blue
+                "--color-brand-500": "#800C1F", // Porsche Brake Caliper Red
+                "--color-brand-600": "#3C0007", // Deep Dark Red
+                "--color-brand-700": "#929CAA", // Light Gray Accent
+                "--color-slate-50": "#111827", // Dark Base Background
+                "--color-slate-100": "#1F2937", // Card Background (Dark)
+                "--color-slate-200": "#374151",
+                "--color-slate-300": "#4B5563",
+                "--color-slate-400": "#9CA3AF", // Muted text
+                "--color-slate-500": "#D1D5DB", // Body text
+                "--color-slate-600": "#E5E7EB",
+                "--color-slate-700": "#F3F4F6",
+                "--color-slate-800": "#F9FAFB", // Heading text (white)
+                "--color-slate-900": "#FFFFFF", // Heading text (white)
+                "--color-green-500": "#800C1F",
+                "--color-green-600": "#3C0007",
+                "--color-emerald-500": "#800C1F",
+                "--color-emerald-600": "#3C0007",
+                "--color-blue-500": "#202D36",
+                "--color-blue-600": "#1E293B",
+                "--color-navbar-bg": "rgba(17, 24, 39, 0.95)",
+                "--color-navbar-border": "rgba(55, 65, 81, 0.8)"
+            },
+            sunset: {
+                "--color-brand-50": "#451952", // Deep Sunset Purple
+                "--color-brand-100": "#662549", // Muted Magenta
+                "--color-brand-200": "#AE445A", // Soft Rose
+                "--color-brand-500": "#F39F5A", // Sunset Gold / Peach
+                "--color-brand-600": "#E8BCB9", // Soft Pink
+                "--color-brand-700": "#1D1A39", // Deep Navy
+                "--color-slate-50": "#1D1A39", // Deep Sunset Navy Background
+                "--color-slate-100": "#2A274E", // Card Background (Dark Sunset)
+                "--color-slate-200": "#3A3668",
+                "--color-slate-300": "#4A4683",
+                "--color-slate-400": "#A3A0D1", // Muted text
+                "--color-slate-500": "#D2CFFE", // Body text
+                "--color-slate-600": "#E7E6FF",
+                "--color-slate-700": "#F4F3FF",
+                "--color-slate-800": "#FAF9F6", // Heading text
+                "--color-slate-900": "#FFFFFF",
+                "--color-green-500": "#AE445A",
+                "--color-green-600": "#662549",
+                "--color-emerald-500": "#AE445A",
+                "--color-emerald-600": "#662549",
+                "--color-blue-500": "#1D1A39",
+                "--color-blue-600": "#1D1A39",
+                "--color-navbar-bg": "rgba(29, 26, 57, 0.95)",
+                "--color-navbar-border": "rgba(58, 54, 104, 0.8)"
+            },
+            bluegold: {
+                "--color-brand-50": "#14213D", // Luxury Navy Blue
+                "--color-brand-100": "#000000", // Pitch Black
+                "--color-brand-200": "#E5E5E5",
+                "--color-brand-500": "#FCA311", // Luxury Gold
+                "--color-brand-600": "#D28308",
+                "--color-brand-700": "#FFFFFF",
+                "--color-slate-50": "#000000", // Luxury Pitch Black Background
+                "--color-slate-100": "#14213D", // Navy Card Background
+                "--color-slate-200": "#24314D",
+                "--color-slate-300": "#34415D",
+                "--color-slate-400": "#94A3B8", // Muted text
+                "--color-slate-500": "#CBD5E1", // Body text
+                "--color-slate-600": "#E2E8F0",
+                "--color-slate-700": "#F1F5F9",
+                "--color-slate-800": "#FAF9F6", // Heading text
+                "--color-slate-900": "#FFFFFF",
+                "--color-green-500": "#FCA311",
+                "--color-green-600": "#D28308",
+                "--color-emerald-500": "#FCA311",
+                "--color-emerald-600": "#D28308",
+                "--color-blue-500": "#14213D",
+                "--color-blue-600": "#0F172A",
+                "--color-navbar-bg": "rgba(0, 0, 0, 0.95)",
+                "--color-navbar-border": "rgba(20, 33, 61, 0.8)"
+            },
+            emerald: {
+                "--color-brand-50": "#051F20", // Dark Forest Green
+                "--color-brand-100": "#0B2B26", // Deep Teal
+                "--color-brand-200": "#163832", // Medium Pine
+                "--color-brand-500": "#8EB69B", // Sage Green Accent
+                "--color-brand-600": "#DAF1DE", // Mint Cream
+                "--color-brand-700": "#235347",
+                "--color-slate-50": "#0B2B26", // Deep Teal Background
+                "--color-slate-100": "#163832", // Pine Green Card Background
+                "--color-slate-200": "#235347",
+                "--color-slate-300": "#2D6457",
+                "--color-slate-400": "#8EB69B", // Muted text
+                "--color-slate-500": "#C7DFC9", // Body text
+                "--color-slate-600": "#DAF1DE",
+                "--color-slate-700": "#FAFDFB",
+                "--color-slate-800": "#FAF9F6", // Heading text
+                "--color-slate-900": "#FFFFFF",
+                "--color-green-500": "#0B2B26",
+                "--color-green-600": "#051F20",
+                "--color-emerald-500": "#0B2B26",
+                "--color-emerald-600": "#051F20",
+                "--color-blue-500": "#163832",
+                "--color-blue-600": "#0B2B26",
+                "--color-navbar-bg": "rgba(11, 43, 38, 0.95)",
+                "--color-navbar-border": "rgba(22, 56, 50, 0.8)"
+            }
+        };
+
+        function applyTheme(themeKey) {
+            const theme = THEMES[themeKey] || THEMES.default;
+            for (const [key, val] of Object.entries(theme)) {
+                document.documentElement.style.setProperty(key, val);
+            }
+        }
+
+        let selectedTheme = "default";
+        
+        function selectTheme(themeKey) {
+            selectedTheme = themeKey;
+            
+            // Highlight active button
+            const buttons = document.querySelectorAll(".theme-select-btn");
+            buttons.forEach(btn => {
+                btn.classList.toggle("active", btn.id === "theme-btn-" + themeKey);
+            });
+            
+            // Temporarily apply theme preview
+            applyTheme(themeKey);
+        }
+
         // --- CUSTOM PROFESSIONAL TOAST NOTIFICATIONS ---
         function showToast(message, type = "success") {
             const container = document.getElementById("toast-container");
             if (!container) return;
             
             const toast = document.createElement("div");
-            toast.className = `flex items-center gap-3 p-4 mb-3 bg-white/95 backdrop-blur-md border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 max-w-sm w-full translate-x-12 opacity-0 transition-all duration-300 pointer-events-auto`;
+            toast.className = `flex items-center gap-3 p-4 mb-3 bg-slate-100/95 backdrop-blur-md border border-slate-200 rounded-2xl shadow-xl shadow-slate-900/20 max-w-sm w-full translate-x-12 opacity-0 transition-all duration-300 pointer-events-auto`;
             
             let iconColor = "text-brand-500 bg-brand-50";
             let iconHtml = '<i class="fa-solid fa-circle-info"></i>';
@@ -1352,8 +1604,8 @@
                     const cloudData = docSnap.data();
                     PRODUK_DATA = cloudData.produk_data || [...DEFAULT_PRODUK];
                     
-                    // Reset default public database doc if it contains old products (motor "P" or book "B")
-                    if (currentSellerId === "default" && (PRODUK_DATA.length === 0 || PRODUK_DATA.some(p => p.id.startsWith("P") || p.id.startsWith("B")))) {
+                    // Reset default public database doc if it contains old products or old mockup images
+                    if (currentSellerId === "default" && (PRODUK_DATA.length === 0 || PRODUK_DATA.some(p => p.id.startsWith("P") || p.id.startsWith("B") || p.gambar !== "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg"))) {
                         PRODUK_DATA = [...DEFAULT_PRODUK];
                         TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
                         await docRef.set({
@@ -1365,10 +1617,19 @@
                     } else {
                         if (cloudData.store_config) {
                             TOKO_CONFIG = { ...TOKO_CONFIG, ...cloudData.store_config };
+                            if (currentSellerId === "default" && (TOKO_CONFIG.email !== "marveynopramaditya@gmail.com" || TOKO_CONFIG.alamat !== "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah")) {
+                                TOKO_CONFIG.email = "marveynopramaditya@gmail.com";
+                                TOKO_CONFIG.alamat = "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah";
+                                await docRef.update({
+                                    store_config: TOKO_CONFIG
+                                });
+                            }
                         } else {
                             TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
                         }
                     }
+                    
+                    applyTheme(TOKO_CONFIG.tema || "default");
 
                     const updated = upgradeCategories(PRODUK_DATA);
                     customerList = cloudData.customer_orders || [];
@@ -1407,6 +1668,7 @@
                 } else {
                     TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
                 }
+                applyTheme(TOKO_CONFIG.tema || "default");
             }
             
             initStoreInfo();
@@ -1473,7 +1735,7 @@
                 btn.className = `px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                     isActive 
                     ? "bg-brand-600 text-white shadow-md shadow-brand-500/30 transform scale-105" 
-                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:border-brand-300"
+                    : "bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200 hover:border-brand-300"
                 }`;
                 btn.textContent = cat;
                 btn.onclick = () => {
@@ -1546,7 +1808,7 @@
                 filteredProducts.forEach((p, index) => {
                     const animDelay = index * 50;
                     const card = document.createElement("div");
-                    card.className = "bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col group opacity-0 translate-y-4 animate-fade-in relative";
+                    card.className = "bg-slate-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 flex flex-col group opacity-0 translate-y-4 animate-fade-in relative";
                     card.style.animation = `fadeIn 0.5s ease forwards ${animDelay}ms`;
                     
                     const sn = (p.nama || "").replace(/'/g, "\\'");
@@ -1554,10 +1816,10 @@
                     card.innerHTML = `
                         <!-- Admin Controls on Card -->
                         <div class="admin-controls absolute top-3 left-3 z-20 gap-1.5">
-                            <button onclick="editProduct('${p.id}')" class="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-brand-600 hover:bg-brand-50 transition border border-slate-200" title="Edit">
+                            <button onclick="editProduct('${p.id}')" class="w-8 h-8 bg-slate-100 rounded-lg shadow-md flex items-center justify-center text-brand-600 hover:bg-brand-50 transition border border-slate-200" title="Edit">
                                 <i class="fa-solid fa-pen text-xs"></i>
                             </button>
-                            <button onclick="promptDeleteProduct('${p.id}', '${sn}')" class="w-8 h-8 bg-white rounded-lg shadow-md flex items-center justify-center text-red-500 hover:bg-red-50 transition border border-slate-200" title="Hapus">
+                            <button onclick="promptDeleteProduct('${p.id}', '${sn}')" class="w-8 h-8 bg-slate-100 rounded-lg shadow-md flex items-center justify-center text-red-500 hover:bg-red-50 transition border border-slate-200" title="Hapus">
                                 <i class="fa-solid fa-trash text-xs"></i>
                             </button>
                         </div>
@@ -1565,12 +1827,12 @@
                         <!-- Bagian Gambar -->
                         <div class="relative w-full aspect-square overflow-hidden bg-slate-100 cursor-pointer" onclick="openModal('${p.gambar}')">
                             <img src="${p.gambar}" alt="${p.nama}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-semibold text-brand-600 border border-slate-200/50">
+                            <div class="absolute top-3 right-3 bg-slate-100/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-semibold text-brand-500 border border-slate-200/50">
                                 ${p.kategori}
                             </div>
                             <!-- Overlay Hover Icon -->
                             <div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-800 shadow-lg">
+                                <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-800 shadow-lg">
                                     <i class="fa-solid fa-magnifying-glass-plus"></i>
                                 </div>
                             </div>
@@ -1578,13 +1840,13 @@
                         
                         <!-- Bagian Konten -->
                         <div class="p-5 flex flex-col flex-grow">
-                            <h3 class="font-bold text-slate-800 text-base mb-1 line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-600 transition-colors">${p.nama}</h3>
-                            <p class="text-brand-600 font-bold text-lg mb-2">${formatRupiah(p.harga)}</p>
+                            <h3 class="font-bold text-slate-800 text-base mb-1 line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-500 transition-colors">${p.nama}</h3>
+                            <p class="text-brand-500 font-bold text-lg mb-2">${formatRupiah(p.harga)}</p>
                             <p class="text-slate-500 text-xs mb-4 line-clamp-2 flex-grow">${p.deskripsi || ''}</p>
                             
                             <!-- Tombol Aksi -->
                             <div class="pt-3 border-t border-slate-100 mt-auto">
-                                <button onclick="openCustomerForm('${p.id}')" class="w-full flex items-center justify-center gap-2 py-2.5 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm hover:shadow-green-500/30">
+                                <button onclick="openCustomerForm('${p.id}')" class="w-full flex items-center justify-center gap-2 py-2.5 bg-wa text-white text-sm font-semibold rounded-xl transition-colors shadow-sm hover:opacity-90">
                                     <i class="fa-brands fa-whatsapp text-lg"></i> Beli via WA
                                 </button>
                             </div>
@@ -2189,8 +2451,8 @@
     <div id="toast-container" class="fixed top-6 right-6 z-[100] flex flex-col items-end gap-3 pointer-events-none max-w-sm w-full"></div>
 
     <!-- CUSTOM CONFIRMATION DIALOG MODAL -->
-    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-      <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300 space-y-4">
+    <div id="confirm-modal" class="fixed inset-0 z-[100] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+      <div class="bg-slate-100 rounded-2xl p-6 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300 space-y-4">
         <div class="flex items-center gap-3 text-red-600">
           <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
             <i class="fa-solid fa-triangle-exclamation text-lg"></i>
