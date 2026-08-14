@@ -137,13 +137,13 @@
             overflow: hidden;
         }
 
-        /* ── Admin Panel Drawer ── */
+        /* ── Admin Panel Full Page ── */
         #admin-panel {
-            transform: translateX(100%);
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: none;
         }
         #admin-panel.open {
-            transform: translateX(0);
+            display: flex;
+            flex-direction: column;
         }
         #admin-overlay {
             opacity: 0;
@@ -154,9 +154,28 @@
             opacity: 1;
             pointer-events: all;
         }
+        .admin-nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 16px; border-radius: 10px;
+            font-size: 13px; font-weight: 500;
+            color: var(--color-slate-500);
+            cursor: pointer; transition: all 0.18s;
+            background: none; border: none; outline: none; width: 100%;
+            text-align: left;
+        }
+        .admin-nav-item:hover {
+            background-color: var(--color-slate-200);
+            color: var(--color-slate-900);
+        }
+        .admin-nav-item.active {
+            background-color: var(--color-brand-500);
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+        .admin-nav-item i { width: 18px; text-align: center; font-size: 14px; }
         .admin-tab {
             border-bottom: 2px solid transparent;
-            color: #64748b;
+            color: var(--color-slate-500);
             font-size: 13px;
             font-weight: 500;
             padding: 14px 0;
@@ -171,12 +190,12 @@
             white-space: nowrap;
         }
         .admin-tab.active {
-            border-bottom-color: #4f46e5;
-            color: #4f46e5;
+            border-bottom-color: var(--color-brand-500);
+            color: var(--color-brand-500);
             font-weight: 600;
         }
         .admin-tab:hover:not(.active) {
-            color: #374151;
+            color: var(--color-slate-900);
         }
 
         /* ── Rekap Table ── */
@@ -200,7 +219,7 @@
         }
         .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
         .form-label {
-            display: block; font-size: 11px; font-weight: 700; color: #475569;
+            display: block; font-size: 11px; font-weight: 700; color: var(--color-slate-500);
             margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em;
         }
 
@@ -209,7 +228,7 @@
         body.admin-mode .admin-controls { display: flex; }
 
         /* ── Stat Card ── */
-        .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; }
+        .stat-card { background-color: var(--color-slate-100); border: 1px solid var(--color-slate-200); border-radius: 14px; padding: 14px 10px; }
         
         /* ── Spinner ── */
         .spinner {
@@ -225,28 +244,73 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased">
-    <!-- ADMIN OVERLAY -->
-    <div id="admin-overlay" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm" onclick="closeAdminPanel()"></div>
+    <!-- ADMIN OVERLAY hidden -->
+    <div id="admin-overlay" class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm hidden" onclick="closeAdminPanel()"></div>
 
-    <!-- ADMIN PANEL DRAWER -->
-    <aside id="admin-panel" class="fixed top-0 right-0 h-full w-full max-w-2xl z-[80] bg-slate-100 shadow-2xl flex flex-col">
-      <!-- Drawer Header -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 flex-shrink-0">
+    <!-- ADMIN PANEL - FULL PAGE -->
+    <div id="admin-panel" class="fixed inset-0 z-[80] bg-slate-50 overflow-hidden flex-col">
+      <!-- Top Header Bar -->
+      <div class="flex items-center justify-between px-6 py-3 bg-brand-600 text-white flex-shrink-0 shadow-lg border-b border-brand-700/50">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center text-white">
-            <i class="fa-solid fa-shield-halved text-sm"></i>
+          <div class="w-8 h-8 bg-brand-700 rounded-lg flex items-center justify-center">
+            <i class="fa-solid fa-store text-sm"></i>
           </div>
           <div>
-            <h2 class="font-bold text-slate-800 text-base leading-tight">Panel Admin</h2>
-            <div id="cloud-status" class="flex items-center gap-1.5 text-xs text-slate-400">
-              <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Memuat data...
+            <span class="font-bold text-base text-white leading-tight" id="admin-store-name-header">Panel Admin</span>
+            <div id="cloud-status" class="flex items-center gap-1.5 text-xs text-white/75">
+              <span class="w-1.5 h-1.5 rounded-full bg-white/70"></span> Memuat data...
             </div>
           </div>
         </div>
-        <button onclick="closeAdminPanel()" class="w-9 h-9 rounded-xl bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-white/70 font-mono hidden md:block" id="admin-header-email">--</span>
+          <button onclick="closeAdminPanel()" class="flex items-center gap-2 px-4 py-2 bg-brand-700 hover:bg-brand-800 rounded-lg text-xs font-semibold text-white transition">
+            <i class="fa-solid fa-arrow-left"></i> Kembali ke Toko
+          </button>
+        </div>
       </div>
+
+      <!-- Body: Sidebar + Content -->
+      <div class="flex flex-1 overflow-hidden">
+
+        <!-- SIDEBAR Navigation -->
+        <aside class="w-64 bg-slate-100 flex-col flex-shrink-0 overflow-y-auto hidden md:flex border-r border-slate-200">
+          <div class="p-4 space-y-1 flex-1">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-4 mb-2 mt-2">Menu Utama</p>
+            <button id="nav-dashboard" class="admin-nav-item active" onclick="switchTab('dashboard')">
+              <i class="fa-solid fa-chart-pie"></i> Dashboard
+            </button>
+            <button id="nav-customers" class="admin-nav-item" onclick="switchTab('customers')">
+              <i class="fa-solid fa-users"></i> Data Customer
+            </button>
+            <button id="nav-recap" class="admin-nav-item" onclick="switchTab('recap')">
+              <i class="fa-solid fa-chart-bar"></i> Rekap Transaksi
+            </button>
+            <button id="nav-produk" class="admin-nav-item" onclick="switchTab('produk')">
+              <i class="fa-solid fa-boxes-stacked"></i> Kelola Produk
+            </button>
+            <button id="nav-settings" class="admin-nav-item" onclick="switchTab('settings')">
+              <i class="fa-solid fa-gears"></i> Toko &amp; Akun
+            </button>
+          </div>
+          <div class="p-4 border-t border-slate-200">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-user text-xs text-white"></i>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs text-slate-500">Login sebagai:</p>
+                <p class="text-xs text-slate-800 font-mono truncate" id="sidebar-user-email">--</p>
+              </div>
+            </div>
+            <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 rounded-lg text-xs font-semibold transition">
+              <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
 
       <!-- AUTH CONTAINER (Shown when not logged in) -->
       <div id="admin-auth-container" class="flex-1 overflow-y-auto p-8 flex flex-col justify-center max-w-md mx-auto w-full space-y-6">
@@ -296,20 +360,93 @@
 
       <!-- MAIN ADMIN CONTAINER (Shown when logged in) -->
       <div id="admin-main-container" class="flex-1 flex flex-col hidden overflow-hidden">
-        <!-- Tabs Navigation -->
-        <div class="flex border-b border-slate-200 px-4 bg-slate-100 flex-shrink-0 overflow-x-auto">
+        <!-- Mobile Tab Bar (shown only on small screens, hidden on md+) -->
+        <div class="flex border-b border-slate-200 px-4 bg-slate-50 flex-shrink-0 overflow-x-auto md:hidden">
+          <button id="tab-dashboard" class="admin-tab" onclick="switchTab('dashboard')">
+            <i class="fa-solid fa-chart-pie mr-1.5"></i>Dashboard
+          </button>
           <button id="tab-customers" class="admin-tab active" onclick="switchTab('customers')">
-            <i class="fa-solid fa-users mr-1.5"></i>Data Customer
+            <i class="fa-solid fa-users mr-1.5"></i>Customer
           </button>
           <button id="tab-recap" class="admin-tab" onclick="switchTab('recap')">
-            <i class="fa-solid fa-chart-bar mr-1.5"></i>Rekap Transaksi
+            <i class="fa-solid fa-chart-bar mr-1.5"></i>Rekap
           </button>
           <button id="tab-produk" class="admin-tab" onclick="switchTab('produk')">
-            <i class="fa-solid fa-boxes-stacked mr-1.5"></i>Kelola Produk
+            <i class="fa-solid fa-boxes-stacked mr-1.5"></i>Produk
           </button>
           <button id="tab-settings" class="admin-tab" onclick="switchTab('settings')">
-            <i class="fa-solid fa-gears mr-1.5"></i>Toko & Akun
+            <i class="fa-solid fa-gears mr-1.5"></i>Akun
           </button>
+        </div>
+
+        <!-- TAB DASHBOARD CONTENT -->
+        <div id="content-dashboard" class="flex-1 overflow-y-auto p-6 hidden">
+          <div class="mb-6">
+            <h2 class="text-xl font-bold text-slate-800">Dashboard</h2>
+            <p class="text-sm text-slate-400 mt-0.5">Ringkasan performa toko Anda.</p>
+          </div>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-slate-100 rounded-2xl border border-slate-200 p-4 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Produk</p>
+                <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-boxes-stacked text-indigo-500 text-sm"></i>
+                </div>
+              </div>
+              <p class="text-2xl font-bold text-slate-800" id="dash-total-produk">0</p>
+              <p class="text-xs text-slate-400 mt-1">Produk aktif di katalog</p>
+            </div>
+            <div class="bg-slate-100 rounded-2xl border border-slate-200 p-4 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Customer</p>
+                <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-users text-emerald-500 text-sm"></i>
+                </div>
+              </div>
+              <p class="text-2xl font-bold text-slate-800" id="dash-total-customer">0</p>
+              <p class="text-xs text-slate-400 mt-1">Customer terdaftar</p>
+            </div>
+            <div class="bg-slate-100 rounded-2xl border border-slate-200 p-4 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Transaksi</p>
+                <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-receipt text-amber-500 text-sm"></i>
+                </div>
+              </div>
+              <p class="text-2xl font-bold text-slate-800" id="dash-total-tx">0</p>
+              <p class="text-xs text-slate-400 mt-1">Total pesanan masuk</p>
+            </div>
+            <div class="bg-slate-100 rounded-2xl border border-slate-200 p-4 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Omzet</p>
+                <div class="w-8 h-8 bg-brand-50 rounded-lg flex items-center justify-center">
+                  <i class="fa-solid fa-sack-dollar text-brand-500 text-sm"></i>
+                </div>
+              </div>
+              <p class="text-lg font-bold text-slate-800 leading-tight" id="dash-total-omzet">Rp 0</p>
+              <p class="text-xs text-slate-400 mt-1">Akumulasi omzet</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-slate-100 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800 text-sm">Pesanan Terbaru</h3>
+                <button onclick="switchTab('customers')" class="text-xs text-indigo-500 hover:underline">Lihat Semua</button>
+              </div>
+              <div id="dash-recent-orders" class="divide-y divide-slate-200">
+                <div class="py-10 text-center text-slate-400 text-sm">Belum ada pesanan</div>
+              </div>
+            </div>
+            <div class="bg-slate-100 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="font-bold text-slate-800 text-sm">Produk Terlaris</h3>
+                <button onclick="switchTab('produk')" class="text-xs text-indigo-500 hover:underline">Kelola Produk</button>
+              </div>
+              <div id="dash-top-products" class="divide-y divide-slate-200">
+                <div class="py-10 text-center text-slate-400 text-sm">Belum ada data transaksi</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- TAB CUSTOMERS CONTENT -->
@@ -333,19 +470,19 @@
           </div>
 
           <!-- Search & Action Buttons -->
-          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 flex-shrink-0 flex-wrap gap-2">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-shrink-0 flex-wrap gap-2">
             <div class="relative">
               <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
               <input type="text" id="customer-search" oninput="renderCustomerTable()" placeholder="Cari nama / produk / kota..." class="form-input pl-8 py-2 text-xs w-56">
             </div>
             <div class="flex gap-2">
-              <button onclick="exportCustomerCSV()" class="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold hover:bg-emerald-100 transition border border-emerald-200">
+              <button onclick="exportCustomerCSV()" class="flex items-center gap-1.5 px-3 py-2 bg-teal-50 text-teal-700 rounded-lg text-xs font-semibold hover:bg-teal-100 transition border border-teal-200 border shadow-sm">
                 <i class="fa-solid fa-file-csv"></i> Export Spreadsheet
               </button>
-              <button onclick="exportCustomerWord()" class="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold hover:bg-blue-100 transition border border-blue-200">
+              <button onclick="exportCustomerWord()" class="flex items-center gap-1.5 px-3 py-2 bg-sky-50 text-sky-700 rounded-lg text-xs font-semibold hover:bg-sky-100 transition border border-sky-200 border shadow-sm">
                 <i class="fa-solid fa-file-word"></i> Export Word
               </button>
-              <button onclick="clearCustomerData()" class="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-100 transition border border-red-200">
+              <button onclick="clearCustomerData()" class="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-100 transition border border-red-200 border shadow-sm">
                 <i class="fa-solid fa-trash"></i> Hapus Semua
               </button>
             </div>
@@ -400,19 +537,19 @@
           </div>
 
           <!-- Search & Actions -->
-          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 flex-shrink-0 flex-wrap gap-2">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-shrink-0 flex-wrap gap-2">
             <div class="relative">
               <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
               <input type="text" id="recap-search" oninput="renderRecapTable()" placeholder="Cari produk / kategori..." class="form-input pl-8 py-2 text-xs w-52">
             </div>
             <div class="flex gap-2">
-              <button onclick="exportRecapCSV()" class="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold hover:bg-emerald-100 transition border border-emerald-200">
+              <button onclick="exportRecapCSV()" class="flex items-center gap-1.5 px-3 py-2 bg-teal-50 text-teal-700 rounded-lg text-xs font-semibold hover:bg-teal-100 transition border border-teal-200 border shadow-sm">
                 <i class="fa-solid fa-file-csv"></i> Export Spreadsheet
               </button>
-              <button onclick="exportRecapWord()" class="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold hover:bg-blue-100 transition border border-blue-200">
+              <button onclick="exportRecapWord()" class="flex items-center gap-1.5 px-3 py-2 bg-sky-50 text-sky-700 rounded-lg text-xs font-semibold hover:bg-sky-100 transition border border-sky-200 border shadow-sm">
                 <i class="fa-solid fa-file-word"></i> Export Word
               </button>
-              <button onclick="clearRecapData()" class="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-100 transition border border-red-200">
+              <button onclick="clearRecapData()" class="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-semibold hover:bg-red-100 transition border border-red-200 border shadow-sm">
                 <i class="fa-solid fa-trash"></i> Hapus Semua
               </button>
             </div>
@@ -466,7 +603,7 @@
             <h4 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-share-nodes text-brand-600 mr-1.5"></i>Bagikan Link Toko Anda</h4>
             <p class="text-xs text-slate-400 leading-relaxed">Gunakan link ini agar customer yang berkunjung langsung melihat etalase produk dan terhubung ke WhatsApp Anda secara eksklusif.</p>
             <div class="flex gap-2">
-              <input type="text" id="setting-store-link" readonly class="form-input bg-white text-xs select-all cursor-pointer font-mono" value="">
+              <input type="text" id="setting-store-link" readonly class="form-input bg-slate-100 text-slate-800 text-xs select-all cursor-pointer font-mono" value="">
               <button onclick="copyStoreLink()" class="px-4 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold transition flex-shrink-0 flex items-center gap-1.5">
                 <i class="fa-solid fa-copy"></i> Salin
               </button>
@@ -505,41 +642,69 @@
             <div class="space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
               <label class="form-label"><i class="fa-solid fa-palette text-brand-500 mr-1"></i>Tema Warna Website</label>
               <p class="text-[10px] text-slate-400 leading-tight">Pilih skema warna etalase website Anda. Warna akan otomatis menyesuaikan.</p>
-              <div class="grid grid-cols-5 gap-2 pt-1">
-                <button onclick="selectTheme('default')" id="theme-btn-default" class="theme-select-btn active flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+              <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 pt-1">
+                <button onclick="selectTheme('default')" id="theme-btn-default" class="theme-select-btn active flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
                   <span class="flex gap-1 mb-1.5">
                     <span class="w-3.5 h-3.5 rounded-full bg-[#A6824A]" title="Gold"></span>
                     <span class="w-3.5 h-3.5 rounded-full bg-[#FAF9F6] border border-slate-200" title="Cream"></span>
                   </span>
                   <span class="text-[9px] font-semibold text-slate-500 leading-none">Soft Gold</span>
                 </button>
-                <button onclick="selectTheme('porsche')" id="theme-btn-porsche" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                <button onclick="selectTheme('porsche')" id="theme-btn-porsche" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
                   <span class="flex gap-1 mb-1.5">
                     <span class="w-3.5 h-3.5 rounded-full bg-[#800C1F]" title="Porsche Red"></span>
                     <span class="w-3.5 h-3.5 rounded-full bg-[#5C7896]" title="Slate Blue"></span>
                   </span>
                   <span class="text-[9px] font-semibold text-slate-500 leading-none">Porsche</span>
                 </button>
-                <button onclick="selectTheme('sunset')" id="theme-btn-sunset" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                <button onclick="selectTheme('sunset')" id="theme-btn-sunset" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
                   <span class="flex gap-1 mb-1.5">
                     <span class="w-3.5 h-3.5 rounded-full bg-[#451952]" title="Purple"></span>
                     <span class="w-3.5 h-3.5 rounded-full bg-[#F39F5A]" title="Peach"></span>
                   </span>
                   <span class="text-[9px] font-semibold text-slate-500 leading-none">Sunset</span>
                 </button>
-                <button onclick="selectTheme('bluegold')" id="theme-btn-bluegold" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                <button onclick="selectTheme('bluegold')" id="theme-btn-bluegold" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
                   <span class="flex gap-1 mb-1.5">
                     <span class="w-3.5 h-3.5 rounded-full bg-[#14213D]" title="Navy"></span>
                     <span class="w-3.5 h-3.5 rounded-full bg-[#FCA311]" title="Gold"></span>
                   </span>
                   <span class="text-[9px] font-semibold text-slate-500 leading-none">Luxury</span>
                 </button>
-                <button onclick="selectTheme('emerald')" id="theme-btn-emerald" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-white transition hover:bg-slate-50">
+                <button onclick="selectTheme('emerald')" id="theme-btn-emerald" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
                   <span class="flex gap-1 mb-1.5">
                     <span class="w-3.5 h-3.5 rounded-full bg-[#0B2B26]" title="Teal"></span>
                     <span class="w-3.5 h-3.5 rounded-full bg-[#8EB69B]" title="Sage"></span>
                   </span>
                   <span class="text-[9px] font-semibold text-slate-500 leading-none">Emerald</span>
+                </button>
+                <button onclick="selectTheme('leaves')" id="theme-btn-leaves" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#F26306]" title="Orange"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#041734]" title="Dark Blue"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Autumn Sky</span>
+                </button>
+                <button onclick="selectTheme('earth_forest')" id="theme-btn-earth_forest" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#BF9154]" title="Bronze Gold"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#244C33]" title="Forest Green"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Earth Forest</span>
+                </button>
+                <button onclick="selectTheme('warm_rust')" id="theme-btn-warm_rust" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#BC430D]" title="Rust Orange"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#241705]" title="Chocolate Brown"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Warm Rust</span>
+                </button>
+                <button onclick="selectTheme('neon_lilac')" id="theme-btn-neon_lilac" class="theme-select-btn flex flex-col items-center p-2 rounded-xl border border-slate-200 bg-slate-100 transition hover:bg-slate-200">
+                  <span class="flex gap-1 mb-1.5">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#977DFF]" title="Lilac Purple"></span>
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#00033D]" title="Space Navy"></span>
+                  </span>
+                  <span class="text-[9px] font-semibold text-slate-500 leading-none">Neon Lilac</span>
                 </button>
               </div>
             </div>
@@ -561,7 +726,76 @@
           </div>
         </div>
       </div>
-    </aside>
+        </div><!-- end main content area -->
+      </div><!-- end body flex -->
+    </div><!-- end admin-panel -->
+
+    <!-- MODAL PRODUK DETAIL -->
+    <div id="product-detail-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeProductDetail()"></div>
+      <div class="relative bg-slate-50 rounded-2xl shadow-2xl w-full max-w-lg modal-animate overflow-hidden flex flex-col max-h-[90vh]">
+        <button onclick="closeProductDetail()" class="absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+        <img id="pd-gambar" src="" alt="" class="w-full h-56 object-cover flex-shrink-0 bg-slate-200">
+        <div class="p-6 overflow-y-auto flex-1">
+          <span id="pd-kategori" class="inline-block px-2.5 py-0.5 bg-brand-100 text-brand-600 rounded-full text-xs font-semibold mb-2"></span>
+          <h3 id="pd-nama" class="text-xl font-bold text-slate-800 leading-tight"></h3>
+          <p id="pd-harga" class="text-2xl font-bold text-brand-600 mt-2 mb-4"></p>
+          <div class="bg-slate-100 rounded-xl p-4 mb-5">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Deskripsi Produk</p>
+            <p id="pd-deskripsi" class="text-sm text-slate-600 leading-relaxed">-</p>
+          </div>
+          <div class="flex gap-3">
+            <button id="pd-add-cart-btn" class="flex-1 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-cart-plus"></i> Keranjang
+            </button>
+            <button id="pd-buy-btn" class="flex-1 py-3 bg-wa text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 hover:opacity-90">
+              <i class="fa-brands fa-whatsapp text-lg"></i> Beli via WA
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL KERANJANG -->
+    <div id="cart-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeCartModal()"></div>
+      <div class="relative bg-slate-50 rounded-2xl shadow-2xl w-full max-w-md modal-animate overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-100 flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-cart-shopping text-brand-600"></i>
+            <h3 class="font-bold text-slate-800 text-base">Keranjang Belanja</h3>
+            <span id="cart-count-label" class="text-xs text-slate-500"></span>
+          </div>
+          <button onclick="closeCartModal()" class="w-8 h-8 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center justify-center text-slate-700 transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="cart-items-container" class="flex-1 overflow-y-auto divide-y divide-slate-200"></div>
+        <div id="cart-empty-state" class="flex-1 flex flex-col items-center justify-center py-12 text-center hidden">
+          <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-3">
+            <i class="fa-solid fa-cart-shopping text-2xl text-slate-300"></i>
+          </div>
+          <p class="font-semibold text-slate-600 mb-1">Keranjang kosong</p>
+          <p class="text-xs text-slate-400">Tambahkan produk dari katalog untuk mulai belanja</p>
+        </div>
+        <div id="cart-footer" class="px-6 py-4 border-t border-slate-200 bg-slate-100 flex-shrink-0 hidden">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-semibold text-slate-600">Total Pesanan</span>
+            <span id="cart-total-price" class="text-lg font-bold text-brand-600">Rp 0</span>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="clearCart()" class="px-4 py-2.5 border border-slate-200 text-slate-500 hover:bg-red-50 hover:text-red-500 hover:border-red-200 rounded-xl text-xs font-semibold transition">
+              <i class="fa-solid fa-trash"></i> Kosongkan
+            </button>
+            <button id="cart-checkout-btn" onclick="checkoutAllCart()" class="flex-1 py-2.5 bg-wa text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 hover:opacity-90">
+              <i class="fa-brands fa-whatsapp text-lg"></i> Pesan Terpilih via WA
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- MODAL CUSTOMER FORM -->
     <div id="customer-form-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-4">
@@ -722,7 +956,11 @@
                 <!-- Search Bar (Desktop) -->
                 
                 <!-- Admin Button (Desktop) -->
-                <div class="hidden md:flex items-center ml-4">
+                <div class="hidden md:flex items-center ml-4 gap-2">
+                    <button onclick="openCartModal()" title="Keranjang Belanja" class="relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition border border-slate-200 flex-shrink-0">
+                        <i class="fa-solid fa-cart-shopping text-sm"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full items-center justify-center hidden">0</span>
+                    </button>
                     <button onclick="openAdminPanel()" title="Panel Admin" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-500 flex items-center justify-center transition border border-slate-200 flex-shrink-0">
                         <i class="fa-solid fa-user-tie text-sm"></i>
                     </button>
@@ -738,6 +976,10 @@
 
                 <!-- Mobile menu button -->
                 <div class="md:hidden flex items-center gap-2">
+                    <button onclick="openCartModal()" class="relative w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center border border-slate-200 hover:bg-slate-200 transition" title="Keranjang">
+                        <i class="fa-solid fa-cart-shopping text-sm"></i>
+                        <span id="cart-badge-mobile" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full items-center justify-center hidden">0</span>
+                    </button>
                     <button onclick="openAdminPanel()" class="w-9 h-9 rounded-xl bg-slate-100 text-brand-500 flex items-center justify-center border border-slate-200 hover:bg-slate-200 transition" title="Panel Admin">
                         <i class="fa-solid fa-user-tie text-sm"></i>
                     </button>
@@ -753,7 +995,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fa-solid fa-search text-slate-400"></i>
                     </div>
-                    <input type="text" id="searchInputMobile" onkeyup="handleSearch(this.value)" class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-full leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 sm:text-sm transition-all" placeholder="Cari produk...">
+                    <input type="text" id="searchInputMobile" onkeyup="handleSearch(this.value)" class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-full leading-5 bg-slate-100 placeholder-slate-400 focus:outline-none focus:bg-slate-200 focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 sm:text-sm transition-all" placeholder="Cari produk...">
                 </div>
             </div>
         </div>
@@ -1097,16 +1339,17 @@
         }
 
         // Listen for Authentication State
-        firebase.auth().onAuthStateChanged(user => {
+        firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
                 currentSellerId = user.uid;
             } else {
                 currentUser = null;
-                const urlParams = new URLSearchParams(window.location.search);
-                currentSellerId = urlParams.get('s') || urlParams.get('seller') || "default";
+                var urlP = new URLSearchParams(window.location.search);
+                currentSellerId = urlP.get('s') || urlP.get('seller') || "default";
             }
             updateAdminButtonVisibility();
+            updateCartBadge();
             loadData();
         });
 
@@ -1238,7 +1481,16 @@
         function handleLogout() {
             showCustomConfirm("Konfirmasi Keluar", "Apakah Anda yakin ingin keluar dari akun Seller Anda?", () => {
                 firebase.auth().signOut().then(() => {
+                    currentUser = null;
+                    var urlP = new URLSearchParams(window.location.search);
+                    currentSellerId = urlP.get('s') || urlP.get('seller') || "default";
+                    authMode = "login";
+                    
+                    updateCartBadge();
                     showToast("Berhasil keluar dari akun.", "info");
+                    
+                    updateDrawerUI();
+                    updateAdminButtonVisibility();
                     closeAdminPanel();
                 }).catch(err => {
                     showToast("Gagal keluar: " + err.message, "error");
@@ -1393,9 +1645,9 @@
                 "--color-brand-50": "#202D36", // Slate Dark Header
                 "--color-brand-100": "#5C7896", // Slate Blue
                 "--color-brand-200": "#7598B9", // Light Slate Blue
-                "--color-brand-500": "#800C1F", // Porsche Brake Caliper Red
-                "--color-brand-600": "#3C0007", // Deep Dark Red
-                "--color-brand-700": "#929CAA", // Light Gray Accent
+                "--color-brand-500": "#E31837", // Guards Red (high contrast vivid red)
+                "--color-brand-600": "#B80F2A", // Rich medium red
+                "--color-brand-700": "#8A0A1E", // Deep dark red
                 "--color-slate-50": "#111827", // Dark Base Background
                 "--color-slate-100": "#1F2937", // Card Background (Dark)
                 "--color-slate-200": "#374151",
@@ -1406,10 +1658,10 @@
                 "--color-slate-700": "#F3F4F6",
                 "--color-slate-800": "#F9FAFB", // Heading text (white)
                 "--color-slate-900": "#FFFFFF", // Heading text (white)
-                "--color-green-500": "#800C1F",
-                "--color-green-600": "#3C0007",
-                "--color-emerald-500": "#800C1F",
-                "--color-emerald-600": "#3C0007",
+                "--color-green-500": "#E31837",
+                "--color-green-600": "#B80F2A",
+                "--color-emerald-500": "#E31837",
+                "--color-emerald-600": "#B80F2A",
                 "--color-blue-500": "#202D36",
                 "--color-blue-600": "#1E293B",
                 "--color-navbar-bg": "rgba(17, 24, 39, 0.95)",
@@ -1419,9 +1671,9 @@
                 "--color-brand-50": "#451952", // Deep Sunset Purple
                 "--color-brand-100": "#662549", // Muted Magenta
                 "--color-brand-200": "#AE445A", // Soft Rose
-                "--color-brand-500": "#F39F5A", // Sunset Gold / Peach
-                "--color-brand-600": "#E8BCB9", // Soft Pink
-                "--color-brand-700": "#1D1A39", // Deep Navy
+                "--color-brand-500": "#F07167", // Vibrant Sunset Orange
+                "--color-brand-600": "#DF5349", // Sunset Rose/Red (high contrast)
+                "--color-brand-700": "#1D1A39", // Deep Sunset Purple/Navy
                 "--color-slate-50": "#1D1A39", // Deep Sunset Navy Background
                 "--color-slate-100": "#2A274E", // Card Background (Dark Sunset)
                 "--color-slate-200": "#3A3668",
@@ -1432,10 +1684,10 @@
                 "--color-slate-700": "#F4F3FF",
                 "--color-slate-800": "#FAF9F6", // Heading text
                 "--color-slate-900": "#FFFFFF",
-                "--color-green-500": "#AE445A",
-                "--color-green-600": "#662549",
-                "--color-emerald-500": "#AE445A",
-                "--color-emerald-600": "#662549",
+                "--color-green-500": "#DF5349",
+                "--color-green-600": "#AE445A",
+                "--color-emerald-500": "#DF5349",
+                "--color-emerald-600": "#AE445A",
                 "--color-blue-500": "#1D1A39",
                 "--color-blue-600": "#1D1A39",
                 "--color-navbar-bg": "rgba(29, 26, 57, 0.95)",
@@ -1446,8 +1698,8 @@
                 "--color-brand-100": "#000000", // Pitch Black
                 "--color-brand-200": "#E5E5E5",
                 "--color-brand-500": "#FCA311", // Luxury Gold
-                "--color-brand-600": "#D28308",
-                "--color-brand-700": "#FFFFFF",
+                "--color-brand-600": "#E58F00", // Rich Gold (high contrast)
+                "--color-brand-700": "#B26F00", // Dark Gold
                 "--color-slate-50": "#000000", // Luxury Pitch Black Background
                 "--color-slate-100": "#14213D", // Navy Card Background
                 "--color-slate-200": "#24314D",
@@ -1459,9 +1711,9 @@
                 "--color-slate-800": "#FAF9F6", // Heading text
                 "--color-slate-900": "#FFFFFF",
                 "--color-green-500": "#FCA311",
-                "--color-green-600": "#D28308",
+                "--color-green-600": "#E58F00",
                 "--color-emerald-500": "#FCA311",
-                "--color-emerald-600": "#D28308",
+                "--color-emerald-600": "#E58F00",
                 "--color-blue-500": "#14213D",
                 "--color-blue-600": "#0F172A",
                 "--color-navbar-bg": "rgba(0, 0, 0, 0.95)",
@@ -1471,9 +1723,9 @@
                 "--color-brand-50": "#051F20", // Dark Forest Green
                 "--color-brand-100": "#0B2B26", // Deep Teal
                 "--color-brand-200": "#163832", // Medium Pine
-                "--color-brand-500": "#8EB69B", // Sage Green Accent
-                "--color-brand-600": "#DAF1DE", // Mint Cream
-                "--color-brand-700": "#235347",
+                "--color-brand-500": "#2EC4B6", // Vibrant Emerald/Teal
+                "--color-brand-600": "#0F9F90", // Teal Green (high contrast)
+                "--color-brand-700": "#014F46", // Dark Forest Green
                 "--color-slate-50": "#0B2B26", // Deep Teal Background
                 "--color-slate-100": "#163832", // Pine Green Card Background
                 "--color-slate-200": "#235347",
@@ -1484,14 +1736,118 @@
                 "--color-slate-700": "#FAFDFB",
                 "--color-slate-800": "#FAF9F6", // Heading text
                 "--color-slate-900": "#FFFFFF",
-                "--color-green-500": "#0B2B26",
-                "--color-green-600": "#051F20",
-                "--color-emerald-500": "#0B2B26",
-                "--color-emerald-600": "#051F20",
+                "--color-green-500": "#2EC4B6",
+                "--color-green-600": "#0F9F90",
+                "--color-emerald-500": "#2EC4B6",
+                "--color-emerald-600": "#0F9F90",
                 "--color-blue-500": "#163832",
                 "--color-blue-600": "#0B2B26",
                 "--color-navbar-bg": "rgba(11, 43, 38, 0.95)",
                 "--color-navbar-border": "rgba(22, 56, 50, 0.8)"
+            },
+            leaves: {
+                "--color-brand-50": "#0D2342",
+                "--color-brand-100": "#17365E",
+                "--color-brand-200": "#51B4F5",
+                "--color-brand-500": "#F26306",
+                "--color-brand-600": "#D15200",
+                "--color-brand-700": "#A10A04",
+                "--color-slate-50": "#041734",
+                "--color-slate-100": "#0D2342",
+                "--color-slate-200": "#17365E",
+                "--color-slate-300": "#204675",
+                "--color-slate-400": "#8BA2C0",
+                "--color-slate-500": "#BDD1E6",
+                "--color-slate-600": "#D2E1F0",
+                "--color-slate-700": "#FAFDFB",
+                "--color-slate-800": "#FAF9F6",
+                "--color-slate-900": "#FFFFFF",
+                "--color-green-500": "#F26306",
+                "--color-green-600": "#D15200",
+                "--color-emerald-500": "#F26306",
+                "--color-emerald-600": "#D15200",
+                "--color-blue-500": "#51B4F5",
+                "--color-blue-600": "#2276C0",
+                "--color-navbar-bg": "rgba(4, 23, 52, 0.95)",
+                "--color-navbar-border": "rgba(23, 54, 94, 0.8)"
+            },
+            earth_forest: {
+                "--color-brand-50": "#3A3336",
+                "--color-brand-100": "#244C33",
+                "--color-brand-200": "#F0D7CC",
+                "--color-brand-500": "#BF9154",
+                "--color-brand-600": "#A87C43",
+                "--color-brand-700": "#F23D3D",
+                "--color-slate-50": "#2E292B",
+                "--color-slate-100": "#3A3336",
+                "--color-slate-200": "#4D4447",
+                "--color-slate-300": "#5F5458",
+                "--color-slate-400": "#C2B9BD",
+                "--color-slate-500": "#F7F0F5",
+                "--color-slate-600": "#FAF6F8",
+                "--color-slate-700": "#FAFDFB",
+                "--color-slate-800": "#FAF9F6",
+                "--color-slate-900": "#FFFFFF",
+                "--color-green-500": "#BF9154",
+                "--color-green-600": "#A87C43",
+                "--color-emerald-500": "#BF9154",
+                "--color-emerald-600": "#A87C43",
+                "--color-blue-500": "#F0D7CC",
+                "--color-blue-600": "#BF9154",
+                "--color-navbar-bg": "rgba(46, 41, 43, 0.95)",
+                "--color-navbar-border": "rgba(77, 68, 71, 0.8)"
+            },
+            warm_rust: {
+                "--color-brand-50": "#33230E",
+                "--color-brand-100": "#BC430D",
+                "--color-brand-200": "#F0D0C7",
+                "--color-brand-500": "#F09410",
+                "--color-brand-600": "#D1800B",
+                "--color-brand-700": "#BC430D",
+                "--color-slate-50": "#241705",
+                "--color-slate-100": "#33230E",
+                "--color-slate-200": "#4A351B",
+                "--color-slate-300": "#5F472B",
+                "--color-slate-400": "#CBBFB2",
+                "--color-slate-500": "#FEEAF0",
+                "--color-slate-600": "#FFF5F7",
+                "--color-slate-700": "#FAFDFB",
+                "--color-slate-800": "#FAF9F6",
+                "--color-slate-900": "#FFFFFF",
+                "--color-green-500": "#F09410",
+                "--color-green-600": "#D1800B",
+                "--color-emerald-500": "#F09410",
+                "--color-emerald-600": "#D1800B",
+                "--color-blue-500": "#F0D0C7",
+                "--color-blue-600": "#BC430D",
+                "--color-navbar-bg": "rgba(36, 23, 5, 0.95)",
+                "--color-navbar-border": "rgba(74, 53, 27, 0.8)"
+            },
+            neon_lilac: {
+                "--color-brand-50": "#0A0D52",
+                "--color-brand-100": "#0033FF",
+                "--color-brand-200": "#FFCCF2",
+                "--color-brand-500": "#977DFF",
+                "--color-brand-600": "#8063F5",
+                "--color-brand-700": "#FFCCF2",
+                "--color-slate-50": "#00033D",
+                "--color-slate-100": "#0A0D52",
+                "--color-slate-200": "#171B73",
+                "--color-slate-300": "#242994",
+                "--color-slate-400": "#C9CCFC",
+                "--color-slate-500": "#F2E6EE",
+                "--color-slate-600": "#FAF7F9",
+                "--color-slate-700": "#FAFDFB",
+                "--color-slate-800": "#FAF9F6",
+                "--color-slate-900": "#FFFFFF",
+                "--color-green-500": "#977DFF",
+                "--color-green-600": "#8063F5",
+                "--color-emerald-500": "#977DFF",
+                "--color-emerald-600": "#8063F5",
+                "--color-blue-500": "#FFCCF2",
+                "--color-blue-600": "#0033FF",
+                "--color-navbar-bg": "rgba(0, 3, 61, 0.95)",
+                "--color-navbar-border": "rgba(23, 27, 115, 0.8)"
             }
         };
 
@@ -1879,12 +2235,23 @@
                         
                         <!-- Bagian Konten -->
                         <div class="p-5 flex flex-col flex-grow">
-                            <h3 class="font-bold text-slate-800 text-base mb-1 line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-500 transition-colors">${p.nama}</h3>
-                            <p class="text-brand-500 font-bold text-lg mb-2">${formatRupiah(p.harga)}</p>
+                            <h3 class="font-bold text-slate-800 text-base mb-1 line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-600 transition-colors">${p.nama}</h3>
+                            <p class="text-brand-600 font-bold text-lg mb-2">${formatRupiah(p.harga)}</p>
                             <p class="text-slate-500 text-xs mb-4 line-clamp-2 flex-grow">${p.deskripsi || ''}</p>
                             
                             <!-- Tombol Aksi -->
-                            <div class="pt-3 border-t border-slate-100 mt-auto">
+                            <div class="pt-3 border-t border-slate-200 mt-auto space-y-2">
+                                <div class="grid grid-cols-3 gap-1.5">
+                                    <button onclick="openProductDetail('${p.id}')" title="Info Produk" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-circle-info text-sky-500"></i> Info
+                                    </button>
+                                    <button onclick="copyProductLink('${p.id}')" title="Salin Tautan" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-link text-indigo-500"></i> Salin
+                                    </button>
+                                    <button onclick="addToCart('${p.id}')" title="Keranjang" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
+                                        <i class="fa-solid fa-cart-plus text-teal-500"></i> Simpan
+                                    </button>
+                                </div>
                                 <button onclick="openCustomerForm('${p.id}')" class="w-full flex items-center justify-center gap-2 py-2.5 bg-wa text-white text-sm font-semibold rounded-xl transition-colors shadow-sm hover:opacity-90">
                                     <i class="fa-brands fa-whatsapp text-lg"></i> Beli via WA
                                 </button>
@@ -1896,20 +2263,163 @@
             }
         }
 
+        // =============================================
+        // CART SYSTEM (localStorage, per-seller isolated)
+        // =============================================
+        function getCartKey() { return "cart_" + currentSellerId; }
+        function getCart() { try { return JSON.parse(localStorage.getItem(getCartKey())||"[]"); } catch(e) { return []; } }
+        function saveCart(cart) { localStorage.setItem(getCartKey(), JSON.stringify(cart)); updateCartBadge(); }
+
+        function addToCart(productId) {
+            var p = PRODUK_DATA.find(function(x){return x.id===productId;});
+            if (!p) return;
+            var cart = getCart();
+            var ex = cart.find(function(i){return i.id===productId;});
+            if (ex) { ex.qty=(ex.qty||1)+1; } 
+            else { cart.push({id:p.id,nama:p.nama,harga:p.harga,gambar:p.gambar,kategori:p.kategori,qty:1,checked:true}); }
+            saveCart(cart);
+            showToast('"'+p.nama+'" ditambahkan ke keranjang.','success');
+        }
+        
+        function removeFromCart(productId) { saveCart(getCart().filter(function(i){return i.id!==productId;})); renderCartModal(); }
+        
+        function updateCartQty(productId, delta) {
+            var cart=getCart(), item=cart.find(function(x){return x.id===productId;});
+            if (!item) return;
+            item.qty=Math.max(1,(item.qty||1)+delta);
+            saveCart(cart); renderCartModal();
+        }
+        
+        function toggleCartItemSelection(productId, checked) {
+            var cart = getCart();
+            var item = cart.find(function(x) { return x.id === productId; });
+            if (item) {
+                item.checked = checked;
+                saveCart(cart);
+                renderCartModal();
+            }
+        }
+        
+        function clearCart() { saveCart([]); renderCartModal(); }
+        
+        function updateCartBadge() {
+            var qty=getCart().reduce(function(s,i){return s+(i.qty||1);},0);
+            ["cart-badge","cart-badge-mobile"].forEach(function(id){
+                var b=document.getElementById(id); if(!b) return;
+                if(qty>0){b.textContent=qty>99?"99+":qty;b.classList.remove("hidden");b.classList.add("flex");}
+                else{b.classList.add("hidden");b.classList.remove("flex");}
+            });
+        }
+        
+        function openCartModal() { renderCartModal(); document.getElementById("cart-modal").classList.remove("hidden"); }
+        function closeCartModal() { document.getElementById("cart-modal").classList.add("hidden"); }
+        
+        function renderCartModal() {
+            var cart=getCart(), c=document.getElementById("cart-items-container"), es=document.getElementById("cart-empty-state"), ft=document.getElementById("cart-footer"), tpEl=document.getElementById("cart-total-price"), cl=document.getElementById("cart-count-label");
+            if(!c) return;
+            if(!cart.length){
+                c.innerHTML="";
+                if(es) es.classList.remove("hidden");
+                if(ft) ft.classList.add("hidden");
+                if(cl) cl.textContent="(kosong)";
+            } else {
+                if(es) es.classList.add("hidden");
+                if(ft) ft.classList.remove("hidden");
+                var ti=cart.reduce(function(s,i){return s+(i.qty||1);},0);
+                if(cl) cl.textContent="("+ti+" item)";
+                c.innerHTML=cart.map(function(item){
+                    var isChecked = item.checked !== false;
+                    return `<div class="flex items-center gap-3 px-5 py-4"><input type="checkbox" onchange="toggleCartItemSelection('${item.id}', this.checked)" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer flex-shrink-0"><img src="${item.gambar||''}" class="w-14 h-14 rounded-xl object-cover border border-slate-200 flex-shrink-0 bg-slate-100"><div class="flex-1 min-w-0"><p class="font-semibold text-slate-800 text-sm truncate">${item.nama}</p><p class="text-brand-500 font-bold text-sm mt-0.5">${formatRupiah(item.harga)}</p><div class="flex items-center gap-2 mt-2"><button onclick="updateCartQty('${item.id}',-1)" class="w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-xs font-bold text-slate-700">−</button><span class="text-sm font-bold text-slate-700 w-6 text-center">${item.qty||1}</span><button onclick="updateCartQty('${item.id}',1)" class="w-6 h-6 rounded-full bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-xs font-bold text-slate-700">+</button></div></div><div class="text-right flex-shrink-0"><p class="text-sm font-bold text-slate-700">${formatRupiah(item.harga*(item.qty||1))}</p><button onclick="removeFromCart('${item.id}')" class="text-xs text-red-400 hover:text-red-600 mt-1 transition">Hapus</button></div></div>`;
+                }).join('');
+                
+                var selectedCart = cart.filter(function(i) { return i.checked !== false; });
+                var total=selectedCart.reduce(function(s,i){return s+(i.harga*(i.qty||1));},0);
+                if(tpEl) tpEl.textContent=formatRupiah(total);
+                
+                var checkoutBtn = document.getElementById("cart-checkout-btn");
+                if (checkoutBtn) {
+                    if (selectedCart.length === 0) {
+                        checkoutBtn.disabled = true;
+                        checkoutBtn.classList.add("opacity-50", "cursor-not-allowed");
+                    } else {
+                        checkoutBtn.disabled = false;
+                        checkoutBtn.classList.remove("opacity-50", "cursor-not-allowed");
+                    }
+                }
+            }
+        }
+        
+        function checkoutAllCart() {
+            var cart=getCart();
+            var selected = cart.filter(function(i) { return i.checked !== false; });
+            if(!selected.length){showToast("Pilih minimal 1 produk untuk dipesan.","warning");return;}
+            closeCartModal();
+            openCustomerForm("__cart__");
+        }
+
+        // =============================================
+        // PRODUCT DETAIL MODAL
+        // =============================================
+        function openProductDetail(productId) {
+            var p=PRODUK_DATA.find(function(x){return x.id===productId;}); if(!p) return;
+            document.getElementById("pd-gambar").src=p.gambar||"";
+            document.getElementById("pd-nama").textContent=p.nama;
+            document.getElementById("pd-harga").textContent=formatRupiah(p.harga);
+            document.getElementById("pd-kategori").textContent=p.kategori||"";
+            document.getElementById("pd-deskripsi").textContent=p.deskripsi||"Tidak ada deskripsi.";
+            var bb=document.getElementById("pd-buy-btn"), cb=document.getElementById("pd-add-cart-btn");
+            if(bb) bb.onclick=function(){closeProductDetail();openCustomerForm(productId);};
+            if(cb) cb.onclick=function(){addToCart(productId);closeProductDetail();};
+            document.getElementById("product-detail-modal").classList.remove("hidden");
+        }
+        function closeProductDetail() { document.getElementById("product-detail-modal").classList.add("hidden"); }
+        
+        function copyProductLink(productId) {
+            var link=window.location.href.split("?")[0]+"?s="+currentSellerId+"&p="+productId;
+            if(navigator.clipboard&&navigator.clipboard.writeText){
+                navigator.clipboard.writeText(link).then(function(){showToast("Tautan produk berhasil disalin!","success");}).catch(function(){fbCopy(link);});
+            } else { fbCopy(link); }
+        }
+        function fbCopy(text) {
+            var ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+            document.body.appendChild(ta); ta.select();
+            try{document.execCommand("copy");showToast("Tautan produk berhasil disalin!","success");}catch(e){showToast("Gagal menyalin tautan.","error");}
+            document.body.removeChild(ta);
+        }
+
         // --- CUSTOMER FORM MODAL FLOW ---
         function openCustomerForm(productId) {
-            const p = PRODUK_DATA.find(x => x.id === productId);
-            if (!p) return;
-            pendingBuyProduct = p;
-            document.getElementById("cf-product-id").value = productId;
-            document.getElementById("cf-product-name").textContent = p.nama;
-            document.getElementById("cf-product-price").textContent = formatRupiah(p.harga);
-            document.getElementById("cf-product-img").src = p.gambar || "";
-            
             document.getElementById("cf-nama").value = "";
             document.getElementById("cf-hp").value = "";
             document.getElementById("cf-kota").value = "";
             document.getElementById("cf-catatan").value = "";
+            document.getElementById("cf-product-id").value = productId;
+
+            if (productId === "__cart__") {
+                var cart = getCart();
+                var selected = cart.filter(function(i) { return i.checked !== false; });
+                var totalQty = selected.reduce(function(s, i) { return s + (i.qty || 1); }, 0);
+                var totalPrice = selected.reduce(function(s, i) { return s + (i.harga * (i.qty || 1)); }, 0);
+                
+                pendingBuyProduct = {
+                    id: "__cart__",
+                    nama: "Pemesanan Keranjang (" + totalQty + " Item)",
+                    harga: totalPrice,
+                    gambar: selected[0] ? selected[0].gambar : "",
+                    kategori: "Keranjang"
+                };
+                
+                document.getElementById("cf-product-name").textContent = "Pemesanan Keranjang (" + totalQty + " Item)";
+                document.getElementById("cf-product-price").textContent = formatRupiah(totalPrice);
+                document.getElementById("cf-product-img").src = selected[0] ? selected[0].gambar : "";
+            } else {
+                const p = PRODUK_DATA.find(x => x.id === productId);
+                if (!p) return;
+                pendingBuyProduct = p;
+                document.getElementById("cf-product-name").textContent = p.nama;
+                document.getElementById("cf-product-price").textContent = formatRupiah(p.harga);
+                document.getElementById("cf-product-img").src = p.gambar || "";
+            }
             
             document.getElementById("customer-form-modal").classList.remove("hidden");
         }
@@ -1936,38 +2446,93 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Menyimpan...';
             
-            const orderData = {
-                tanggal: new Date().toISOString(),
-                nama: name,
-                hp: hp,
-                kota: kota,
-                catatan: catatan,
-                produkId: p.id,
-                produkNama: p.nama,
-                kategori: p.kategori,
-                harga: p.harga
-            };
+            let orderData;
+            let waText = "";
             
-            customerList.unshift(orderData);
-            rekapList.unshift({
-                tanggal: new Date().toISOString(),
-                produkId: p.id,
-                produkNama: p.nama,
-                kategori: p.kategori,
-                harga: p.harga
-            });
+            if (p.id === "__cart__") {
+                var cart = getCart();
+                var selected = cart.filter(function(i) { return i.checked !== false; });
+                var total = selected.reduce(function(s, i) { return s + (i.harga * (i.qty || 1)); }, 0);
+                
+                var productNames = selected.map(function(item) {
+                    return item.nama + " (x" + (item.qty || 1) + ")";
+                }).join(", ");
+                
+                orderData = {
+                    tanggal: new Date().toISOString(),
+                    nama: name,
+                    hp: hp,
+                    kota: kota,
+                    catatan: catatan,
+                    produkId: "__cart__",
+                    produkNama: "Keranjang: " + productNames,
+                    kategori: "Keranjang",
+                    harga: total
+                };
+                
+                customerList.unshift(orderData);
+                rekapList.unshift({
+                    tanggal: new Date().toISOString(),
+                    produkId: "__cart__",
+                    produkNama: "Keranjang: " + productNames,
+                    kategori: "Keranjang",
+                    harga: total
+                });
+                
+                const nl = "\n";
+                waText = `${TOKO_CONFIG.pesanPembuka || ("Halo Admin " + TOKO_CONFIG.nama + ", saya ingin memesan:")}${nl}${nl}`;
+                waText += `Detail Pesanan Keranjang:${nl}`;
+                selected.forEach(function(item, index) {
+                    var sub = item.harga * (item.qty || 1);
+                    waText += `${index + 1}. ${item.nama}${nl}   Harga: ${formatRupiah(item.harga)} x ${(item.qty || 1)} = ${formatRupiah(sub)}${nl}`;
+                });
+                waText += `${nl}Total Belanja: ${formatRupiah(total)}${nl}${nl}`;
+                
+                waText += `Data Pemesan:${nl}`;
+                waText += `- Nama: ${name}${nl}`;
+                waText += `- WhatsApp: ${hp}${nl}`;
+                waText += `- Kota/Alamat: ${kota || '-'}${nl}`;
+                if (catatan) {
+                    waText += `- Catatan: ${catatan}${nl}`;
+                }
+                waText += `${nl}Tolong informasikan ketersediaan dan total biaya (beserta ongkir). Terima kasih!`;
+                
+                var remaining = cart.filter(function(i) { return i.checked === false; });
+                saveCart(remaining);
+            } else {
+                orderData = {
+                    tanggal: new Date().toISOString(),
+                    nama: name,
+                    hp: hp,
+                    kota: kota,
+                    catatan: catatan,
+                    produkId: p.id,
+                    produkNama: p.nama,
+                    kategori: p.kategori,
+                    harga: p.harga
+                };
+                
+                customerList.unshift(orderData);
+                rekapList.unshift({
+                    tanggal: new Date().toISOString(),
+                    produkId: p.id,
+                    produkNama: p.nama,
+                    kategori: p.kategori,
+                    harga: p.harga
+                });
+                
+                waText = generateWAUrl(p, orderData);
+            }
             
             await saveData(true);
-            
-            const waText = generateWAUrl(p, orderData);
-            window.open(waText, "_blank");
+            window.open("https://wa.me/" + (TOKO_CONFIG.whatsapp || "") + "?text=" + encodeURIComponent(waText), "_blank");
             
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Kirim ke WA';
             closeCustomerForm();
         }
 
-        // --- ADMIN PANEL DRAWER LOGIC ---
+        // --- ADMIN PANEL FULL PAGE LOGIC ---
         function openAdminPanel() {
             const allowed = isSignupAllowed();
             
@@ -2000,33 +2565,91 @@
             }
 
             document.getElementById("admin-panel").classList.add("open");
-            document.getElementById("admin-overlay").classList.add("open");
-            document.body.classList.add("admin-mode");
             document.body.style.overflow = "hidden";
-            renderCustomerTable();
-            renderRecapTable();
-            renderAdminProductList();
+            document.body.classList.add("admin-mode");
+
+            if (currentUser) {
+                ["admin-header-email", "sidebar-user-email", "setting-user-email"].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.textContent = currentUser.email || "--";
+                });
+                var headerName = document.getElementById("admin-store-name-header");
+                if (headerName) headerName.textContent = TOKO_CONFIG.nama || "Panel Admin";
+                renderDashboard();
+                switchTab('dashboard');
+            } else {
+                authMode = "login";
+                const title = document.getElementById("auth-title");
+                const subtitle = document.getElementById("auth-subtitle");
+                const groupStore = document.getElementById("auth-group-store");
+                const groupWa = document.getElementById("auth-group-wa");
+                const submitBtn = document.getElementById("auth-submit-btn");
+                if (title) title.textContent = "Masuk Seller";
+                if (subtitle) subtitle.textContent = "Kelola katalog produk, rekap customer, dan hubungi pembeli secara profesional.";
+                if (groupStore) groupStore.classList.add("hidden");
+                if (groupWa) groupWa.classList.add("hidden");
+                if (submitBtn) submitBtn.textContent = "Masuk Akun";
+                
+                ["auth-email", "auth-password", "auth-store-name", "auth-store-wa"].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = "";
+                });
+                const errBox = document.getElementById("auth-error-msg");
+                if (errBox) errBox.classList.add("hidden");
+                
+                updateDrawerUI();
+            }
         }
 
         function closeAdminPanel() {
             document.getElementById("admin-panel").classList.remove("open");
-            document.getElementById("admin-overlay").classList.remove("open");
             document.body.classList.remove("admin-mode");
             document.body.style.overflow = "";
         }
 
         function switchTab(tab) {
-            const tabs = ["customers", "recap", "produk", "settings"];
-            tabs.forEach(t => {
-                const elTab = document.getElementById("tab-" + t);
-                const elContent = document.getElementById("content-" + t);
+            ["dashboard","customers","recap","produk","settings"].forEach(function(t) {
+                var elTab = document.getElementById("tab-" + t);
                 if (elTab) elTab.classList.toggle("active", t === tab);
+                var elContent = document.getElementById("content-" + t);
                 if (elContent) elContent.classList.toggle("hidden", t !== tab);
+                var navItem = document.getElementById("nav-" + t);
+                if (navItem) navItem.classList.toggle("active", t === tab);
             });
+            if (tab === "dashboard") renderDashboard();
             if (tab === "customers") renderCustomerTable();
             if (tab === "recap") renderRecapTable();
             if (tab === "produk") renderAdminProductList();
             if (tab === "settings") renderAccountSettings();
+        }
+
+        function renderDashboard() {
+            var eld = function(id) { return document.getElementById(id); };
+            if (!eld("dash-total-produk")) return;
+            eld("dash-total-produk").textContent = PRODUK_DATA.length;
+            eld("dash-total-customer").textContent = customerList.length;
+            eld("dash-total-tx").textContent = rekapList.length;
+            eld("dash-total-omzet").textContent = formatRupiah(rekapList.reduce(function(s,r){return s+(r.harga||0);},0));
+            var rc = eld("dash-recent-orders");
+            if (rc) {
+                if (!customerList.length) { rc.innerHTML='<div class="py-10 text-center text-slate-400 text-sm">Belum ada pesanan</div>'; }
+                else {
+                    var recent = customerList.slice().sort(function(a,b){return(b.tanggal||0)-(a.tanggal||0);}).slice(0,5);
+                    rc.innerHTML = recent.map(function(r){
+                        return '<div class="flex items-center gap-3 px-5 py-3"><div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0"><i class="fa-solid fa-user text-emerald-600 text-xs"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-700 truncate">'+(r.nama||'--')+'</p><p class="text-xs text-slate-400 truncate">'+(r.produkNama||'--')+'</p></div><span class="text-xs font-bold text-emerald-600 flex-shrink-0">'+formatRupiah(r.harga)+'</span></div>';
+                    }).join('');
+                }
+            }
+            var tp = eld("dash-top-products");
+            if (tp) {
+                if (!rekapList.length) { tp.innerHTML='<div class="py-10 text-center text-slate-400 text-sm">Belum ada data transaksi</div>'; }
+                else {
+                    var cnts={}; rekapList.forEach(function(r){cnts[r.produkNama]=(cnts[r.produkNama]||0)+1;});
+                    var srtd=Object.entries(cnts).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+                    var mx=srtd[0]?srtd[0][1]:1;
+                    tp.innerHTML=srtd.map(function(e){return '<div class="px-5 py-3"><div class="flex items-center justify-between mb-1.5"><p class="text-sm font-semibold text-slate-700 truncate flex-1 mr-3">'+e[0]+'</p><span class="text-xs font-bold text-brand-500">'+e[1]+'x</span></div><div class="w-full bg-slate-100 rounded-full h-1.5"><div class="bg-brand-500 h-1.5 rounded-full" style="width:'+Math.round(e[1]/mx*100)+'%"></div></div></div>';}).join('');
+                }
+            }
         }
 
         // --- TABLES RENDERING ---
@@ -2311,6 +2934,9 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button onclick="copyProductLink('${p.id}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 flex items-center justify-center transition" title="Salin Link">
+                            <i class="fa-solid fa-link text-xs"></i>
+                        </button>
                         <button onclick="editProduct('${p.id}')" class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 flex items-center justify-center transition" title="Edit">
                             <i class="fa-solid fa-pen text-xs"></i>
                         </button>
@@ -2494,9 +3120,10 @@
         });
 
         // Inisialisasi Aplikasi Saat Halaman Selesai Dimuat
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', function() {
             initStoreInfo();
             updateAdminButtonVisibility();
+            updateCartBadge();
             loadData();
         });
     </script>
@@ -2541,5 +3168,5 @@
       </div>
     </div>
 
-</body>>
+</body>
 </html>
