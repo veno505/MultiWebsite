@@ -200,16 +200,25 @@
 
         /* ── Rekap Table ── */
         .recap-table th {
-            background: #f8fafc; font-size: 10px; letter-spacing: 0.06em;
-            text-transform: uppercase; color: #64748b; font-weight: 700;
-            padding: 10px 14px; border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+            background-color: #1e293b !important;
+            font-size: 10px; letter-spacing: 0.06em;
+            text-transform: uppercase; color: #ffffff !important; font-weight: 700;
+            padding: 10px 14px; border-bottom: 1px solid #334155 !important; white-space: nowrap;
         }
         .recap-table td {
-            padding: 10px 14px; border-bottom: 1px solid #f1f5f9;
-            font-size: 12px; color: #374151; vertical-align: middle;
+            padding: 10px 14px; border-bottom: 1px solid #1e293b !important;
+            font-size: 12px; color: #ffffff !important; vertical-align: middle;
+            background-color: #0f172a !important;
+        }
+        .recap-table td * {
+            color: #ffffff !important;
         }
         .recap-table tr:last-child td { border-bottom: none; }
-        .recap-table tr:hover td { background: #fafbff; }
+        .recap-table tr:hover td,
+        .recap-table tr:hover td * {
+            color: #ff3b30 !important;
+            background-color: #1e293b !important;
+        }
 
         /* ── Form Inputs ── */
         .form-input {
@@ -500,6 +509,7 @@
                   <th class="text-left">Kota</th>
                   <th class="text-left">Produk</th>
                   <th class="text-right">Harga</th>
+                  <th class="text-center" style="width: 100px">Aksi</th>
                 </tr>
               </thead>
               <tbody id="customer-tbody">
@@ -565,6 +575,7 @@
                   <th class="text-left">Produk</th>
                   <th class="text-left">Kategori</th>
                   <th class="text-right">Harga</th>
+                  <th class="text-center" style="width: 100px">Aksi</th>
                 </tr>
               </thead>
               <tbody id="recap-tbody">
@@ -928,6 +939,76 @@
           </button>
           <button onclick="confirmDeleteProduct()" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold transition">
             Hapus
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL EDIT CUSTOMER -->
+    <div id="customer-edit-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeCustomerEditModal()"></div>
+      <div class="relative bg-slate-100 rounded-2xl shadow-2xl w-full max-w-md modal-animate overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <h3 class="font-bold text-slate-800 text-base">Edit Data Customer</h3>
+          <button onclick="closeCustomerEditModal()" class="w-8 h-8 rounded-lg bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <input type="hidden" id="edit-cust-index">
+          <div>
+            <label class="form-label">Nama Lengkap</label>
+            <input type="text" id="edit-cust-nama" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Nomor WhatsApp</label>
+            <input type="text" id="edit-cust-hp" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Kota / Alamat</label>
+            <input type="text" id="edit-cust-kota" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Produk Terpesan</label>
+            <input type="text" id="edit-cust-produk" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Harga (Rp)</label>
+            <input type="number" id="edit-cust-harga" class="form-input">
+          </div>
+          <button onclick="saveCustomerEdit()" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition">
+            Simpan Perubahan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL EDIT REKAP -->
+    <div id="recap-edit-modal" class="fixed inset-0 z-[90] hidden flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeRecapEditModal()"></div>
+      <div class="relative bg-slate-100 rounded-2xl shadow-2xl w-full max-w-md modal-animate overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <h3 class="font-bold text-slate-800 text-base">Edit Data Transaksi</h3>
+          <button onclick="closeRecapEditModal()" class="w-8 h-8 rounded-lg bg-slate-200 hover:bg-slate-300 flex items-center justify-center text-slate-600 transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <input type="hidden" id="edit-recap-index">
+          <div>
+            <label class="form-label">Nama Produk</label>
+            <input type="text" id="edit-recap-produk" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Kategori</label>
+            <input type="text" id="edit-recap-kategori" class="form-input">
+          </div>
+          <div>
+            <label class="form-label">Harga (Rp)</label>
+            <input type="number" id="edit-recap-harga" class="form-input">
+          </div>
+          <button onclick="saveRecapEdit()" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition">
+            Simpan Perubahan
           </button>
         </div>
       </div>
@@ -2157,11 +2238,10 @@
         // --- GENERATE WA URL ---
         function generateWAUrl(product, customerInfo) {
             const nl = "\n";
-            let text = `${TOKO_CONFIG.pesanPembuka}${nl}${nl}`;
+            let text = `${TOKO_CONFIG.pesanPembuka || ("Halo Admin " + TOKO_CONFIG.nama + ", saya ingin memesan:")}${nl}${nl}`;
             text += `Detail Pesanan:${nl}`;
-            text += `- Produk: ${product.nama}${nl}`;
-            text += `- Harga: ${formatRupiah(product.harga)}${nl}`;
-            text += `- Kode: ${product.id}${nl}${nl}`;
+            text += `1. ${product.nama}${nl}   Harga: ${formatRupiah(product.harga)} x 1 = ${formatRupiah(product.harga)}${nl}`;
+            text += `${nl}Total Belanja: ${formatRupiah(product.harga)}${nl}${nl}`;
             
             if (customerInfo) {
                 text += `Data Pemesan:${nl}`;
@@ -2171,11 +2251,11 @@
                 if (customerInfo.catatan) {
                     text += `- Catatan: ${customerInfo.catatan}${nl}`;
                 }
-                text += nl;
+                text += `${nl}`;
             }
             text += `Tolong informasikan ketersediaan dan total biaya (beserta ongkir). Terima kasih!`;
             
-            return `https://wa.me/${TOKO_CONFIG.whatsapp}?text=${encodeURIComponent(text)}`;
+            return text;
         }
 
         // --- RENDER PRODUCTS ---
@@ -2688,6 +2768,14 @@
                         <td class="text-slate-500 text-xs max-w-[90px]"><span class="block truncate">${r.kota || "--"}</span></td>
                         <td class="max-w-[120px]"><span class="block truncate text-xs text-slate-700 font-medium">${r.produkNama || "--"}</span></td>
                         <td class="text-right font-semibold text-emerald-600 text-xs">${formatRupiah(r.harga)}</td>
+                        <td class="px-2 py-1.5 flex items-center justify-center gap-1.5">
+                            <button onclick="editCustomer(${i})" class="w-6 h-6 bg-slate-700 text-sky-400 rounded hover:bg-slate-600 hover:text-sky-300 flex items-center justify-center transition" title="Edit">
+                                <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                            </button>
+                            <button onclick="deleteCustomer(${i})" class="w-6 h-6 bg-slate-700 text-red-400 rounded hover:bg-slate-600 hover:text-red-300 flex items-center justify-center transition" title="Hapus">
+                                <i class="fa-solid fa-trash text-[10px]"></i>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -2726,6 +2814,14 @@
                         <td class="font-medium max-w-[160px]"><span class="block truncate">${r.produkNama || "--"}</span></td>
                         <td><span class="inline-flex px-2 py-0.5 bg-brand-50 text-brand-600 rounded-md text-xs font-semibold">${r.kategori || "--"}</span></td>
                         <td class="text-right font-semibold text-emerald-600 text-xs">${formatRupiah(r.harga)}</td>
+                        <td class="px-2 py-1.5 flex items-center justify-center gap-1.5">
+                            <button onclick="editRecap(${i})" class="w-6 h-6 bg-slate-700 text-sky-400 rounded hover:bg-slate-600 hover:text-sky-300 flex items-center justify-center transition" title="Edit">
+                                <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                            </button>
+                            <button onclick="deleteRecap(${i})" class="w-6 h-6 bg-slate-700 text-red-400 rounded hover:bg-slate-600 hover:text-red-300 flex items-center justify-center transition" title="Hapus">
+                                <i class="fa-solid fa-trash text-[10px]"></i>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -3118,6 +3214,105 @@
                 nav.classList.remove('shadow-md');
             }
         });
+
+        // --- EDIT & DELETE CUSTOMER/RECAP ---
+        function editCustomer(index) {
+            const r = customerList[index];
+            if (!r) return;
+            document.getElementById("edit-cust-index").value = index;
+            document.getElementById("edit-cust-nama").value = r.nama || "";
+            document.getElementById("edit-cust-hp").value = r.hp || "";
+            document.getElementById("edit-cust-kota").value = r.kota || "";
+            document.getElementById("edit-cust-produk").value = r.produkNama || "";
+            document.getElementById("edit-cust-harga").value = r.harga || 0;
+            document.getElementById("customer-edit-modal").classList.remove("hidden");
+        }
+        
+        function closeCustomerEditModal() {
+            document.getElementById("customer-edit-modal").classList.add("hidden");
+        }
+        
+        async function saveCustomerEdit() {
+            const index = parseInt(document.getElementById("edit-cust-index").value);
+            if (isNaN(index) || !customerList[index]) return;
+            
+            const nama = document.getElementById("edit-cust-nama").value.trim();
+            const hp = document.getElementById("edit-cust-hp").value.trim();
+            const kota = document.getElementById("edit-cust-kota").value.trim();
+            const produkNama = document.getElementById("edit-cust-produk").value.trim();
+            const harga = parseFloat(document.getElementById("edit-cust-harga").value) || 0;
+            
+            if (!nama || !hp) {
+                showToast("Nama dan WhatsApp wajib diisi.", "warning");
+                return;
+            }
+            
+            customerList[index].nama = nama;
+            customerList[index].hp = hp;
+            customerList[index].kota = kota;
+            customerList[index].produkNama = produkNama;
+            customerList[index].harga = harga;
+            
+            await saveData(true);
+            renderCustomerTable();
+            closeCustomerEditModal();
+            showToast("Data customer berhasil diubah.", "success");
+        }
+        
+        function deleteCustomer(index) {
+            showCustomConfirm("Hapus Customer?", "Apakah Anda yakin ingin menghapus data customer ini secara permanen?", async () => {
+                customerList.splice(index, 1);
+                await saveData(true);
+                renderCustomerTable();
+                showToast("Data customer berhasil dihapus.", "info");
+            });
+        }
+        
+        function editRecap(index) {
+            const r = rekapList[index];
+            if (!r) return;
+            document.getElementById("edit-recap-index").value = index;
+            document.getElementById("edit-recap-produk").value = r.produkNama || "";
+            document.getElementById("edit-recap-kategori").value = r.kategori || "";
+            document.getElementById("edit-recap-harga").value = r.harga || 0;
+            document.getElementById("recap-edit-modal").classList.remove("hidden");
+        }
+        
+        function closeRecapEditModal() {
+            document.getElementById("recap-edit-modal").classList.add("hidden");
+        }
+        
+        async function saveRecapEdit() {
+            const index = parseInt(document.getElementById("edit-recap-index").value);
+            if (isNaN(index) || !rekapList[index]) return;
+            
+            const produkNama = document.getElementById("edit-recap-produk").value.trim();
+            const kategori = document.getElementById("edit-recap-kategori").value.trim();
+            const harga = parseFloat(document.getElementById("edit-recap-harga").value) || 0;
+            
+            if (!produkNama) {
+                showToast("Nama Produk wajib diisi.", "warning");
+                return;
+            }
+            
+            rekapList[index].produkNama = produkNama;
+            rekapList[index].kategori = kategori;
+            rekapList[index].harga = harga;
+            
+            await saveData(true);
+            renderRecapTable();
+            closeRecapEditModal();
+            showToast("Data transaksi berhasil diubah.", "success");
+        }
+        
+        function deleteRecap(index) {
+            showCustomConfirm("Hapus Transaksi?", "Apakah Anda yakin ingin menghapus data transaksi ini secara permanen?", async () => {
+                rekapList.splice(index, 1);
+                await saveData(true);
+                renderRecapTable();
+                showToast("Data transaksi berhasil dihapus.", "info");
+            });
+        }
 
         // Inisialisasi Aplikasi Saat Halaman Selesai Dimuat
         window.addEventListener('DOMContentLoaded', function() {
