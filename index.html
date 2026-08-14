@@ -288,7 +288,7 @@
           Masuk Akun
         </button>
 
-        <p class="text-center text-xs text-slate-400">
+        <p id="auth-toggle-wrapper" class="text-center text-xs text-slate-400">
           <span id="auth-toggle-text">Belum punya akun?</span>
           <button onclick="toggleAuthMode()" class="text-brand-600 font-semibold hover:underline bg-none border-none p-0 outline-none" id="auth-toggle-btn">Daftar Sekarang</button>
         </p>
@@ -1070,6 +1070,32 @@
         let currentSellerId = "default";
         let authMode = "login";
 
+        // Dynamic visibility helper for Admin Panel buttons
+        function updateAdminButtonVisibility() {
+            const adminBtns = document.querySelectorAll('button[onclick="openAdminPanel()"]');
+            const urlParams = new URLSearchParams(window.location.search);
+            const isSharedLink = urlParams.has('s') || urlParams.has('seller');
+            
+            // Tampilkan tombol admin jika BUKAN mengakses tautan toko yang dibagikan (?s= / ?seller=),
+            // ATAU jika penjual/pemilik sudah dalam keadaan login masuk
+            const shouldShow = !isSharedLink || currentUser !== null;
+            adminBtns.forEach(btn => {
+                if (shouldShow) {
+                    btn.classList.remove("hidden");
+                } else {
+                    btn.classList.add("hidden");
+                }
+            });
+        }
+        
+        // Check if signup mode is permitted
+        function isSignupAllowed() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isSharedLink = urlParams.has('s') || urlParams.has('seller');
+            // Pendaftaran hanya aktif di halaman utama, bukan saat pelanggan membuka tautan toko yang dibagikan
+            return !isSharedLink;
+        }
+
         // Listen for Authentication State
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
@@ -1080,11 +1106,17 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 currentSellerId = urlParams.get('s') || urlParams.get('seller') || "default";
             }
+            updateAdminButtonVisibility();
             loadData();
         });
 
         // Toggle Login / Signup Mode
         function toggleAuthMode() {
+            if (!isSignupAllowed()) {
+                authMode = "login";
+                showToast("Pendaftaran publik dinonaktifkan.", "error");
+                return;
+            }
             authMode = authMode === "login" ? "signup" : "login";
             const title = document.getElementById("auth-title");
             const subtitle = document.getElementById("auth-subtitle");
@@ -1144,6 +1176,13 @@
             }
             
             const btn = document.getElementById("auth-submit-btn");
+            
+            // Core Security Guard: Programmatically reject registration if URL token is not present
+            if (authMode === "signup" && !isSignupAllowed()) {
+                showAuthError("Pendaftaran akun publik tidak diaktifkan.");
+                return;
+            }
+
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Memproses...';
             
@@ -1930,6 +1969,36 @@
 
         // --- ADMIN PANEL DRAWER LOGIC ---
         function openAdminPanel() {
+            const allowed = isSignupAllowed();
+            
+            // Show or hide the "Belum punya akun?" register link wrapper
+            const toggleWrapper = document.getElementById("auth-toggle-wrapper");
+            if (toggleWrapper) {
+                if (allowed) {
+                    toggleWrapper.classList.remove("hidden");
+                } else {
+                    toggleWrapper.classList.add("hidden");
+                }
+            }
+            
+            // Strictly reset authMode back to login if signup is not allowed
+            if (!allowed && authMode === "signup") {
+                authMode = "login";
+                const title = document.getElementById("auth-title");
+                const subtitle = document.getElementById("auth-subtitle");
+                const groupStore = document.getElementById("auth-group-store");
+                const groupWa = document.getElementById("auth-group-wa");
+                const submitBtn = document.getElementById("auth-submit-btn");
+                const toggleText = document.getElementById("auth-toggle-text");
+                const toggleBtn = document.getElementById("auth-toggle-btn");
+                
+                if (title) title.textContent = "Masuk Seller";
+                if (subtitle) subtitle.textContent = "Kelola katalog produk, rekap customer, dan hubungi pembeli secara profesional.";
+                if (groupStore) groupStore.classList.add("hidden");
+                if (groupWa) groupWa.classList.add("hidden");
+                if (submitBtn) submitBtn.textContent = "Masuk Akun";
+            }
+
             document.getElementById("admin-panel").classList.add("open");
             document.getElementById("admin-overlay").classList.add("open");
             document.body.classList.add("admin-mode");
@@ -2427,6 +2496,7 @@
         // Inisialisasi Aplikasi Saat Halaman Selesai Dimuat
         window.addEventListener('DOMContentLoaded', () => {
             initStoreInfo();
+            updateAdminButtonVisibility();
             loadData();
         });
     </script>
