@@ -1091,9 +1091,9 @@
         // Check if signup mode is permitted
         function isSignupAllowed() {
             const urlParams = new URLSearchParams(window.location.search);
-            const isSharedLink = urlParams.has('s') || urlParams.has('seller');
-            // Pendaftaran hanya aktif di halaman utama, bukan saat pelanggan membuka tautan toko yang dibagikan
-            return !isSharedLink;
+            // Pendaftaran akun seller dinonaktifkan secara publik (termasuk di halaman utama)
+            // dan hanya diperbolehkan bagi Owner/Admin utama via parameter khusus
+            return urlParams.get('register') === 'admin' || urlParams.get('action') === 'signup_admin';
         }
 
         // Listen for Authentication State
@@ -1179,7 +1179,7 @@
             
             // Core Security Guard: Programmatically reject registration if URL token is not present
             if (authMode === "signup" && !isSignupAllowed()) {
-                showAuthError("Pendaftaran akun publik tidak diaktifkan.");
+                showAuthError("Pembuatan akun seller baru hanya dapat dilakukan oleh Administrator.");
                 return;
             }
 
