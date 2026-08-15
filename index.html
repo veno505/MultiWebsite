@@ -4489,10 +4489,11 @@
             try {
                 const user = firebase.auth().currentUser;
                 if (!user) {
-                    showToast("Harap login terlebih dahulu", "error");
+                    showToast("Sesi login tidak ditemukan. Harap login kembali.", "error");
                     return;
                 }
                 const idToken = await user.getIdToken();
+                
                 const res = await fetch('/api/save-payment-config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
@@ -4502,15 +4503,30 @@
                     })
                 });
                 
-                const result = await res.json();
+                const responseText = await res.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch(e) {
+                    console.error("Vercel HTML Error Response:", responseText);
+                    showToast("Error sistem: Endpoint gagal dieksekusi (Lihat console).", "error");
+                    return;
+                }
+
+                if (res.status === 404) {
+                    showToast("Endpoint /api/save-payment-config tidak ditemukan di Vercel.", "error");
+                    return;
+                }
+                
                 if (result.success) {
                     showToast("Pengaturan pembayaran berhasil disimpan", "success");
-                    loadPaymentConfig(); // reload status
+                    loadPaymentConfig();
                 } else {
                     showToast("Gagal menyimpan: " + (result.error || "Server error"), "error");
                 }
             } catch (e) {
-                showToast("Gagal menghubungi server", "error");
+                console.error("Fetch Error:", e);
+                showToast("Kesalahan Jaringan/CORS: Gagal menghubungi server", "error");
             }
         }
 
@@ -4529,12 +4545,32 @@
             btn.disabled = true;
 
             try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showToast("Harap login terlebih dahulu", "error");
+                    return;
+                }
+                const idToken = await user.getIdToken();
                 const res = await fetch('/api/test-midtrans-connection', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-                    body: JSON.stringify({ serverKey, isProduction })
+                    body: JSON.stringify({ serverKey, mode: isProduction ? 'production' : 'sandbox' })
                 });
-                const result = await res.json();
+                
+                const responseText = await res.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch(e) {
+                    console.error("Vercel HTML Error Response:", responseText);
+                    showToast("Error sistem: Endpoint gagal dieksekusi (Lihat console).", "error");
+                    return;
+                }
+
+                if (res.status === 404) {
+                    showToast("Endpoint /api/test-midtrans-connection tidak ditemukan di Vercel.", "error");
+                    return;
+                }
                 
                 if (result.success) {
                     showToast("Koneksi ke Midtrans berhasil!", "success");
@@ -4542,7 +4578,8 @@
                     showToast("Gagal koneksi: " + (result.error || "Kredensial tidak valid"), "error");
                 }
             } catch (e) {
-                showToast("Terjadi kesalahan jaringan", "error");
+                console.error("Fetch Error:", e);
+                showToast("Kesalahan Jaringan/CORS: Gagal menghubungi server", "error");
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
