@@ -232,8 +232,8 @@
 
         /* ── Payment Method Cards ── */
         .pay-method-card {
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
+            background-color: var(--color-slate-50);
+            border: 1px solid var(--color-slate-200);
             transition: all 0.2s;
         }
         .pay-method-card:hover {
@@ -254,7 +254,7 @@
             background-color: var(--color-brand-600);
         }
         .pay-method-card.active .radio-dot {
-            background-color: #ffffff !important;
+            background-color: var(--color-slate-50) !important;
         }
         .pay-method-card:hover .icon-box, .pay-method-card.active .icon-box {
             background-color: rgba(255, 255, 255, 0.2) !important;
@@ -799,6 +799,41 @@
                   </span>
                   <span class="text-[9px] font-semibold text-slate-500 leading-none">Neon Lilac</span>
                 </button>
+              </div>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100 mt-6 mb-6">
+              <h4 class="font-bold text-slate-800 mb-4">Status Operasional</h4>
+              <div class="mb-4">
+                <label class="form-label">Status Toko</label>
+                <select id="setting-store-status" class="form-input">
+                  <option value="open">Buka (Menerima Pesanan)</option>
+                  <option value="closed">Tutup (Pemesanan Dihentikan)</option>
+                </select>
+                <p class="text-[11px] text-slate-500 mt-1">Jika toko ditutup, tombol Beli akan dinonaktifkan.</p>
+              </div>
+            </div>
+
+            <div class="pt-6 border-t border-slate-100 mt-6 mb-6">
+              <h4 class="font-bold text-slate-800 mb-4">Sosial Media</h4>
+              <div id="admin-socials-list" class="space-y-3 mb-4"></div>
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <h5 class="text-xs font-bold text-slate-600 mb-3 uppercase">Tambah Sosmed Baru</h5>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                  <div>
+                    <label class="form-label">Nama (Misal: Instagram)</label>
+                    <input type="text" id="add-social-name" class="form-input" placeholder="Platform">
+                  </div>
+                  <div>
+                    <label class="form-label">Icon (Gambar atau Kode "fa-...")</label>
+                    <input type="text" id="add-social-icon" class="form-input" placeholder="fa-brands fa-instagram">
+                  </div>
+                  <div>
+                    <label class="form-label">URL Link Profil</label>
+                    <input type="text" id="add-social-link" class="form-input" placeholder="https://...">
+                  </div>
+                </div>
+                <button onclick="addSocialLink()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 w-full sm:w-auto">Tambah Sosmed</button>
               </div>
             </div>
 
@@ -1461,7 +1496,7 @@
     <!-- Hero Section -->
     <section id="beranda" class="pt-32 pb-16 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
         <div class="w-full md:w-1/2 space-y-6 text-center md:text-left">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-brand-500 text-sm font-medium border border-slate-200">
+            <div id="hero-store-status" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-brand-500 text-sm font-medium border border-slate-200">
                 <span class="relative flex h-2 w-2">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
@@ -1572,17 +1607,7 @@
                     <p class="text-slate-400 text-sm leading-relaxed" id="footer-store-desc">
                         Katalog online terbaik untuk memenuhi kebutuhan Anda. Berbelanja aman, nyaman, dan praktis.
                     </p>
-                    <div class="flex space-x-4 pt-2">
-                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-brand-600 hover:text-white transition">
-                            <i class="fa-brands fa-instagram"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-brand-600 hover:text-white transition">
-                            <i class="fa-brands fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-brand-600 hover:text-white transition">
-                            <i class="fa-brands fa-tiktok"></i>
-                        </a>
-                    </div>
+                    <div id="footer-social-links" class="flex flex-wrap gap-4 pt-2"></div>
                 </div>
 
                 <!-- Col 2 -->
@@ -1620,6 +1645,7 @@
                             <span id="footer-phone">+62 812-3456-7890</span>
                         </li>
                     </ul>
+                    <div id="footer-social-links" class="mt-5 flex flex-wrap gap-3"></div>
                 </div>
             </div>
             
@@ -1960,6 +1986,60 @@
                 mainContainer.classList.add("hidden");
             }
         }
+        // --- SETTINGS UI ---
+        function renderAdminSocials() {
+            const container = document.getElementById("admin-socials-list");
+            if (!container) return;
+            if (!TOKO_CONFIG.socials || TOKO_CONFIG.socials.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-500 italic">Belum ada sosmed yang ditambahkan.</p>';
+                return;
+            }
+            container.innerHTML = TOKO_CONFIG.socials.map((s, i) => `
+                <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <img src="${s.iconUrl}" class="w-6 h-6 object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2092/2092063.png'">
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">${s.label}</p>
+                            <a href="${s.link}" target="_blank" class="text-[10px] text-brand-500 hover:underline">${s.link}</a>
+                        </div>
+                    </div>
+                    <button onclick="deleteSocialLink(${i})" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
+            `).join("");
+        }
+
+        async function addSocialLink() {
+            const label = document.getElementById("add-social-name").value.trim();
+            const iconUrl = document.getElementById("add-social-icon").value.trim();
+            const link = document.getElementById("add-social-link").value.trim();
+            
+            if (!label || !link) {
+                showToast("Nama dan Link Sosmed wajib diisi", "warning");
+                return;
+            }
+            
+            if (!TOKO_CONFIG.socials) TOKO_CONFIG.socials = [];
+            TOKO_CONFIG.socials.push({ id: Date.now().toString(), label, iconUrl, link });
+            
+            document.getElementById("add-social-name").value = "";
+            document.getElementById("add-social-icon").value = "";
+            document.getElementById("add-social-link").value = "";
+            
+            renderAdminSocials();
+            await saveData(false);
+            initStoreInfo(); // Update footer
+            showToast("Sosmed berhasil ditambahkan", "success");
+        }
+
+        async function deleteSocialLink(index) {
+            if (confirm("Hapus sosmed ini?")) {
+                TOKO_CONFIG.socials.splice(index, 1);
+                renderAdminSocials();
+                await saveData(false);
+                initStoreInfo();
+                showToast("Sosmed dihapus", "info");
+            }
+        }
 
         // Render Toko & Akun Settings Tab content
         function renderAccountSettings() {
@@ -1981,6 +2061,8 @@
             if (document.getElementById("setting-store-address")) document.getElementById("setting-store-address").value = TOKO_CONFIG.alamat || "";
             if (document.getElementById("setting-store-email")) document.getElementById("setting-store-email").value = TOKO_CONFIG.email || "";
             if (document.getElementById("setting-user-email")) document.getElementById("setting-user-email").textContent = currentUser.email || "Anonymous";
+            if (document.getElementById("setting-store-status")) document.getElementById("setting-store-status").value = (TOKO_CONFIG.isOpen !== false) ? "open" : "closed";
+            renderAdminSocials();
         }
 
         // Save customized store settings
@@ -1996,6 +2078,8 @@
                 return;
             }
             
+            const statusVal = document.getElementById("setting-store-status") ? document.getElementById("setting-store-status").value : "open";
+            TOKO_CONFIG.isOpen = (statusVal === "open");
             TOKO_CONFIG.nama = name;
             TOKO_CONFIG.whatsapp = wa.replace(/^0/, '62');
             TOKO_CONFIG.deskripsi = desc;
@@ -2004,6 +2088,7 @@
             TOKO_CONFIG.tema = selectedTheme;
             
             await saveData(true);
+            initStoreInfo(); // Update UI in real-time
             showToast("Informasi toko berhasil disimpan!", "success");
         }
 
@@ -2725,6 +2810,8 @@
         function addToCart(productId) {
             var p = PRODUK_DATA.find(function(x){return x.id===productId;});
             if (!p) return;
+            p.views = (p.views || 0) + 1;
+            saveData(false);
             var cart = getCart();
             var ex = cart.find(function(i){return i.id===productId;});
             if (ex) { ex.qty=(ex.qty||1)+1; } 
@@ -2814,6 +2901,8 @@
         // =============================================
         function openProductDetail(productId) {
             var p=PRODUK_DATA.find(function(x){return x.id===productId;}); if(!p) return;
+            p.views = (p.views || 0) + 1;
+            saveData(false);
             document.getElementById("pd-gambar").src=p.gambar||"";
             document.getElementById("pd-nama").textContent=p.nama;
             document.getElementById("pd-harga").textContent=formatRupiah(p.harga);
@@ -3030,6 +3119,7 @@
                 if (headerName) headerName.textContent = TOKO_CONFIG.nama || "Panel Admin";
                 renderDashboard();
                 switchTab('dashboard');
+                updateDrawerUI();
             } else {
                 authMode = "login";
                 const title = document.getElementById("auth-title");
@@ -3403,6 +3493,13 @@
                             <span class="text-xs text-slate-400">${p.kategori || ''}</span>
                         </div>
                     </div>
+                    <div class="hidden sm:flex flex-col items-end mr-4">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase">Performa</span>
+                        <div class="flex items-center gap-3 mt-1">
+                            <span class="flex items-center gap-1 text-xs text-slate-500" title="Dilihat"><i class="fa-solid fa-eye text-brand-500"></i> ${p.views || 0}</span>
+                            <span class="flex items-center gap-1 text-xs text-slate-500" title="Dipesan (Checkout)"><i class="fa-solid fa-cart-arrow-down text-emerald-500"></i> ${p.checkouts || 0}</span>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-1.5 flex-shrink-0">
                         <button onclick="copyProductLink('${p.id}')" class="w-8 h-8 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 flex items-center justify-center transition" title="Salin Link">
                             <i class="fa-solid fa-link text-xs"></i>
@@ -3517,6 +3614,30 @@
             document.getElementById("store-name-display").textContent = TOKO_CONFIG.nama;
             document.getElementById("store-desc-display").textContent = TOKO_CONFIG.deskripsi;
             
+            const heroStatus = document.getElementById("hero-store-status");
+            if (heroStatus) {
+                if (TOKO_CONFIG.isOpen !== false) {
+                    heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> Toko Buka & Siap Melayani';
+                    heroStatus.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-sm font-medium border border-emerald-100";
+                } else {
+                    heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span> Toko Sedang Tutup';
+                    heroStatus.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-medium border border-red-100";
+                }
+            }
+            
+            const socialContainer = document.getElementById("footer-social-links");
+            if (socialContainer) {
+                if (TOKO_CONFIG.socials && TOKO_CONFIG.socials.length > 0) {
+                    socialContainer.innerHTML = TOKO_CONFIG.socials.map(s => 
+                        '<a href="' + s.link + '" target="_blank" title="' + s.label + '" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-brand-500 transition shadow-lg overflow-hidden">' +
+                        (s.iconUrl && s.iconUrl.startsWith('fa-') ? '<i class="' + s.iconUrl + ' text-white text-lg"></i>' : (s.iconUrl ? '<img src="' + s.iconUrl + '" class="w-5 h-5 object-contain" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/2092/2092063.png\'" />' : '<i class="fa-solid fa-link text-white"></i>')) +
+                        '</a>'
+                    ).join("");
+                } else {
+                    socialContainer.innerHTML = "";
+                }
+            }
+
             document.getElementById("footer-store-name").textContent = TOKO_CONFIG.nama;
             document.getElementById("footer-store-desc").textContent = TOKO_CONFIG.deskripsi;
             document.getElementById("footer-address").textContent = TOKO_CONFIG.alamat;
@@ -3699,7 +3820,10 @@
         function openPaymentPage(productId) {
             const p = PRODUK_DATA.find(x => x.id === productId);
             if (!p) return;
+            if (TOKO_CONFIG.isOpen === false) { showToast("Maaf, toko sedang tutup. Tidak dapat memesan saat ini.", "warning"); return; }
             
+            p.checkouts = (p.checkouts || 0) + 1;
+            saveData(false);
             payProductId = productId;
             payProduct = p;
             payQty = 1;
