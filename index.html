@@ -850,6 +850,58 @@
             </button>
           </div>
 
+          
+          <!-- Section 4: Pengaturan Pembayaran -->
+          <div class="mt-8 pt-8 border-t border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-credit-card text-brand-600 mr-1.5"></i>Pengaturan Pembayaran (Midtrans)</h4>
+                <span id="payment-status-badge" class="px-2 py-1 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">Belum Diatur</span>
+            </div>
+            
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
+              <div>
+                <label class="form-label">Environment Mode</label>
+                <select id="payment-mode" class="form-input">
+                  <option value="sandbox">Sandbox (Testing)</option>
+                  <option value="production">Production (Live)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="form-label">Merchant ID</label>
+                <input type="text" id="payment-merchant-id" class="form-input" placeholder="Mxxxxxxx">
+              </div>
+              
+              <div>
+                <label class="form-label">Client Key</label>
+                <input type="text" id="payment-client-key" class="form-input" placeholder="SB-Mid-client-xxx">
+              </div>
+              
+              <div>
+                <label class="form-label">Server Key <span class="text-xs text-brand-500 ml-2">(Sangat Rahasia)</span></label>
+                <input type="password" id="payment-server-key" class="form-input" placeholder="SB-Mid-server-xxx">
+                <p class="text-[10px] text-slate-400 mt-1">Server Key tidak akan pernah ditampilkan kembali demi keamanan.</p>
+              </div>
+
+              <div>
+                <label class="form-label">Notification URL (Untuk Midtrans Dashboard)</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="payment-notif-url" class="form-input bg-slate-100 text-slate-500 text-xs" readonly value="">
+                    <button onclick="copyNotifUrl()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold whitespace-nowrap"><i class="fa-solid fa-copy"></i> Salin</button>
+                </div>
+              </div>
+              
+              <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button onclick="testMidtransConnection()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-plug"></i> Test Koneksi
+                </button>
+                <button onclick="savePaymentSettings()" class="flex-1 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-save"></i> Simpan Pengaturan
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Section 3: Account Info -->
           <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
             <div>
@@ -2042,6 +2094,7 @@
             document.getElementById("add-social-link").value = "";
             
             renderAdminSocials();
+            if(firebase.auth().currentUser) { loadPaymentConfig(); }
             await saveData(false);
             initStoreInfo(); // Update footer
             showToast("Sosmed berhasil ditambahkan", "success");
@@ -2565,6 +2618,7 @@
                     }
                     
                     applyTheme(TOKO_CONFIG.tema || "default");
+            await checkOnlinePaymentAvailability();
 
                     const updated = upgradeCategories(PRODUK_DATA);
                     customerList = cloudData.customer_orders || [];
