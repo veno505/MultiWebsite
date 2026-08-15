@@ -206,18 +206,21 @@
             padding: 10px 14px; border-bottom: 1px solid #334155 !important; white-space: nowrap;
         }
         .recap-table td {
-            padding: 10px 14px; border-bottom: 1px solid #1e293b !important;
+            padding: 10px 14px; border-bottom: 1px solid #334155 !important;
             font-size: 12px; color: #ffffff !important; vertical-align: middle;
             background-color: #0f172a !important;
         }
         .recap-table td * {
             color: #ffffff !important;
         }
-        .recap-table tr:last-child td { border-bottom: none; }
+        .recap-table tr:last-child td { border-bottom: none !important; }
+        .recap-table tr:hover td {
+            background-color: #dc2626 !important;
+            border-bottom-color: #b91c1c !important;
+        }
         .recap-table tr:hover td,
         .recap-table tr:hover td * {
-            color: #ff3b30 !important;
-            background-color: #1e293b !important;
+            color: #ffffff !important;
         }
 
         /* ── Form Inputs ── */
@@ -226,10 +229,40 @@
             font-size: 13px; font-family: 'Poppins', sans-serif; outline: none;
             transition: border-color 0.2s, box-shadow 0.2s; color: #1e293b; background: white;
         }
-        .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .form-input:focus { border-color: var(--color-brand-500); box-shadow: 0 0 0 3px rgba(166,130,74,0.15); }
         .form-label {
             display: block; font-size: 11px; font-weight: 700; color: var(--color-slate-500);
             margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+
+        /* ── Payment Method Cards ── */
+        .pay-method-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .pay-method-card:hover {
+            background-color: var(--color-slate-800) !important;
+            border-color: var(--color-slate-800) !important;
+        }
+        .pay-method-card:hover * {
+            color: #ffffff !important;
+        }
+        .pay-method-card.active {
+            background-color: var(--color-brand-600) !important;
+            border-color: var(--color-brand-600) !important;
+        }
+        .pay-method-card.active * {
+            color: #ffffff !important;
+        }
+        .pay-method-card .radio-dot {
+            background-color: var(--color-brand-600);
+        }
+        .pay-method-card.active .radio-dot {
+            background-color: #ffffff !important;
+        }
+        .pay-method-card:hover .icon-box, .pay-method-card.active .icon-box {
+            background-color: rgba(255, 255, 255, 0.2) !important;
         }
 
         /* ── Admin Controls ── */
@@ -294,6 +327,9 @@
             </button>
             <button id="nav-recap" class="admin-nav-item" onclick="switchTab('recap')">
               <i class="fa-solid fa-chart-bar"></i> Rekap Transaksi
+            </button>
+            <button id="nav-transactions" class="admin-nav-item" onclick="switchTab('transactions')">
+              <i class="fa-solid fa-credit-card"></i> Transaksi Masuk
             </button>
             <button id="nav-produk" class="admin-nav-item" onclick="switchTab('produk')">
               <i class="fa-solid fa-boxes-stacked"></i> Kelola Produk
@@ -379,6 +415,9 @@
           </button>
           <button id="tab-recap" class="admin-tab" onclick="switchTab('recap')">
             <i class="fa-solid fa-chart-bar mr-1.5"></i>Rekap
+          </button>
+          <button id="tab-transactions" class="admin-tab" onclick="switchTab('transactions')">
+            <i class="fa-solid fa-credit-card mr-1.5"></i>Transaksi
           </button>
           <button id="tab-produk" class="admin-tab" onclick="switchTab('produk')">
             <i class="fa-solid fa-boxes-stacked mr-1.5"></i>Produk
@@ -591,6 +630,54 @@
           </div>
         </div>
 
+        <!-- TAB TRANSAKSI CONTENT -->
+        <div id="content-transactions" class="flex-grow overflow-y-auto flex flex-col hidden">
+          <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between flex-shrink-0">
+            <div>
+              <p class="font-semibold text-slate-700 text-sm">Transaksi Masuk</p>
+              <p class="text-xs text-slate-400" id="tx-count-label">-- transaksi masuk</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="loadTransactions()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh
+              </button>
+            </div>
+          </div>
+          <div class="p-4 bg-slate-50 flex items-center justify-between gap-3 border-b border-slate-100 flex-shrink-0">
+            <div class="relative flex-1 max-w-xs">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+              <input type="text" id="tx-search" oninput="renderTransactionsTable()" placeholder="Cari Order ID / Nama..." class="form-input pl-8 py-2 text-xs w-full">
+            </div>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <table class="recap-table w-full">
+              <thead>
+                <tr>
+                  <th class="text-center" style="width: 36px">No</th>
+                  <th class="text-left">Tanggal</th>
+                  <th class="text-left">Order ID</th>
+                  <th class="text-left">Nama Customer</th>
+                  <th class="text-left">Produk</th>
+                  <th class="text-center">Kuantitas</th>
+                  <th class="text-right">Total</th>
+                  <th class="text-center">Metode</th>
+                  <th class="text-center">Status</th>
+                  <th class="text-center" style="width: 80px">Hubungi</th>
+                </tr>
+              </thead>
+              <tbody id="tx-tbody">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+            <div id="tx-empty" class="py-16 text-center hidden">
+              <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-credit-card text-2xl text-slate-400"></i>
+              </div>
+              <p class="font-semibold text-slate-600">Belum ada transaksi pembayaran masuk</p>
+            </div>
+          </div>
+        </div>
+
         <!-- TAB PRODUK CONTENT -->
         <div id="content-produk" class="flex-grow overflow-y-auto flex flex-col hidden">
           <div class="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between flex-shrink-0">
@@ -757,13 +844,18 @@
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Deskripsi Produk</p>
             <p id="pd-deskripsi" class="text-sm text-slate-600 leading-relaxed">-</p>
           </div>
-          <div class="flex gap-3">
-            <button id="pd-add-cart-btn" class="flex-1 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
-              <i class="fa-solid fa-cart-plus"></i> Keranjang
+          <div class="space-y-2">
+            <button id="pd-add-cart-btn" class="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-cart-plus"></i> Tambah Ke Keranjang
             </button>
-            <button id="pd-buy-btn" class="flex-1 py-3 bg-wa text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 hover:opacity-90">
-              <i class="fa-brands fa-whatsapp text-lg"></i> Beli via WA
-            </button>
+            <div class="flex gap-3">
+              <button id="pd-buy-now-btn" class="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-credit-card"></i> Beli Sekarang
+              </button>
+              <button id="pd-buy-btn" class="flex-1 py-3 bg-wa text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 hover:opacity-90">
+                <i class="fa-brands fa-whatsapp text-lg"></i> via WA
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1010,6 +1102,286 @@
           <button onclick="saveRecapEdit()" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition">
             Simpan Perubahan
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN HALAMAN PEMBAYARAN -->
+    <div id="payment-page" class="fixed inset-0 z-[80] bg-slate-100 overflow-y-auto hidden flex flex-col">
+      <!-- Header -->
+      <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10 shadow-sm">
+        <button onclick="closePaymentPage()" class="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span class="text-sm font-semibold">Kembali ke Toko</span>
+        </button>
+        <span class="text-slate-700 font-bold text-base" id="pay-store-name">Nama Toko</span>
+        <span class="inline-flex px-3 py-1 bg-brand-50 text-brand-600 rounded-full text-xs font-semibold border border-brand-100">
+          Secure Checkout
+        </span>
+      </div>
+
+      <!-- Main Container -->
+      <div class="max-w-5xl w-full mx-auto p-4 md:p-8 flex-1 grid grid-cols-1 md:grid-cols-12 gap-6">
+        <!-- Kolom Kiri: Review Produk -->
+        <div class="md:col-span-5 space-y-6">
+          <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+            <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-3">Ringkasan Pesanan</h3>
+            
+            <img id="pay-product-img" src="" alt="Produk" class="w-full h-48 object-cover rounded-xl border border-slate-100 bg-slate-50">
+            
+            <div>
+              <h4 id="pay-product-title" class="font-bold text-slate-800 text-base leading-tight">Nama Produk</h4>
+              <p id="pay-product-price" class="text-brand-600 font-bold text-lg mt-1">Rp 0</p>
+            </div>
+
+            <!-- Qty Selector -->
+            <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <span class="text-sm font-semibold text-slate-500">Jumlah Pembelian</span>
+              <div class="flex items-center gap-3">
+                <button onclick="changePayQty(-1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-brand-500 hover:text-white hover:border-brand-500 flex items-center justify-center text-slate-600 font-bold transition">
+                  <i class="fa-solid fa-minus text-xs"></i>
+                </button>
+                <span id="pay-qty" class="text-base font-bold text-slate-800 w-6 text-center">1</span>
+                <button onclick="changePayQty(1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-brand-500 hover:text-white hover:border-brand-500 flex items-center justify-center text-slate-600 font-bold transition">
+                  <i class="fa-solid fa-plus text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Total Summary -->
+            <div class="border-t border-slate-100 pt-4 flex items-center justify-between">
+              <span class="text-slate-800 font-bold text-base">Total Pembayaran</span>
+              <span id="pay-total-amount" class="text-brand-600 font-bold text-xl">Rp 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Kanan: Pengisian Data & Metode Pembayaran -->
+        <div class="md:col-span-7">
+          <!-- Step 1: Customer Info & Payment Method Selection -->
+          <div id="payment-input-section" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6">
+            <div>
+              <h3 class="font-bold text-slate-800 text-lg">1. Data Pemesan</h3>
+              <p class="text-xs text-slate-500 mt-1">Harap isi data dengan lengkap untuk proses verifikasi transaksi.</p>
+            </div>
+            
+            <div class="space-y-4">
+              <div>
+                <label class="form-label">Nama Lengkap <span class="text-red-400">*</span></label>
+                <input type="text" id="pay-cust-name" class="form-input" placeholder="Contoh: Budi Prasetyo">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="form-label">No. WhatsApp <span class="text-red-400">*</span></label>
+                  <input type="tel" id="pay-cust-hp" class="form-input" placeholder="Contoh: 62812345678">
+                </div>
+                <div>
+                  <label class="form-label">Kota / Alamat <span class="text-red-400">*</span></label>
+                  <input type="text" id="pay-cust-city" class="form-input" placeholder="Contoh: Semarang">
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Catatan Tambahan</label>
+                <textarea id="pay-cust-note" class="form-input resize-none" rows="2" placeholder="Warna, ukuran, atau instruksi pengiriman..."></textarea>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-6">
+              <h3 class="font-bold text-slate-800 text-lg">2. Metode Pembayaran</h3>
+              <p class="text-xs text-slate-500 mt-1">Pilih salah satu metode pembayaran di bawah ini.</p>
+              
+              <!-- Payment Method Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer active">
+                  <input type="radio" name="pay-method" value="qris" class="sr-only" checked onclick="selectPaymentMethod('qris')">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
+                      <i class="fa-solid fa-qrcode text-brand-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <span class="block text-sm font-bold text-slate-800">QRIS Dinamis</span>
+                      <span class="block text-[10px] text-slate-500">GoPay, DANA, OVO, ShopeePay</span>
+                    </div>
+                  </div>
+                  <div class="w-5 h-5 border border-slate-300 rounded-full flex items-center justify-center">
+                    <div class="w-2.5 h-2.5 rounded-full radio-dot" id="radio-qris-dot"></div>
+                  </div>
+                </label>
+
+                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
+                  <input type="radio" name="pay-method" value="bri" class="sr-only" onclick="selectPaymentMethod('bri')">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
+                      <i class="fa-solid fa-building-columns text-slate-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <span class="block text-sm font-bold text-slate-800">Virtual Account BRI</span>
+                      <span class="block text-[10px] text-slate-500">Bayar via BRIVA / Mobile Banking</span>
+                    </div>
+                  </div>
+                  <div class="w-5 h-5 border border-slate-300 rounded-full flex items-center justify-center">
+                    <div class="w-2.5 h-2.5 rounded-full radio-dot hidden" id="radio-bri-dot"></div>
+                  </div>
+                </label>
+
+                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
+                  <input type="radio" name="pay-method" value="gopay" class="sr-only" onclick="selectPaymentMethod('gopay')">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
+                      <i class="fa-solid fa-wallet text-sky-500 text-xl"></i>
+                    </div>
+                    <div>
+                      <span class="block text-sm font-bold text-slate-800">GoPay Direct</span>
+                      <span class="block text-[10px] text-slate-500">Redirect otomatis / Link GoPay</span>
+                    </div>
+                  </div>
+                  <div class="w-5 h-5 border border-slate-300 rounded-full flex items-center justify-center">
+                    <div class="w-2.5 h-2.5 rounded-full radio-dot hidden" id="radio-gopay-dot"></div>
+                  </div>
+                </label>
+
+                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
+                  <input type="radio" name="pay-method" value="shopeepay" class="sr-only" onclick="selectPaymentMethod('shopeepay')">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
+                      <i class="fa-solid fa-bag-shopping text-orange-500 text-xl"></i>
+                    </div>
+                    <div>
+                      <span class="block text-sm font-bold text-slate-800">ShopeePay Direct</span>
+                      <span class="block text-[10px] text-slate-500">Redirect aplikasi Shopee</span>
+                    </div>
+                  </div>
+                  <div class="w-5 h-5 border border-slate-300 rounded-full flex items-center justify-center">
+                    <div class="w-2.5 h-2.5 rounded-full radio-dot hidden" id="radio-shopeepay-dot"></div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <button onclick="processDirectPayment()" id="pay-submit-btn" class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl text-base font-bold transition shadow-md flex items-center justify-center gap-2">
+              <i class="fa-solid fa-shield-halved"></i> Bayar Sekarang
+            </button>
+          </div>
+
+          <!-- Step 2: Active Payment Instruction -->
+          <div id="payment-process-section" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6 hidden">
+            <div class="text-center space-y-2">
+              <span class="inline-flex px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-bold border border-amber-100 animate-pulse">
+                Menunggu Pembayaran
+              </span>
+              <h3 class="font-bold text-slate-800 text-lg" id="proc-method-title">Selesaikan Pembayaran</h3>
+              <p class="text-xs text-slate-500">Nomor Transaksi: <span id="proc-order-id" class="font-mono font-bold text-slate-700">CH-XXXX</span></p>
+            </div>
+
+            <!-- Virtual Account Display -->
+            <div id="proc-va-wrap" class="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3 hidden">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nomor Virtual Account BRI</p>
+              <div class="flex items-center justify-center gap-2">
+                <span id="proc-va-number" class="text-2xl font-mono font-bold text-slate-800 tracking-wider">1234567890</span>
+                <button onclick="copyVaNumber()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-600 transition" title="Salin VA">
+                  <i class="fa-regular fa-copy text-xs"></i>
+                </button>
+              </div>
+              <p class="text-xs text-slate-500">Lakukan transfer dari ATM BRI, BRILink, atau BRImo menggunakan menu BRIVA.</p>
+            </div>
+
+            <!-- QR Code Display -->
+            <div id="proc-qr-wrap" class="text-center space-y-3 hidden">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scan Kode QRIS di Bawah Ini</p>
+              <div class="w-64 h-64 mx-auto border border-slate-200 bg-white rounded-2xl p-3 shadow-inner flex items-center justify-center">
+                <img id="proc-qr-img" src="" alt="QR Code" class="w-full h-full object-contain">
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed px-4">Buka aplikasi e-wallet Anda (GoPay, DANA, ShopeePay, OVO) atau M-Banking, lalu pilih fitur scan/pay untuk membayar.</p>
+            </div>
+
+            <!-- E-Wallet Link Action Display -->
+            <div id="proc-link-wrap" class="text-center space-y-4 hidden">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Lanjutkan di Aplikasi E-Wallet</p>
+              <a id="proc-redirect-link" href="" target="_blank" class="inline-flex px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition shadow-sm items-center gap-2">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Aplikasi Pembayaran
+              </a>
+              <p class="text-xs text-slate-500 px-6">Jika tidak diarahkan otomatis, silakan klik tombol di atas untuk membuka aplikasi dompet digital Anda.</p>
+            </div>
+
+            <!-- Status Check Box & Timer -->
+            <div class="border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-ping"></div>
+                <span class="text-xs text-slate-500">Mengecek status pembayaran otomatis...</span>
+              </div>
+              <button onclick="checkPaymentStatusManual()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Cek Manual
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Payment Success Screen -->
+          <div id="payment-success-section" class="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 text-center space-y-6 hidden">
+            <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border border-emerald-100 animate-bounce">
+              <i class="fa-solid fa-circle-check text-emerald-500 text-5xl"></i>
+            </div>
+            
+            <div class="space-y-1">
+              <h3 class="font-bold text-slate-800 text-xl">Pembayaran Berhasil!</h3>
+              <p class="text-sm text-slate-500">Terima kasih atas pesanan Anda. Transaksi Anda telah diverifikasi.</p>
+            </div>
+
+            <!-- Transaction Details Table Card -->
+            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 text-left space-y-3.5 max-w-md mx-auto">
+              <div class="flex justify-between text-xs pb-2 border-b border-slate-200">
+                <span class="text-slate-400">Nomor Transaksi</span>
+                <span id="succ-order-id" class="font-mono font-bold text-slate-700">CH-XXXX</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Toko</span>
+                <span id="succ-store-name" class="font-semibold text-slate-700">Nama Toko</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Produk</span>
+                <span id="succ-product-name" class="font-semibold text-slate-700">Nama Produk x 1</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Metode Pembayaran</span>
+                <span id="succ-method" class="font-semibold text-slate-700">QRIS</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Waktu Transaksi</span>
+                <span id="succ-time" class="font-semibold text-slate-700">Tanggal & Waktu</span>
+              </div>
+              <div class="flex justify-between text-sm pt-2 border-t border-slate-200 font-bold">
+                <span class="text-slate-800">Total Pembayaran</span>
+                <span id="succ-total" class="text-emerald-600">Rp 0</span>
+              </div>
+            </div>
+
+            <div class="space-y-3 max-w-md mx-auto pt-2">
+              <button onclick="sendSuccessProofWA()" class="w-full py-3.5 bg-wa hover:opacity-90 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                <i class="fa-brands fa-whatsapp text-lg"></i> Kirim Bukti ke WhatsApp
+              </button>
+              <button onclick="closePaymentPage()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition border border-slate-200">
+                Selesai & Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOATING TRANSACTION WIDGET -->
+    <div id="floating-tx-widget" class="fixed bottom-6 left-6 z-40 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 max-w-xs w-full hidden transform translate-y-10 opacity-0 transition-all duration-300">
+      <div class="flex items-start gap-3">
+        <div id="tx-widget-icon" class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"></div>
+        <div class="flex-1 space-y-1">
+          <p class="text-xs font-bold text-slate-800" id="tx-widget-title">Transaksi Ditemukan</p>
+          <p class="text-[10px] text-slate-500" id="tx-widget-desc">Menunggu pembayaran...</p>
+          <div class="flex gap-2 pt-1.5">
+            <button id="tx-widget-action" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-[10px] font-bold transition">
+              Detail
+            </button>
+            <button onclick="dismissTxWidget()" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[10px] font-bold transition">
+              Tutup
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -2332,9 +2704,14 @@
                                         <i class="fa-solid fa-cart-plus text-teal-500"></i> Simpan
                                     </button>
                                 </div>
-                                <button onclick="openCustomerForm('${p.id}')" class="w-full flex items-center justify-center gap-2 py-2.5 bg-wa text-white text-sm font-semibold rounded-xl transition-colors shadow-sm hover:opacity-90">
-                                    <i class="fa-brands fa-whatsapp text-lg"></i> Beli via WA
-                                </button>
+                                <div class="flex gap-2">
+                                    <button onclick="openPaymentPage('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl transition shadow-sm">
+                                        <i class="fa-solid fa-credit-card"></i> Beli Sekarang
+                                    </button>
+                                    <button onclick="openCustomerForm('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-wa text-white text-xs font-semibold rounded-xl transition hover:opacity-90">
+                                        <i class="fa-brands fa-whatsapp text-xs"></i> via WA
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -2447,9 +2824,10 @@
             document.getElementById("pd-harga").textContent=formatRupiah(p.harga);
             document.getElementById("pd-kategori").textContent=p.kategori||"";
             document.getElementById("pd-deskripsi").textContent=p.deskripsi||"Tidak ada deskripsi.";
-            var bb=document.getElementById("pd-buy-btn"), cb=document.getElementById("pd-add-cart-btn");
+            var bb=document.getElementById("pd-buy-btn"), cb=document.getElementById("pd-add-cart-btn"), bn=document.getElementById("pd-buy-now-btn");
             if(bb) bb.onclick=function(){closeProductDetail();openCustomerForm(productId);};
             if(cb) cb.onclick=function(){addToCart(productId);closeProductDetail();};
+            if(bn) bn.onclick=function(){closeProductDetail();openPaymentPage(productId);};
             document.getElementById("product-detail-modal").classList.remove("hidden");
         }
         function closeProductDetail() { document.getElementById("product-detail-modal").classList.add("hidden"); }
@@ -2688,7 +3066,7 @@
         }
 
         function switchTab(tab) {
-            ["dashboard","customers","recap","produk","settings"].forEach(function(t) {
+            ["dashboard","customers","recap","transactions","produk","settings"].forEach(function(t) {
                 var elTab = document.getElementById("tab-" + t);
                 if (elTab) elTab.classList.toggle("active", t === tab);
                 var elContent = document.getElementById("content-" + t);
@@ -2699,6 +3077,7 @@
             if (tab === "dashboard") renderDashboard();
             if (tab === "customers") renderCustomerTable();
             if (tab === "recap") renderRecapTable();
+            if (tab === "transactions") loadTransactions();
             if (tab === "produk") renderAdminProductList();
             if (tab === "settings") renderAccountSettings();
         }
@@ -3314,12 +3693,507 @@
             });
         }
 
+        // --- DIRECT PAYMENT SYSTEM (MIDTRANS) ---
+        let payProductId = "";
+        let payProduct = null;
+        let payQty = 1;
+        let activeOrderId = "";
+        let statusIntervalId = null;
+        let selectedPayMethod = "qris";
+
+        function openPaymentPage(productId) {
+            const p = PRODUK_DATA.find(x => x.id === productId);
+            if (!p) return;
+            
+            payProductId = productId;
+            payProduct = p;
+            payQty = 1;
+            activeOrderId = "";
+            selectedPayMethod = "qris";
+            
+            if (statusIntervalId) {
+                clearInterval(statusIntervalId);
+                statusIntervalId = null;
+            }
+            
+            // Populate Review Card
+            document.getElementById("pay-store-name").textContent = TOKO_CONFIG.nama;
+            document.getElementById("pay-product-title").textContent = p.nama;
+            document.getElementById("pay-product-price").textContent = formatRupiah(p.harga);
+            document.getElementById("pay-product-img").src = p.gambar || "";
+            document.getElementById("pay-qty").textContent = "1";
+            document.getElementById("pay-total-amount").textContent = formatRupiah(p.harga);
+            
+            // Reset input values
+            document.getElementById("pay-cust-name").value = "";
+            document.getElementById("pay-cust-hp").value = "";
+            document.getElementById("pay-cust-city").value = "";
+            document.getElementById("pay-cust-note").value = "";
+            
+            // Reset Radio Button values
+            document.querySelectorAll('input[name="pay-method"]').forEach(radio => {
+                radio.checked = radio.value === "qris";
+            });
+            selectPaymentMethod("qris");
+            
+            // Toggle panels
+            document.getElementById("payment-input-section").classList.remove("hidden");
+            document.getElementById("payment-process-section").classList.add("hidden");
+            document.getElementById("payment-success-section").classList.add("hidden");
+            
+            // Show page
+            document.getElementById("payment-page").classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+        }
+        
+        function closePaymentPage() {
+            document.getElementById("payment-page").classList.add("hidden");
+            document.body.style.overflow = "";
+            if (statusIntervalId) {
+                clearInterval(statusIntervalId);
+                statusIntervalId = null;
+            }
+            // Refresh dashboard or check transaction widget in background
+            checkActiveTransactionOnLoad();
+        }
+        
+        function changePayQty(diff) {
+            if (!payProduct) return;
+            payQty = Math.max(1, payQty + diff);
+            document.getElementById("pay-qty").textContent = payQty;
+            
+            const total = payProduct.harga * payQty;
+            document.getElementById("pay-total-amount").textContent = formatRupiah(total);
+            
+            const submitBtn = document.getElementById("pay-submit-btn");
+            submitBtn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Bayar ${formatRupiah(total)}`;
+        }
+        
+        function selectPaymentMethod(method) {
+            selectedPayMethod = method;
+            const methods = ['qris', 'bri', 'gopay', 'shopeepay'];
+            
+            methods.forEach(m => {
+                const dot = document.getElementById("radio-" + m + "-dot");
+                if (dot) dot.classList.toggle("hidden", method !== m);
+                
+                const radio = document.querySelector(`input[name="pay-method"][value="${m}"]`);
+                if (radio) {
+                    const label = radio.closest('label');
+                    if (method === m) {
+                        label.classList.add('active');
+                    } else {
+                        label.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        async function processDirectPayment() {
+            const name = document.getElementById("pay-cust-name").value.trim();
+            const hp = document.getElementById("pay-cust-hp").value.trim();
+            const city = document.getElementById("pay-cust-city").value.trim();
+            const note = document.getElementById("pay-cust-note").value.trim();
+            
+            if (!name || !hp || !city) {
+                showToast("Nama, WhatsApp, dan Kota wajib diisi.", "warning");
+                return;
+            }
+            
+            const submitBtn = document.getElementById("pay-submit-btn");
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memproses Transaksi...';
+            
+            try {
+                const response = await fetch('/api/create-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sellerId: currentSellerId,
+                        productId: payProductId,
+                        qty: payQty,
+                        customerName: name,
+                        customerHp: hp,
+                        customerCity: city,
+                        customerNote: note,
+                        paymentMethod: selectedPayMethod
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || "Gagal membuat pembayaran");
+                }
+                
+                if (data.success) {
+                    activeOrderId = data.orderId;
+                    
+                    // Save last transaction to localStorage for resuming
+                    localStorage.setItem(`last_transaction_${currentSellerId}`, activeOrderId);
+                    
+                    renderPaymentProcess(data);
+                } else {
+                    throw new Error("Gagal membuat pembayaran");
+                }
+                
+            } catch (err) {
+                console.error("Direct payment request failed:", err);
+                
+                let errorMsg = err.message;
+                
+                // Pengecekan jika dibuka dari file lokal atau gagal total
+                if (window.location.protocol === 'file:') {
+                    errorMsg = "Gagal: Pembayaran tidak bisa dilakukan dari file:// lokal. Mohon akses website via URL production (https://commerce-hub26.vercel.app/).";
+                } else if (errorMsg === "Failed to fetch") {
+                    errorMsg = "Gagal terhubung ke Vercel (Failed to fetch). Pastikan koneksi internet stabil dan tidak ada extension browser (seperti AdBlocker) yang memblokir.";
+                } else if (errorMsg.includes("Unexpected token") || errorMsg.includes("is not valid JSON")) {
+                    errorMsg = "Terjadi kesalahan di server backend Vercel (Response bukan JSON). Cek logs Serverless Function Anda di dashboard Vercel.";
+                }
+                
+                showToast(errorMsg, "error");
+                submitBtn.disabled = false;
+                const total = payProduct.harga * payQty;
+                submitBtn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Bayar Rp${total.toLocaleString('id-ID')}`;
+            }
+        }
+        
+        function renderPaymentProcess(data) {
+            document.getElementById("payment-input-section").classList.add("hidden");
+            document.getElementById("payment-process-section").classList.remove("hidden");
+            
+            document.getElementById("proc-order-id").textContent = data.orderId;
+            
+            // Hide all sub layouts
+            document.getElementById("proc-va-wrap").classList.add("hidden");
+            document.getElementById("proc-qr-wrap").classList.add("hidden");
+            document.getElementById("proc-link-wrap").classList.add("hidden");
+            
+            const payInfo = data.paymentInfo || {};
+            
+            if (data.paymentMethod === "bri") {
+                document.getElementById("proc-method-title").textContent = "Selesaikan BRIVA Virtual Account";
+                document.getElementById("proc-va-wrap").classList.remove("hidden");
+                document.getElementById("proc-va-number").textContent = payInfo.vaNumber || "Belum tersedia";
+            } else if (data.paymentMethod === "qris" || data.paymentMethod === "gopay") {
+                document.getElementById("proc-method-title").textContent = data.paymentMethod === "qris" ? "Bayar dengan QRIS" : "Bayar dengan GoPay QR";
+                document.getElementById("proc-qr-wrap").classList.remove("hidden");
+                document.getElementById("proc-qr-img").src = payInfo.qrCodeUrl || "";
+                
+                if (data.paymentMethod === "gopay" && payInfo.deepLink) {
+                    document.getElementById("proc-link-wrap").classList.remove("hidden");
+                    document.getElementById("proc-redirect-link").href = payInfo.deepLink;
+                }
+            } else if (data.paymentMethod === "shopeepay" || data.paymentMethod === "dana") {
+                document.getElementById("proc-method-title").textContent = data.paymentMethod === "shopeepay" ? "Selesaikan di ShopeePay" : "Selesaikan di DANA";
+                document.getElementById("proc-link-wrap").classList.remove("hidden");
+                document.getElementById("proc-redirect-link").href = payInfo.deepLink || "#";
+            }
+            
+            startPaymentStatusPolling(data.orderId);
+        }
+        
+        function startPaymentStatusPolling(orderId) {
+            if (statusIntervalId) clearInterval(statusIntervalId);
+            
+            checkPaymentStatus(orderId); // run once immediately
+            
+            statusIntervalId = setInterval(() => {
+                checkPaymentStatus(orderId);
+            }, 4000);
+        }
+        
+        async function checkPaymentStatus(orderId) {
+            try {
+                const response = await fetch(`/api/get-status?orderId=${orderId}`);
+                if (!response.ok) return;
+                const data = await response.json();
+                
+                if (data.success && data.status === 'success') {
+                    clearInterval(statusIntervalId);
+                    statusIntervalId = null;
+                    renderPaymentSuccess(data);
+                } else if (data.success && (data.status === 'expire' || data.status === 'failed')) {
+                    clearInterval(statusIntervalId);
+                    statusIntervalId = null;
+                    showToast("Pembayaran kedaluwarsa atau gagal. Silakan coba lagi.", "error");
+                    closePaymentPage();
+                }
+            } catch (err) {
+                console.warn("Polling payment status failed:", err);
+            }
+        }
+        
+        function checkPaymentStatusManual() {
+            if (!activeOrderId) return;
+            showToast("Memperbarui status pembayaran...", "info");
+            checkPaymentStatus(activeOrderId);
+        }
+        
+        function copyVaNumber() {
+            const vaNum = document.getElementById("proc-va-number").textContent;
+            navigator.clipboard.writeText(vaNum).then(() => {
+                showToast("Nomor VA berhasil disalin!", "success");
+            }).catch(() => {
+                showToast("Gagal menyalin nomor VA.", "error");
+            });
+        }
+        
+        function renderPaymentSuccess(data) {
+            document.getElementById("payment-process-section").classList.add("hidden");
+            document.getElementById("payment-success-section").classList.remove("hidden");
+            
+            document.getElementById("succ-order-id").textContent = data.orderId;
+            document.getElementById("succ-store-name").textContent = data.storeName || TOKO_CONFIG.nama;
+            document.getElementById("succ-product-name").textContent = `${data.productNama} (x${data.qty})`;
+            document.getElementById("succ-method").textContent = data.paymentMethod.toUpperCase();
+            document.getElementById("succ-total").textContent = formatRupiah(data.totalHarga);
+            
+            const timeStr = data.updatedAt ? new Date(data.updatedAt).toLocaleString("id-ID") : new Date().toLocaleString("id-ID");
+            document.getElementById("succ-time").textContent = timeStr;
+            
+            // Trigger floating transaction check cleanup since it succeeded
+            localStorage.setItem(`last_transaction_${currentSellerId}`, data.orderId); // keeps it as success state in localstorage
+            
+            dismissTxWidget();
+        }
+        
+        async function resumePendingTransaction(orderId) {
+            try {
+                showToast("Memuat status pembayaran...", "info");
+                const response = await fetch(`/api/get-status?orderId=${orderId}`);
+                if (!response.ok) return;
+                const data = await response.json();
+                
+                if (data.success) {
+                    activeOrderId = orderId;
+                    payProductId = ""; // not required since it's already generated
+                    payProduct = { nama: data.productNama, harga: data.totalHarga / data.qty };
+                    payQty = data.qty;
+                    
+                    // Setup review card
+                    document.getElementById("pay-store-name").textContent = data.storeName || TOKO_CONFIG.nama;
+                    document.getElementById("pay-product-title").textContent = data.productNama;
+                    document.getElementById("pay-product-price").textContent = formatRupiah(payProduct.harga);
+                    document.getElementById("pay-product-img").src = data.productGambar || "";
+                    document.getElementById("pay-qty").textContent = data.qty;
+                    document.getElementById("pay-total-amount").textContent = formatRupiah(data.totalHarga);
+                    
+                    if (data.status === 'pending') {
+                        renderPaymentProcess({
+                            orderId: orderId,
+                            paymentMethod: data.paymentMethod,
+                            paymentInfo: data.paymentInfo
+                        });
+                        document.getElementById("payment-page").classList.remove("hidden");
+                        document.body.style.overflow = "hidden";
+                    } else if (data.status === 'success') {
+                        renderPaymentSuccess(data);
+                        document.getElementById("payment-page").classList.remove("hidden");
+                        document.body.style.overflow = "hidden";
+                    }
+                }
+            } catch (err) {
+                console.error("Resume pending transaction failed:", err);
+            }
+        }
+        
+        async function showSuccessTransaction(orderId) {
+            await resumePendingTransaction(orderId);
+        }
+        
+        function sendSuccessProofWA() {
+            const orderId = document.getElementById("succ-order-id").textContent;
+            const prodName = document.getElementById("succ-product-name").textContent;
+            const method = document.getElementById("succ-method").textContent;
+            const total = document.getElementById("succ-total").textContent;
+            
+            const nl = "\n";
+            let text = `Halo, saya sudah melakukan pembayaran.${nl}${nl}`;
+            text += `Nomor transaksi: ${orderId}${nl}`;
+            text += `Produk: ${prodName}${nl}`;
+            text += `Total pembayaran: ${total}${nl}`;
+            text += `Metode pembayaran: ${method}${nl}`;
+            text += `Status: Pembayaran Berhasil${nl}${nl}`;
+            text += `Mohon diproses pesanannya. Terima kasih!`;
+            
+            const waTarget = TOKO_CONFIG.whatsapp || "";
+            window.open(`https://wa.me/${waTarget}?text=${encodeURIComponent(text)}`, "_blank");
+        }
+        
+        async function checkActiveTransactionOnLoad() {
+            if (!currentSellerId) return;
+            const key = `last_transaction_${currentSellerId}`;
+            const storedOrderId = localStorage.getItem(key);
+            if (!storedOrderId) return;
+            
+            try {
+                const response = await fetch(`/api/get-status?orderId=${storedOrderId}`);
+                if (!response.ok) {
+                    if (response.status === 404) localStorage.removeItem(key);
+                    return;
+                }
+                const data = await response.json();
+                if (data.success && (data.status === 'pending' || data.status === 'success')) {
+                    showFloatingTxWidget(data.orderId, data.status, data.totalHarga, data.productNama, data.qty);
+                } else {
+                    localStorage.removeItem(key);
+                }
+            } catch (e) {
+                console.warn("Error checking last transaction:", e);
+            }
+        }
+        
+        function showFloatingTxWidget(orderId, status, totalAmount, productName, qty) {
+            const widget = document.getElementById("floating-tx-widget");
+            const iconWrap = document.getElementById("tx-widget-icon");
+            const titleEl = document.getElementById("tx-widget-title");
+            const descEl = document.getElementById("tx-widget-desc");
+            const actionBtn = document.getElementById("tx-widget-action");
+            
+            if (!widget) return;
+            
+            if (status === 'pending') {
+                iconWrap.className = "w-10 h-10 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center flex-shrink-0 border border-amber-100";
+                iconWrap.innerHTML = '<i class="fa-solid fa-credit-card text-lg"></i>';
+                titleEl.textContent = "Pembayaran Belum Selesai";
+                descEl.textContent = `${productName} (${qty}x) - ${formatRupiah(totalAmount)}`;
+                
+                actionBtn.textContent = "Selesaikan";
+                actionBtn.onclick = function() {
+                    resumePendingTransaction(orderId);
+                    dismissTxWidget();
+                };
+            } else if (status === 'success') {
+                iconWrap.className = "w-10 h-10 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 border border-emerald-100";
+                iconWrap.innerHTML = '<i class="fa-solid fa-circle-check text-lg"></i>';
+                titleEl.textContent = "Pembayaran Sukses!";
+                descEl.textContent = `${productName} (${qty}x) - ${formatRupiah(totalAmount)}`;
+                
+                actionBtn.textContent = "Lihat Bukti";
+                actionBtn.onclick = function() {
+                    showSuccessTransaction(orderId);
+                    dismissTxWidget();
+                };
+            }
+            
+            widget.classList.remove("hidden");
+            setTimeout(() => {
+                widget.classList.remove("translate-y-10", "opacity-0");
+            }, 100);
+        }
+        
+        function dismissTxWidget() {
+            const widget = document.getElementById("floating-tx-widget");
+            if (!widget) return;
+            widget.classList.add("translate-y-10", "opacity-0");
+            setTimeout(() => {
+                widget.classList.add("hidden");
+            }, 300);
+        }
+        
+        // --- TRANSAKSI MASUK (ADMIN PANEL) ---
+        let transactionsList = [];
+        
+        async function loadTransactions() {
+            if (!currentSellerId) return;
+            try {
+                document.getElementById("tx-count-label").textContent = "Memuat...";
+                const snap = await db.collection("transactions")
+                    .where("sellerId", "==", currentSellerId)
+                    .get();
+                    
+                transactionsList = [];
+                snap.forEach(doc => {
+                    transactionsList.push(doc.data());
+                });
+                
+                // Sort in memory to avoid composite index requirement in firestore
+                transactionsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                renderTransactionsTable();
+            } catch (err) {
+                console.error("Gagal memuat transaksi:", err);
+                showToast("Gagal memuat transaksi dari Firestore.", "error");
+            }
+        }
+        
+        function renderTransactionsTable() {
+            const tbody = document.getElementById("tx-tbody");
+            const emptyState = document.getElementById("tx-empty");
+            const searchInput = document.getElementById("tx-search");
+            
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            
+            const q = searchInput ? searchInput.value.toLowerCase().trim() : "";
+            
+            const filtered = transactionsList.filter(t => {
+                return t.orderId.toLowerCase().includes(q) || 
+                       (t.customerName && t.customerName.toLowerCase().includes(q)) || 
+                       (t.productNama && t.productNama.toLowerCase().includes(q));
+            });
+            
+            document.getElementById("tx-count-label").textContent = `${filtered.length} transaksi ditemukan`;
+            
+            if (filtered.length === 0) {
+                emptyState.classList.remove("hidden");
+                return;
+            }
+            emptyState.classList.add("hidden");
+            
+            filtered.forEach((t, i) => {
+                const tr = document.createElement("tr");
+                
+                let statusBadge = "";
+                if (t.status === "success") {
+                    statusBadge = `<span class="inline-flex px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md text-[10px] font-bold">Sukses</span>`;
+                } else if (t.status === "pending") {
+                    statusBadge = `<span class="inline-flex px-2 py-0.5 bg-amber-100 text-amber-800 rounded-md text-[10px] font-bold">Pending</span>`;
+                } else if (t.status === "expire") {
+                    statusBadge = `<span class="inline-flex px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md text-[10px] font-bold">Kedaluwarsa</span>`;
+                } else {
+                    statusBadge = `<span class="inline-flex px-2 py-0.5 bg-red-100 text-red-800 rounded-md text-[10px] font-bold">Gagal</span>`;
+                }
+                
+                const dateFormatted = new Date(t.createdAt).toLocaleString("id-ID", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+                
+                tr.innerHTML = `
+                    <td class="text-center text-slate-400 text-xs">${i + 1}</td>
+                    <td class="whitespace-nowrap text-slate-500 text-xs">${dateFormatted}</td>
+                    <td class="font-mono font-semibold text-slate-700 text-xs">${t.orderId}</td>
+                    <td class="font-semibold text-slate-800 max-w-[120px]"><span class="block truncate">${t.customerName || "--"}</span></td>
+                    <td class="max-w-[120px]"><span class="block truncate text-xs text-slate-700 font-medium">${t.productNama || "--"}</span></td>
+                    <td class="text-center font-medium text-slate-600 text-xs">${t.qty}</td>
+                    <td class="text-right font-semibold text-emerald-600 text-xs">${formatRupiah(t.totalHarga)}</td>
+                    <td class="text-center text-slate-500 text-xs uppercase">${t.paymentMethod}</td>
+                    <td class="text-center">${statusBadge}</td>
+                    <td class="px-2 py-1.5 flex items-center justify-center">
+                        <a href="https://wa.me/${t.customerHp.replace(/[^0-9]/g, '')}" target="_blank" class="w-6 h-6 bg-emerald-600 text-white rounded hover:bg-emerald-700 flex items-center justify-center transition" title="Hubungi via WA">
+                            <i class="fa-brands fa-whatsapp text-xs"></i>
+                        </a>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+
         // Inisialisasi Aplikasi Saat Halaman Selesai Dimuat
         window.addEventListener('DOMContentLoaded', function() {
             initStoreInfo();
             updateAdminButtonVisibility();
             updateCartBadge();
             loadData();
+            setTimeout(checkActiveTransactionOnLoad, 1000);
         });
     </script>
 
