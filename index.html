@@ -2990,8 +2990,79 @@
             document.body.removeChild(ta);
         }
 
+        
+        // --- PAYMENT CONFIG AVAILABILITY ---
+        let isOnlinePaymentAvailable = true;
+
+        async function checkOnlinePaymentAvailability() {
+            try {
+                const response = await fetch('/api/check-payment-status?sellerId=' + encodeURIComponent(currentSellerId));
+                const result = await response.json();
+                if (result.success) {
+                    isOnlinePaymentAvailable = result.isAvailable;
+                } else {
+                    isOnlinePaymentAvailable = false;
+                }
+            } catch (e) {
+                isOnlinePaymentAvailable = false;
+            }
+        }
+
+
         // --- CUSTOMER FORM MODAL FLOW ---
+        
         function openCustomerForm(productId) {
+            if (!isOnlinePaymentAvailable) {
+                // Sembunyikan metode pembayaran online
+                const qrisOpt = document.querySelector('input[name="cf_payment_method"][value="qris"]');
+                const gopayOpt = document.querySelector('input[name="cf_payment_method"][value="gopay"]');
+                const shopeeOpt = document.querySelector('input[name="cf_payment_method"][value="shopeepay"]');
+                const danaOpt = document.querySelector('input[name="cf_payment_method"][value="dana"]');
+                const briOpt = document.querySelector('input[name="cf_payment_method"][value="bri"]');
+                
+                if (qrisOpt) qrisOpt.closest('label').style.display = 'none';
+                if (gopayOpt) gopayOpt.closest('label').style.display = 'none';
+                if (shopeeOpt) shopeeOpt.closest('label').style.display = 'none';
+                if (danaOpt) danaOpt.closest('label').style.display = 'none';
+                if (briOpt) briOpt.closest('label').style.display = 'none';
+                
+                // Set default to whatsapp
+                const waOpt = document.querySelector('input[name="cf_payment_method"][value="whatsapp"]');
+                if (waOpt) waOpt.checked = true;
+                
+                // Show notice
+                const notice = document.getElementById('no-online-payment-notice');
+                if (!notice) {
+                    // Try to find the payment method container. It usually has "Metode Pembayaran" text nearby.
+                    const methodsContainer = document.getElementById("cf-payment-group"); 
+                    if (methodsContainer) {
+                        const noticeEl = document.createElement('div');
+                        noticeEl.id = 'no-online-payment-notice';
+                        noticeEl.className = 'p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700 mb-3';
+                        noticeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Pembayaran online (Midtrans) belum diaktifkan oleh seller. Silakan gunakan metode WhatsApp.';
+                        methodsContainer.parentNode.insertBefore(noticeEl, methodsContainer);
+                    }
+                } else {
+                    notice.style.display = 'block';
+                }
+            } else {
+                // Tampilkan kembali jika tersedia
+                const qrisOpt = document.querySelector('input[name="cf_payment_method"][value="qris"]');
+                const gopayOpt = document.querySelector('input[name="cf_payment_method"][value="gopay"]');
+                const shopeeOpt = document.querySelector('input[name="cf_payment_method"][value="shopeepay"]');
+                const danaOpt = document.querySelector('input[name="cf_payment_method"][value="dana"]');
+                const briOpt = document.querySelector('input[name="cf_payment_method"][value="bri"]');
+                
+                if (qrisOpt) qrisOpt.closest('label').style.display = 'flex';
+                if (gopayOpt) gopayOpt.closest('label').style.display = 'flex';
+                if (shopeeOpt) shopeeOpt.closest('label').style.display = 'flex';
+                if (danaOpt) danaOpt.closest('label').style.display = 'flex';
+                if (briOpt) briOpt.closest('label').style.display = 'flex';
+                
+                const notice = document.getElementById('no-online-payment-notice');
+                if (notice) notice.style.display = 'none';
+            }
+
             document.getElementById("cf-nama").value = "";
             document.getElementById("cf-hp").value = "";
             document.getElementById("cf-kota").value = "";
@@ -4383,6 +4454,101 @@
                 tbody.appendChild(tr);
             });
         }
+
+        
+        // --- MULTI TENANT PAYMENT CONFIGURATION ---
+        async function loadPaymentConfig() {
+            try {
+                const doc = await db.collection("seller_payments").doc(currentSellerId).get();
+                if (doc.exists) {
+                    const config = doc.data();
+                    document.getElementById('payment-mode').value = config.isProduction ? 'production' : 'sandbox';
+                    document.getElementById('payment-merchant-id').value = config.merchantId || '';
+                    document.getElementById('payment-client-key').value = config.clientKey || '';
+                    document.getElementById('payment-server-key').value = config.serverKey || '';
+                    document.getElementById('payment-status-badge').innerHTML = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-semibold">Sudah Diatur</span>';
+                } else {
+                    document.getElementById('payment-status-badge').innerHTML = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-semibold">Belum Diatur</span>';
+                }
+            } catch (e) {
+                console.error("Gagal load payment config", e);
+            }
+        }
+
+        async function savePaymentSettings() {
+            const isProduction = document.getElementById('payment-mode').value === 'production';
+            const merchantId = document.getElementById('payment-merchant-id').value.trim();
+            const clientKey = document.getElementById('payment-client-key').value.trim();
+            const serverKey = document.getElementById('payment-server-key').value.trim();
+
+            if (!merchantId || !clientKey || !serverKey) {
+                showToast("Semua kolom harus diisi!", "error");
+                return;
+            }
+
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showToast("Harap login terlebih dahulu", "error");
+                    return;
+                }
+                const idToken = await user.getIdToken();
+                const res = await fetch('/api/save-payment-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sellerId: currentSellerId,
+                        merchantId, clientKey, serverKey, isProduction, idToken
+                    })
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    showToast("Pengaturan pembayaran berhasil disimpan", "success");
+                    loadPaymentConfig(); // reload status
+                } else {
+                    showToast("Gagal menyimpan: " + (result.error || "Server error"), "error");
+                }
+            } catch (e) {
+                showToast("Gagal menghubungi server", "error");
+            }
+        }
+
+        async function testMidtransConnection() {
+            const isProduction = document.getElementById('payment-mode').value === 'production';
+            const serverKey = document.getElementById('payment-server-key').value.trim();
+
+            if (!serverKey) {
+                showToast("Server Key harus diisi untuk test koneksi", "error");
+                return;
+            }
+
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengetes...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/test-midtrans-connection', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ serverKey, isProduction })
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    showToast("Koneksi ke Midtrans berhasil!", "success");
+                } else {
+                    showToast("Gagal koneksi: " + (result.error || "Kredensial tidak valid"), "error");
+                }
+            } catch (e) {
+                showToast("Terjadi kesalahan jaringan", "error");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
 
         // Inisialisasi Aplikasi Saat Halaman Selesai Dimuat
         window.addEventListener('DOMContentLoaded', function() {
