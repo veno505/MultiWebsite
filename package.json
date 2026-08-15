@@ -1,0 +1,8 @@
+{
+  "name": "commercehub-backend",
+  "version": "1.0.0",
+  "dependencies": {
+    "midtrans-client": "^1.3.1",
+    "firebase-admin": "^11.8.0"
+  }
+}
