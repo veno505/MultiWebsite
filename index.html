@@ -730,6 +730,14 @@
                 <label class="form-label">Email Toko</label>
                 <input type="email" id="setting-store-email" class="form-input" placeholder="cs@domain.com">
               </div>
+              <div>
+                <label class="form-label">Judul Tampilan Awal (Hero)</label>
+                <input type="text" id="setting-hero-title" class="form-input" placeholder="Contoh: Temukan Kebutuhan Anda Lebih Mudah">
+              </div>
+              <div>
+                <label class="form-label">URL Gambar Utama (Hero)</label>
+                <input type="text" id="setting-hero-image" class="form-input" placeholder="URL Gambar">
+              </div>
             </div>
             <!-- Theme Selection Section -->
             <div class="space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
@@ -1503,7 +1511,7 @@
                 </span>
                 Toko Buka & Siap Melayani
             </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
+            <h1 id="hero-title-display" class="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                 Temukan Kebutuhan Anda <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-700">Lebih Mudah</span>
             </h1>
             <p class="text-lg text-slate-600 max-w-xl mx-auto md:mx-0" id="store-desc-display">
@@ -1521,7 +1529,7 @@
         <div class="w-full md:w-1/2">
             <!-- Hero Image / Illustration Placeholder -->
             <div class="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50 border border-white">
-                <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Toko Belanja" class="w-full h-full object-cover">
+                <img id="hero-image-display" src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Toko Belanja" class="w-full h-full object-cover">
                 <!-- Overlay Gradient -->
                 <div class="absolute inset-0 bg-gradient-to-tr from-brand-600/20 to-transparent mix-blend-overlay"></div>
             </div>
@@ -1702,7 +1710,9 @@
             alamat: "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah",
             email: "marveynopramaditya@gmail.com",
             mataUang: "Rp",
-            pesanPembuka: "Halo Admin CommerceHub, saya tertarik untuk memesan paket jasa pembuatan website berikut:"
+            pesanPembuka: "Halo Admin CommerceHub, saya tertarik untuk memesan paket jasa pembuatan website berikut:",
+            heroTitle: "Temukan Kebutuhan Anda Lebih Mudah",
+            heroImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
         };
 
         let TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
@@ -1816,7 +1826,13 @@
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 currentUser = user;
-                currentSellerId = user.uid;
+                // Jika marveyno, biarkan dia mengedit halaman 'default' (Tampilan Awal)
+                if (user.email === "marveyno@gmail.com") {
+                    var urlP = new URLSearchParams(window.location.search);
+                    currentSellerId = urlP.get('s') || urlP.get('seller') || "default";
+                } else {
+                    currentSellerId = user.uid;
+                }
             } else {
                 currentUser = null;
                 var urlP = new URLSearchParams(window.location.search);
@@ -1893,7 +1909,7 @@
             }
             
             const btn = document.getElementById("auth-submit-btn");
-            
+
             // Core Security Guard: Programmatically reject registration if URL token is not present
             if (authMode === "signup" && !isSignupAllowed()) {
                 showAuthError("Pembuatan akun seller baru hanya dapat dilakukan oleh Administrator.");
@@ -2060,6 +2076,8 @@
             if (document.getElementById("setting-store-desc")) document.getElementById("setting-store-desc").value = TOKO_CONFIG.deskripsi || "";
             if (document.getElementById("setting-store-address")) document.getElementById("setting-store-address").value = TOKO_CONFIG.alamat || "";
             if (document.getElementById("setting-store-email")) document.getElementById("setting-store-email").value = TOKO_CONFIG.email || "";
+            document.getElementById("setting-hero-title").value = TOKO_CONFIG.heroTitle || "Temukan Kebutuhan Anda Lebih Mudah";
+            document.getElementById("setting-hero-image").value = TOKO_CONFIG.heroImage || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
             if (document.getElementById("setting-user-email")) document.getElementById("setting-user-email").textContent = currentUser.email || "Anonymous";
             if (document.getElementById("setting-store-status")) document.getElementById("setting-store-status").value = (TOKO_CONFIG.isOpen !== false) ? "open" : "closed";
             renderAdminSocials();
@@ -2072,6 +2090,8 @@
             const desc = document.getElementById("setting-store-desc").value.trim();
             const address = document.getElementById("setting-store-address").value.trim();
             const email = document.getElementById("setting-store-email").value.trim();
+            const heroTitle = document.getElementById("setting-hero-title").value.trim();
+            const heroImage = document.getElementById("setting-hero-image").value.trim();
             
             if (!name || !wa) {
                 showToast("Nama Toko dan Nomor WhatsApp wajib diisi.", "warning");
@@ -2085,6 +2105,8 @@
             TOKO_CONFIG.deskripsi = desc;
             TOKO_CONFIG.alamat = address;
             TOKO_CONFIG.email = email;
+            if (heroTitle) TOKO_CONFIG.heroTitle = heroTitle;
+            if (heroImage) TOKO_CONFIG.heroImage = heroImage;
             TOKO_CONFIG.tema = selectedTheme;
             
             await saveData(true);
@@ -2532,29 +2554,14 @@
                     const cloudData = docSnap.data();
                     PRODUK_DATA = cloudData.produk_data || [...DEFAULT_PRODUK];
                     
-                    // Reset default public database doc if it contains old products or old mockup images
-                    if (currentSellerId === "default" && (PRODUK_DATA.length === 0 || PRODUK_DATA.some(p => p.id.startsWith("P") || p.id.startsWith("B") || p.gambar !== "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg"))) {
-                        PRODUK_DATA = [...DEFAULT_PRODUK];
-                        TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
-                        await docRef.set({
-                            produk_data: PRODUK_DATA,
-                            customer_orders: [],
-                            rekap_transaksi: [],
-                            store_config: TOKO_CONFIG
-                        });
-                    } else {
-                        if (cloudData.store_config) {
-                            TOKO_CONFIG = { ...TOKO_CONFIG, ...cloudData.store_config };
-                            if (currentSellerId === "default" && (TOKO_CONFIG.email !== "marveynopramaditya@gmail.com" || TOKO_CONFIG.alamat !== "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah")) {
-                                TOKO_CONFIG.email = "marveynopramaditya@gmail.com";
-                                TOKO_CONFIG.alamat = "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah";
-                                await docRef.update({
-                                    store_config: TOKO_CONFIG
-                                });
-                            }
-                        } else {
-                            TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
+                    if (cloudData.store_config) {
+                        TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG, ...cloudData.store_config };
+                        // Migration fallback
+                        if (TOKO_CONFIG.socials === undefined) {
+                            TOKO_CONFIG.socials = [];
                         }
+                    } else {
+                        TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
                     }
                     
                     applyTheme(TOKO_CONFIG.tema || "default");
@@ -3613,6 +3620,23 @@
             document.title = `${TOKO_CONFIG.nama} - Katalog Digital`;
             document.getElementById("store-name-display").textContent = TOKO_CONFIG.nama;
             document.getElementById("store-desc-display").textContent = TOKO_CONFIG.deskripsi;
+            
+            var heroTitleEl = document.getElementById("hero-title-display");
+            if (heroTitleEl) {
+                var titleText = TOKO_CONFIG.heroTitle || "Temukan Kebutuhan Anda Lebih Mudah";
+                var words = titleText.split(" ");
+                if (words.length > 1) {
+                    var lastWord = words.pop();
+                    heroTitleEl.innerHTML = words.join(" ") + ' <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-700">' + lastWord + '</span>';
+                } else {
+                    heroTitleEl.textContent = titleText;
+                }
+            }
+            
+            var heroImgEl = document.getElementById("hero-image-display");
+            if (heroImgEl) {
+                heroImgEl.src = TOKO_CONFIG.heroImage || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+            }
             
             const heroStatus = document.getElementById("hero-store-status");
             if (heroStatus) {
