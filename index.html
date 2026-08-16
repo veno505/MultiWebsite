@@ -286,6 +286,24 @@
 
     <!-- ADMIN PANEL - FULL PAGE -->
     <div id="admin-panel" class="fixed inset-0 z-[80] bg-slate-50 overflow-hidden flex-col">
+      <!-- Overlay Expired (Hidden by default) -->
+      <div id="admin-expired-overlay" class="absolute inset-0 z-[90] bg-slate-900/90 backdrop-blur-md hidden flex-col items-center justify-center p-6 text-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-red-500"></div>
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500">
+                <i class="fa-solid fa-clock text-3xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Masa Aktif Berakhir</h2>
+            <p class="text-slate-600 mb-6 leading-relaxed">Masa berlangganan panel Anda telah habis sejak <span id="expired-date-text" class="font-semibold text-slate-800"></span>. Hubungi Admin Pusat untuk memperpanjang masa aktif.</p>
+            <button onclick="window.open('https://wa.me/6281234567890?text=Halo%20Admin,%20saya%20ingin%20memperpanjang%20website%20toko%20saya', '_blank')" class="w-full bg-brand-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-brand-700 transition flex justify-center items-center gap-2">
+                <i class="fa-brands fa-whatsapp text-lg"></i> Hubungi Admin Pusat
+            </button>
+            <button onclick="closeAdminPanel()" class="mt-4 w-full bg-slate-100 text-slate-600 font-bold py-3 px-4 rounded-xl hover:bg-slate-200 transition">
+                Kembali ke Beranda
+            </button>
+        </div>
+      </div>
+      
       <!-- Top Header Bar -->
       <div class="flex items-center justify-between px-4 md:px-6 py-3 bg-brand-600 text-white flex-shrink-0 shadow-lg border-b border-brand-700/50">
         <div class="flex items-center gap-3">
@@ -844,6 +862,29 @@
                 <button onclick="addSocialLink()" class="px-4 py-2 bg-slate-800 text-slate-50 rounded-lg text-sm font-medium hover:bg-slate-700 w-full sm:w-auto">Tambah Sosmed</button>
               </div>
             </div>
+            
+            <!-- SUPER ADMIN SECTION (OWNER ONLY) -->
+            <div id="super-admin-section" class="pt-6 border-t border-slate-100 mt-6 mb-6 hidden">
+              <div class="bg-red-50 border border-red-200 rounded-xl p-5 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                <h4 class="font-bold text-red-800 mb-1 flex items-center gap-2"><i class="fa-solid fa-crown text-red-600"></i> Area Owner (Super Admin)</h4>
+                <p class="text-[11px] text-red-600 mb-4">Fitur khusus Owner untuk mengelola masa aktif seller (Toko Lain).</p>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label class="form-label text-red-700">UID Firebase Seller</label>
+                        <input type="text" id="super-admin-target-uid" class="form-input bg-white border-red-200 focus:border-red-500 focus:ring-red-500/20" style="color: #000 !important; background-color: #fff !important;" placeholder="Contoh: u9XYZkL2pQZJ...">
+                    </div>
+                    <div>
+                        <label class="form-label text-red-700">Perpanjang Hingga Tanggal</label>
+                        <input type="date" id="super-admin-target-date" class="form-input bg-white border-red-200 focus:border-red-500 focus:ring-red-500/20" style="color: #000 !important; background-color: #fff !important;">
+                    </div>
+                    <button onclick="updateSellerSubscription()" class="w-full bg-red-600 text-white font-bold py-2.5 px-4 rounded-xl hover:bg-red-700 transition shadow-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Update Masa Aktif
+                    </button>
+                </div>
+              </div>
+            </div>
 
             <button onclick="saveStoreSettings()" class="w-full py-3 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
               <i class="fa-solid fa-floppy-disk"></i> Simpan Info Toko
@@ -1387,7 +1428,7 @@
             <!-- E-Wallet Link Action Display -->
             <div id="proc-link-wrap" class="text-center space-y-4 hidden">
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Lanjutkan di Aplikasi E-Wallet</p>
-              <a id="proc-redirect-link" href="" target="_blank" class="inline-flex px-4 md:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition shadow-sm items-center gap-2">
+              <a id="proc-redirect-link" href="" target="_self" class="inline-flex px-4 md:px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold transition shadow-sm items-center gap-2">
                 <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Aplikasi Pembayaran
               </a>
               <p class="text-xs text-slate-500 px-4 md:px-6">Jika tidak diarahkan otomatis, silakan klik tombol di atas untuk membuka aplikasi dompet digital Anda.</p>
@@ -1494,6 +1535,7 @@
                     <a href="#beranda" class="text-slate-600 hover:text-brand-600 font-medium transition">Beranda</a>
                     <a href="#katalog" class="text-slate-600 hover:text-brand-600 font-medium transition">Katalog Produk</a>
                     <a href="#kontak" class="text-slate-600 hover:text-brand-600 font-medium transition">Hubungi Kami</a>
+                    <button onclick="showCustomerHistory()" class="text-slate-600 hover:text-brand-600 font-medium transition"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Riwayat Pesanan</button>
                 </div>
 
                 <!-- Search Bar (Desktop) -->
@@ -1549,6 +1591,7 @@
                 <a href="#beranda" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Beranda</a>
                 <a href="#katalog" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Katalog Produk</a>
                 <a href="#kontak" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Hubungi Kami</a>
+                <button onclick="showCustomerHistory()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Riwayat Pesanan</button>
             </div>
         </div>
     </nav>
@@ -1760,7 +1803,7 @@
             deskripsi: "Layanan jasa pembuatan website profesional, cepat, responsif, dan SEO-friendly. Sangat cocok untuk landing page, profil bisnis perusahaan, portofolio kreatif, hingga toko online (e-commerce).",
             whatsapp: "6281229923834",
             alamat: "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah",
-            email: "marveynopramaditya@gmail.com",
+            email: "marveyno@gmail.com",
             mataUang: "Rp",
             pesanPembuka: "Halo Admin CommerceHub, saya tertarik untuk memesan paket jasa pembuatan website berikut:",
             heroTitle: "Temukan Kebutuhan Anda Lebih Mudah",
@@ -2134,6 +2177,39 @@
             if (document.getElementById("setting-user-email")) document.getElementById("setting-user-email").textContent = currentUser.email || "Anonymous";
             if (document.getElementById("setting-store-status")) document.getElementById("setting-store-status").value = (TOKO_CONFIG.isOpen !== false) ? "open" : "closed";
             renderAdminSocials();
+            
+            // Render Super Admin Panel
+            const OWNER_EMAIL = "marveyno@gmail.com";
+            if (currentUser && currentUser.email === OWNER_EMAIL) {
+                const superAdminSec = document.getElementById("super-admin-section");
+                if (superAdminSec) superAdminSec.classList.remove("hidden");
+            }
+        }
+
+        async function updateSellerSubscription() {
+            const uid = document.getElementById("super-admin-target-uid").value.trim();
+            const dateStr = document.getElementById("super-admin-target-date").value;
+            
+            if (!uid || !dateStr) {
+                showToast("Harap isi UID Seller dan Tanggal Masa Aktif.", "warning");
+                return;
+            }
+            
+            try {
+                const subDate = new Date(dateStr).toISOString();
+                showToast("Memproses pembaruan...", "info");
+                
+                await db.collection("uangku_data").doc(uid).set({
+                    subscriptionUntil: subDate
+                }, { merge: true });
+                
+                showToast("Berhasil update masa aktif Seller!", "success");
+                document.getElementById("super-admin-target-uid").value = "";
+                document.getElementById("super-admin-target-date").value = "";
+            } catch (err) {
+                console.error("Gagal update masa aktif:", err);
+                showToast("Gagal update masa aktif. Pastikan memiliki izin (Rules).", "error");
+            }
         }
 
         // Save customized store settings
@@ -2619,6 +2695,23 @@
                     
                     applyTheme(TOKO_CONFIG.tema || "default");
             await checkOnlinePaymentAvailability();
+            
+                    // CHECK SUBSCRIPTION
+                    if (cloudData.subscriptionUntil && new Date(cloudData.subscriptionUntil).getTime() < Date.now()) {
+                        const overlay = document.getElementById('admin-expired-overlay');
+                        if (overlay) {
+                            overlay.classList.remove('hidden');
+                            overlay.classList.add('flex');
+                            const expDate = new Date(cloudData.subscriptionUntil).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+                            document.getElementById('expired-date-text').textContent = expDate;
+                        }
+                    } else {
+                        const overlay = document.getElementById('admin-expired-overlay');
+                        if (overlay) {
+                            overlay.classList.add('hidden');
+                            overlay.classList.remove('flex');
+                        }
+                    }
 
                     const updated = upgradeCategories(PRODUK_DATA);
                     customerList = cloudData.customer_orders || [];
@@ -4102,6 +4195,21 @@
                     // Save last transaction to localStorage for resuming
                     localStorage.setItem(`last_transaction_${currentSellerId}`, activeOrderId);
                     
+                    // Save to transaction history array
+                    let history = JSON.parse(localStorage.getItem(`customer_history_${currentSellerId}`) || '[]');
+                    // Cegah duplikasi orderId yang sama
+                    if (!history.find(h => h.orderId === data.orderId)) {
+                        history.unshift({
+                            orderId: data.orderId,
+                            tanggal: new Date().toISOString(),
+                            produkNama: payProduct.nama,
+                            qty: payQty,
+                            totalHarga: payProduct.harga * payQty,
+                            paymentMethod: data.paymentMethod
+                        });
+                        localStorage.setItem(`customer_history_${currentSellerId}`, JSON.stringify(history));
+                    }
+                    
                     renderPaymentProcess(data);
                 } else {
                     throw new Error("Gagal membuat pembayaran");
@@ -4123,11 +4231,110 @@
                 
                 showToast(errorMsg, "error");
                 submitBtn.disabled = false;
-                const total = payProduct.harga * payQty;
-                submitBtn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Bayar Rp${total.toLocaleString('id-ID')}`;
+                submitBtn.innerHTML = 'Bayar Sekarang';
+            }
+        }
+
+        function showCustomerHistory() {
+            const modal = document.getElementById("customer-history-modal");
+            const content = document.getElementById("customer-history-content");
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
+            setTimeout(() => {
+                modal.classList.remove("opacity-0");
+                modal.children[0].classList.remove("scale-95");
+            }, 10);
+            
+            let history = JSON.parse(localStorage.getItem(`customer_history_${currentSellerId}`) || '[]');
+            
+            if (history.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-10">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                            <i class="fa-solid fa-box-open text-2xl"></i>
+                        </div>
+                        <p class="text-slate-500 font-medium">Belum ada riwayat pesanan.</p>
+                    </div>`;
+                return;
+            }
+            
+            let html = `<div class="space-y-4">`;
+            history.forEach((h, index) => {
+                const dateStr = new Date(h.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
+                html += `
+                <div class="border border-slate-200 rounded-xl p-4 hover:border-brand-300 transition bg-white shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="text-xs text-slate-500 mb-1">${dateStr}</p>
+                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${h.produkNama}</h4>
+                        </div>
+                        <span id="badge-hist-${h.orderId}" class="px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200"><i class="fa-solid fa-spinner animate-spin mr-1"></i>Cek status</span>
+                    </div>
+                    <div class="flex justify-between items-end mt-3">
+                        <div class="text-xs text-slate-500">
+                            ID: <span class="font-mono bg-slate-100 px-1 rounded">${h.orderId}</span><br>
+                            Metode: <span class="uppercase font-semibold">${h.paymentMethod}</span>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-brand-600">Rp ${(h.totalHarga || 0).toLocaleString('id-ID')}</p>
+                            <button onclick="checkOrderStatusFromHistory('${h.orderId}')" class="mt-2 text-xs text-brand-600 hover:text-brand-700 font-medium underline">Refresh / Bayar</button>
+                        </div>
+                    </div>
+                </div>`;
+                
+                // Trigger auto-check status
+                setTimeout(() => checkSilentStatus(h.orderId), 100 * index);
+            });
+            html += `</div>`;
+            content.innerHTML = html;
+        }
+        
+        function closeCustomerHistory() {
+            const modal = document.getElementById("customer-history-modal");
+            modal.classList.add("opacity-0");
+            modal.children[0].classList.add("scale-95");
+            setTimeout(() => {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }, 300);
+        }
+        
+        async function checkSilentStatus(orderId) {
+            try {
+                const badge = document.getElementById(`badge-hist-${orderId}`);
+                if (!badge) return;
+                
+                const res = await fetch('/api/get-status?orderId=' + orderId);
+                const data = await res.json();
+                
+                if (data.success && data.transaction) {
+                    const st = data.transaction.status;
+                    if (st === 'success' || st === 'settlement' || st === 'capture') {
+                        badge.className = "px-2 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold border border-green-200";
+                        badge.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i>Sukses';
+                    } else if (st === 'failed' || st === 'cancel' || st === 'deny' || st === 'expire') {
+                        badge.className = "px-2 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-200";
+                        badge.innerHTML = '<i class="fa-solid fa-times-circle mr-1"></i>Gagal / Expire';
+                    } else {
+                        badge.className = "px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-xs font-bold border border-amber-200";
+                        badge.innerHTML = '<i class="fa-solid fa-clock mr-1"></i>Pending';
+                    }
+                } else {
+                    badge.innerHTML = 'Tidak ditemukan';
+                }
+            } catch (e) {
+                // Ignore silent errors
             }
         }
         
+        async function checkOrderStatusFromHistory(orderId) {
+            closeCustomerHistory();
+            activeOrderId = orderId;
+            localStorage.setItem(`last_transaction_${currentSellerId}`, activeOrderId);
+            showToast("Mengecek pesanan...", "info");
+            checkPaymentStatus();
+        }
+
         function renderPaymentProcess(data) {
             document.getElementById("payment-input-section").classList.add("hidden");
             document.getElementById("payment-process-section").classList.remove("hidden");
@@ -4504,17 +4711,18 @@
                 });
                 
                 const responseText = await res.text();
+                
+                if (res.status === 404) {
+                    showToast("Endpoint /api/save-payment-config tidak ditemukan (404). Pastikan deploy Vercel berhasil.", "error");
+                    return;
+                }
+                
                 let result;
                 try {
                     result = JSON.parse(responseText);
                 } catch(e) {
-                    console.error("Vercel HTML Error Response:", responseText);
-                    showToast("Error sistem: Endpoint gagal dieksekusi (Lihat console).", "error");
-                    return;
-                }
-
-                if (res.status === 404) {
-                    showToast("Endpoint /api/save-payment-config tidak ditemukan di Vercel.", "error");
+                    console.error("Vercel Error Body:", responseText);
+                    showToast("Vercel Error " + res.status + ": Server gagal merespon JSON.", "error");
                     return;
                 }
                 
@@ -4558,17 +4766,18 @@
                 });
                 
                 const responseText = await res.text();
+                
+                if (res.status === 404) {
+                    showToast("Endpoint /api/test-midtrans-connection tidak ditemukan (404).", "error");
+                    return;
+                }
+                
                 let result;
                 try {
                     result = JSON.parse(responseText);
                 } catch(e) {
-                    console.error("Vercel HTML Error Response:", responseText);
-                    showToast("Error sistem: Endpoint gagal dieksekusi (Lihat console).", "error");
-                    return;
-                }
-
-                if (res.status === 404) {
-                    showToast("Endpoint /api/test-midtrans-connection tidak ditemukan di Vercel.", "error");
+                    console.error("Vercel Error Body:", responseText);
+                    showToast("Vercel Error " + res.status + ": Server gagal merespon JSON.", "error");
                     return;
                 }
                 
@@ -4635,6 +4844,24 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Modal Riwayat Transaksi Customer -->
+    <div id="customer-history-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-clock-rotate-left mr-2 text-brand-500"></i>Riwayat Pesanan Saya</h3>
+                <button onclick="closeCustomerHistory()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition shadow-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div class="p-6 overflow-y-auto" id="customer-history-content">
+                <!-- Injected via JS -->
+            </div>
+        </div>
     </div>
 
 </body>
