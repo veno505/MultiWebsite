@@ -749,6 +749,14 @@
                 <input type="email" id="setting-store-email" class="form-input" placeholder="cs@domain.com">
               </div>
               <div>
+                <label class="form-label">Jam Buka (Opsional)</label>
+                <input type="time" id="setting-store-open" class="form-input">
+              </div>
+              <div>
+                <label class="form-label">Jam Tutup (Opsional)</label>
+                <input type="time" id="setting-store-close" class="form-input">
+              </div>
+              <div>
                 <label class="form-label">Judul Tampilan Awal (Hero)</label>
                 <input type="text" id="setting-hero-title" class="form-input" placeholder="Contoh: Temukan Kebutuhan Anda Lebih Mudah">
               </div>
@@ -1535,7 +1543,6 @@
                     <a href="#beranda" class="text-slate-600 hover:text-brand-600 font-medium transition">Beranda</a>
                     <a href="#katalog" class="text-slate-600 hover:text-brand-600 font-medium transition">Katalog Produk</a>
                     <a href="#kontak" class="text-slate-600 hover:text-brand-600 font-medium transition">Hubungi Kami</a>
-                    <button onclick="showCustomerHistory()" class="text-slate-600 hover:text-brand-600 font-medium transition"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Riwayat Pesanan</button>
                 </div>
 
                 <!-- Search Bar (Desktop) -->
@@ -1591,34 +1598,36 @@
                 <a href="#beranda" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Beranda</a>
                 <a href="#katalog" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Katalog Produk</a>
                 <a href="#kontak" class="block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50">Hubungi Kami</a>
-                <button onclick="showCustomerHistory()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-brand-600 hover:bg-slate-50"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Riwayat Pesanan</button>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="beranda" class="pt-32 pb-16 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-8 md:gap-12">
-        <div class="w-full md:w-1/2 space-y-6 text-center md:text-left">
-            <div id="hero-store-status" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-brand-500 text-sm font-medium border border-slate-200">
+    <section id="beranda" class="pt-24 pb-8 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6 md:gap-12">
+        <div class="w-full md:w-1/2 space-y-4 md:space-y-6 text-center md:text-left">
+            <div id="hero-store-status" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-brand-500 text-xs md:text-sm font-medium border border-slate-200">
                 <span class="relative flex h-2 w-2">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
                 </span>
                 Toko Buka & Siap Melayani
             </div>
-            <h1 id="hero-title-display" class="text-xl md:text-2xl md:text-3xl md:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
+            <h1 id="hero-title-display" class="text-2xl sm:text-3xl md:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
                 Temukan Kebutuhan Anda <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-brand-700">Lebih Mudah</span>
             </h1>
             <p class="text-lg text-slate-600 max-w-xl mx-auto md:mx-0" id="store-desc-display">
                 Kami menyediakan berbagai macam produk berkualitas dengan harga terbaik. Pesan sekarang langsung via WhatsApp tanpa ribet!
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
+            <div class="flex flex-row flex-wrap gap-3 justify-center md:justify-start pt-4">
                 <a href="#katalog" class="px-4 md:px-8 py-3.5 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-medium transition-all shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2">
                     Mulai Belanja <i class="fa-solid fa-arrow-right"></i>
                 </a>
-                <a href="#kontak" class="px-4 md:px-8 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-full font-medium transition-all flex items-center justify-center gap-2 shadow-sm">
-                    Hubungi Admin <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                <a href="#kontak" class="px-4 md:px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-full font-medium transition-all flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-green-500"></i> Admin
                 </a>
+                <button onclick="showCustomerHistory()" class="px-4 md:px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-full font-medium transition-all flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Riwayat
+                </button>
             </div>
         </div>
         <div class="w-full md:w-1/2">
@@ -1658,7 +1667,7 @@
             </div>
 
             <!-- Product Grid -->
-            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 px-1 md:px-0">
                 <!-- Product Cards will be injected here by JS -->
             </div>
 
@@ -2172,6 +2181,8 @@
             if (document.getElementById("setting-store-desc")) document.getElementById("setting-store-desc").value = TOKO_CONFIG.deskripsi || "";
             if (document.getElementById("setting-store-address")) document.getElementById("setting-store-address").value = TOKO_CONFIG.alamat || "";
             if (document.getElementById("setting-store-email")) document.getElementById("setting-store-email").value = TOKO_CONFIG.email || "";
+            if (document.getElementById("setting-store-open")) document.getElementById("setting-store-open").value = TOKO_CONFIG.openHour || "";
+            if (document.getElementById("setting-store-close")) document.getElementById("setting-store-close").value = TOKO_CONFIG.closeHour || "";
             document.getElementById("setting-hero-title").value = TOKO_CONFIG.heroTitle || "Temukan Kebutuhan Anda Lebih Mudah";
             document.getElementById("setting-hero-image").value = TOKO_CONFIG.heroImage || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
             if (document.getElementById("setting-user-email")) document.getElementById("setting-user-email").textContent = currentUser.email || "Anonymous";
@@ -2234,6 +2245,12 @@
             TOKO_CONFIG.deskripsi = desc;
             TOKO_CONFIG.alamat = address;
             TOKO_CONFIG.email = email;
+            
+            const openHour = document.getElementById("setting-store-open") ? document.getElementById("setting-store-open").value : "";
+            const closeHour = document.getElementById("setting-store-close") ? document.getElementById("setting-store-close").value : "";
+            TOKO_CONFIG.openHour = openHour;
+            TOKO_CONFIG.closeHour = closeHour;
+            
             if (heroTitle) TOKO_CONFIG.heroTitle = heroTitle;
             if (heroImage) TOKO_CONFIG.heroImage = heroImage;
             TOKO_CONFIG.tema = selectedTheme;
@@ -2705,6 +2722,10 @@
                             const expDate = new Date(cloudData.subscriptionUntil).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
                             document.getElementById('expired-date-text').textContent = expDate;
                         }
+                        // Nonaktifkan toko di frontend untuk customer
+                        TOKO_CONFIG.isOpen = false;
+                        TOKO_CONFIG.nama = "[NONAKTIF] " + (TOKO_CONFIG.nama || "Toko");
+                        TOKO_CONFIG.deskripsi = "Masa aktif berlangganan toko ini telah habis. Silakan hubungi admin.";
                     } else {
                         const overlay = document.getElementById('admin-expired-overlay');
                         if (overlay) {
@@ -2908,7 +2929,7 @@
                         <!-- Bagian Gambar -->
                         <div class="relative w-full aspect-square overflow-hidden bg-slate-100 cursor-pointer" onclick="openModal('${p.gambar}')">
                             <img src="${p.gambar}" alt="${p.nama}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            <div class="absolute top-3 right-3 bg-slate-100/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-semibold text-brand-500 border border-slate-200/50">
+                            <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-slate-100/90 backdrop-blur-sm px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg text-[10px] md:text-xs font-semibold text-brand-500 border border-slate-200/50">
                                 ${p.kategori}
                             </div>
                             <!-- Overlay Hover Icon -->
@@ -2920,29 +2941,29 @@
                         </div>
                         
                         <!-- Bagian Konten -->
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h3 class="font-bold text-slate-800 text-base mb-1 line-clamp-2 leading-tight min-h-[2.5rem] group-hover:text-brand-600 transition-colors">${p.nama}</h3>
-                            <p class="text-brand-600 font-bold text-lg mb-2">${formatRupiah(p.harga)}</p>
-                            <p class="text-slate-500 text-xs mb-4 line-clamp-2 flex-grow">${p.deskripsi || ''}</p>
+                        <div class="p-3 md:p-5 flex flex-col flex-grow">
+                            <h3 class="font-bold text-slate-800 text-xs md:text-base mb-1 line-clamp-2 leading-tight min-h-[2rem] md:min-h-[2.5rem] group-hover:text-brand-600 transition-colors">${p.nama}</h3>
+                            <p class="text-brand-600 font-bold text-sm md:text-lg mb-1.5 md:mb-2">${formatRupiah(p.harga)}</p>
+                            <p class="text-slate-500 text-[10px] md:text-xs mb-3 md:mb-4 line-clamp-2 flex-grow">${p.deskripsi || ''}</p>
                             
                             <!-- Tombol Aksi -->
                             <div class="pt-3 border-t border-slate-200 mt-auto space-y-2">
-                                <div class="grid grid-cols-3 gap-1.5">
-                                    <button onclick="openProductDetail('${p.id}')" title="Info Produk" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
-                                        <i class="fa-solid fa-circle-info text-sky-500"></i> Info
+                                <div class="grid grid-cols-3 gap-1 md:gap-1.5">
+                                    <button onclick="openProductDetail('${p.id}')" title="Info Produk" class="py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-1.5">
+                                        <i class="fa-solid fa-circle-info text-sky-500 text-sm md:text-xs"></i> <span class="hidden sm:inline">Info</span>
                                     </button>
-                                    <button onclick="copyProductLink('${p.id}')" title="Salin Tautan" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
-                                        <i class="fa-solid fa-link text-indigo-500"></i> Salin
+                                    <button onclick="copyProductLink('${p.id}')" title="Salin Tautan" class="py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-1.5">
+                                        <i class="fa-solid fa-link text-indigo-500 text-sm md:text-xs"></i> <span class="hidden sm:inline">Salin</span>
                                     </button>
-                                    <button onclick="addToCart('${p.id}')" title="Keranjang" class="py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
-                                        <i class="fa-solid fa-cart-plus text-teal-500"></i> Simpan
+                                    <button onclick="addToCart('${p.id}')" title="Keranjang" class="py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-1.5">
+                                        <i class="fa-solid fa-cart-plus text-teal-500 text-sm md:text-xs"></i> <span class="hidden sm:inline">Simpan</span>
                                     </button>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button onclick="openPaymentPage('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl transition shadow-sm">
-                                        <i class="fa-solid fa-credit-card"></i> Beli Sekarang
+                                <div class="flex flex-col sm:flex-row gap-1.5 md:gap-2">
+                                    <button onclick="openPaymentPage('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 md:py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition shadow-sm">
+                                        <i class="fa-solid fa-credit-card"></i> <span class="sm:inline">Beli</span>
                                     </button>
-                                    <button onclick="openCustomerForm('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-wa text-white text-xs font-semibold rounded-xl transition hover:opacity-90">
+                                    <button onclick="openCustomerForm('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 md:py-2.5 bg-wa text-white text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition hover:opacity-90">
                                         <i class="fa-brands fa-whatsapp text-xs"></i> via WA
                                     </button>
                                 </div>
@@ -3850,19 +3871,57 @@
                     heroTitleEl.textContent = titleText;
                 }
             }
+        } // ADDED MISSING BRACE HERE
+        
+        // Fungsi pembantu mengecek status buka/tutup toko
+        function isStoreCurrentlyOpen() {
+            if (TOKO_CONFIG.isOpen === false) return false;
             
-            var heroImgEl = document.getElementById("hero-image-display");
+            if (TOKO_CONFIG.openHour && TOKO_CONFIG.closeHour) {
+                const now = new Date();
+                const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                
+                const [oH, oM] = TOKO_CONFIG.openHour.split(':').map(Number);
+                const [cH, cM] = TOKO_CONFIG.closeHour.split(':').map(Number);
+                
+                const openMinutes = oH * 60 + oM;
+                const closeMinutes = cH * 60 + cM;
+                
+                if (closeMinutes < openMinutes) {
+                    return currentMinutes >= openMinutes || currentMinutes <= closeMinutes;
+                } else {
+                    return currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+                }
+            }
+            return true;
+        }
+
+        // Render header toko di halaman pelanggan
+        function renderHero() {
+            if (document.getElementById("hero-store-name")) document.getElementById("hero-store-name").textContent = TOKO_CONFIG.nama || "Toko Anda";
+            if (document.getElementById("hero-store-desc")) document.getElementById("hero-store-desc").textContent = TOKO_CONFIG.deskripsi || "Deskripsi toko belum ditambahkan.";
+            if (document.getElementById("hero-title-main")) document.getElementById("hero-title-main").textContent = TOKO_CONFIG.heroTitle || "Temukan Kebutuhan Anda Lebih Mudah";
+            
+            const heroImgEl = document.getElementById("hero-image-display");
             if (heroImgEl) {
                 heroImgEl.src = TOKO_CONFIG.heroImage || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
             }
             
             const heroStatus = document.getElementById("hero-store-status");
             if (heroStatus) {
-                if (TOKO_CONFIG.isOpen !== false) {
-                    heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> Toko Buka & Siap Melayani';
+                if (isStoreCurrentlyOpen()) {
+                    let text = "Toko Buka & Siap Melayani";
+                    if (TOKO_CONFIG.openHour && TOKO_CONFIG.closeHour) {
+                        text = `Buka (${TOKO_CONFIG.openHour} - ${TOKO_CONFIG.closeHour})`;
+                    }
+                    heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> ' + text;
                     heroStatus.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-sm font-medium border border-emerald-100";
                 } else {
-                    heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span> Toko Sedang Tutup';
+                    let text = "Toko Sedang Tutup";
+                    if (TOKO_CONFIG.openHour && TOKO_CONFIG.closeHour && TOKO_CONFIG.isOpen !== false) {
+                        text = `Tutup (Buka jam ${TOKO_CONFIG.openHour})`;
+                    }
+                    heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span> ' + text;
                     heroStatus.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-medium border border-red-100";
                 }
             }
@@ -4062,7 +4121,7 @@
         function openPaymentPage(productId) {
             const p = PRODUK_DATA.find(x => x.id === productId);
             if (!p) return;
-            if (TOKO_CONFIG.isOpen === false) { showToast("Maaf, toko sedang tutup. Tidak dapat memesan saat ini.", "warning"); return; }
+            if (!isStoreCurrentlyOpen()) { showToast("Maaf, toko sedang tutup. Tidak dapat memesan saat ini.", "warning"); return; }
             
             p.checkouts = (p.checkouts || 0) + 1;
             saveData(false);
@@ -4250,10 +4309,10 @@
             if (history.length === 0) {
                 content.innerHTML = `
                     <div class="text-center py-10">
-                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                        <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
                             <i class="fa-solid fa-box-open text-2xl"></i>
                         </div>
-                        <p class="text-slate-500 font-medium">Belum ada riwayat pesanan.</p>
+                        <p class="text-slate-400 font-medium">Belum ada riwayat pesanan.</p>
                     </div>`;
                 return;
             }
@@ -4262,22 +4321,22 @@
             history.forEach((h, index) => {
                 const dateStr = new Date(h.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
                 html += `
-                <div class="border border-slate-200 rounded-xl p-4 hover:border-brand-300 transition bg-white shadow-sm">
+                <div class="border border-slate-700 rounded-xl p-4 hover:border-brand-500 transition bg-slate-800 shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <p class="text-xs text-slate-500 mb-1">${dateStr}</p>
-                            <h4 class="font-bold text-slate-800 text-sm md:text-base">${h.produkNama}</h4>
+                            <p class="text-xs text-slate-400 mb-1">${dateStr}</p>
+                            <h4 class="font-bold text-white text-sm md:text-base">${h.produkNama}</h4>
                         </div>
-                        <span id="badge-hist-${h.orderId}" class="px-2 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200"><i class="fa-solid fa-spinner animate-spin mr-1"></i>Cek status</span>
+                        <span id="badge-hist-${h.orderId}" class="px-2 py-1 rounded-full bg-slate-700 text-slate-300 text-xs font-bold border border-slate-600"><i class="fa-solid fa-spinner animate-spin mr-1"></i>Cek status</span>
                     </div>
                     <div class="flex justify-between items-end mt-3">
-                        <div class="text-xs text-slate-500">
-                            ID: <span class="font-mono bg-slate-100 px-1 rounded">${h.orderId}</span><br>
-                            Metode: <span class="uppercase font-semibold">${h.paymentMethod}</span>
+                        <div class="text-xs text-slate-400">
+                            ID: <span class="font-mono bg-slate-700 px-1 rounded text-slate-300">${h.orderId}</span><br>
+                            Metode: <span class="uppercase font-semibold text-slate-300">${h.paymentMethod}</span>
                         </div>
                         <div class="text-right">
-                            <p class="text-sm font-bold text-brand-600">Rp ${(h.totalHarga || 0).toLocaleString('id-ID')}</p>
-                            <button onclick="checkOrderStatusFromHistory('${h.orderId}')" class="mt-2 text-xs text-brand-600 hover:text-brand-700 font-medium underline">Refresh / Bayar</button>
+                            <p class="text-sm font-bold text-brand-400">Rp ${(h.totalHarga || 0).toLocaleString('id-ID')}</p>
+                            <button onclick="checkOrderStatusFromHistory('${h.orderId}')" class="mt-2 text-xs text-brand-400 hover:text-brand-300 font-medium underline">Refresh / Bayar</button>
                         </div>
                     </div>
                 </div>`;
@@ -4310,13 +4369,13 @@
                 if (data.success && data.transaction) {
                     const st = data.transaction.status;
                     if (st === 'success' || st === 'settlement' || st === 'capture') {
-                        badge.className = "px-2 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold border border-green-200";
+                        badge.className = "px-2 py-1 rounded-full bg-green-900/30 text-green-400 text-xs font-bold border border-green-800";
                         badge.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i>Sukses';
                     } else if (st === 'failed' || st === 'cancel' || st === 'deny' || st === 'expire') {
-                        badge.className = "px-2 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-200";
+                        badge.className = "px-2 py-1 rounded-full bg-red-900/30 text-red-400 text-xs font-bold border border-red-800";
                         badge.innerHTML = '<i class="fa-solid fa-times-circle mr-1"></i>Gagal / Expire';
                     } else {
-                        badge.className = "px-2 py-1 rounded-full bg-amber-50 text-amber-600 text-xs font-bold border border-amber-200";
+                        badge.className = "px-2 py-1 rounded-full bg-amber-900/30 text-amber-400 text-xs font-bold border border-amber-800";
                         badge.innerHTML = '<i class="fa-solid fa-clock mr-1"></i>Pending';
                     }
                 } else {
@@ -4501,19 +4560,31 @@
         async function checkActiveTransactionOnLoad() {
             if (!currentSellerId) return;
             const key = `last_transaction_${currentSellerId}`;
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectOrderId = urlParams.get('order_id');
             const storedOrderId = localStorage.getItem(key);
-            if (!storedOrderId) return;
+            const orderIdToCheck = redirectOrderId || storedOrderId;
+            
+            if (!orderIdToCheck) return;
             
             try {
-                const response = await fetch(`/api/get-status?orderId=${storedOrderId}`);
+                const response = await fetch(`/api/get-status?orderId=${orderIdToCheck}`);
                 if (!response.ok) {
-                    if (response.status === 404) localStorage.removeItem(key);
+                    if (response.status === 404 && !redirectOrderId) localStorage.removeItem(key);
                     return;
                 }
                 const data = await response.json();
                 if (data.success && (data.status === 'pending' || data.status === 'success')) {
-                    showFloatingTxWidget(data.orderId, data.status, data.totalHarga, data.productNama, data.qty);
-                } else {
+                    if (redirectOrderId) {
+                        if (data.status === 'pending') {
+                            resumePendingTransaction(data.orderId);
+                        } else {
+                            showSuccessTransaction(data.orderId);
+                        }
+                    } else {
+                        showFloatingTxWidget(data.orderId, data.status, data.totalHarga, data.productNama, data.qty);
+                    }
+                } else if (!redirectOrderId) {
                     localStorage.removeItem(key);
                 }
             } catch (e) {
@@ -4847,12 +4918,12 @@
     </div>
 
     <!-- Modal Riwayat Transaksi Customer -->
-    <div id="customer-history-modal" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
+    <div id="customer-history-modal" class="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-700 overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]">
             <!-- Header -->
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-slate-800 text-lg"><i class="fa-solid fa-clock-rotate-left mr-2 text-brand-500"></i>Riwayat Pesanan Saya</h3>
-                <button onclick="closeCustomerHistory()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800">
+                <h3 class="font-bold text-white text-lg"><i class="fa-solid fa-clock-rotate-left mr-2 text-brand-500"></i>Riwayat Pesanan Saya</h3>
+                <button onclick="closeCustomerHistory()" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-600 hover:bg-slate-700 flex items-center justify-center text-slate-300 transition shadow-sm">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
