@@ -2757,18 +2757,51 @@
                     await checkOnlinePaymentAvailability();
             
                     // CHECK SUBSCRIPTION
-                    if (cloudData.subscriptionUntil && new Date(cloudData.subscriptionUntil).getTime() < Date.now()) {
-                        const overlay = document.getElementById('admin-expired-overlay');
-                        if (overlay) {
-                            overlay.classList.remove('hidden');
-                            overlay.classList.add('flex');
-                            const expDate = new Date(cloudData.subscriptionUntil).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
-                            document.getElementById('expired-date-text').textContent = expDate;
+                    if (window.subscriptionTimeout) clearTimeout(window.subscriptionTimeout);
+                    
+                    if (cloudData.subscriptionUntil) {
+                        const timeRemaining = new Date(cloudData.subscriptionUntil).getTime() - Date.now();
+                        
+                        if (timeRemaining <= 0) {
+                            const overlay = document.getElementById('admin-expired-overlay');
+                            if (overlay) {
+                                overlay.classList.remove('hidden');
+                                overlay.classList.add('flex');
+                                const expDate = new Date(cloudData.subscriptionUntil).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+                                document.getElementById('expired-date-text').textContent = expDate;
+                            }
+                            
+                            // Jika seller yang login masa aktifnya habis, paksa logout (kecuali owner)
+                            if (currentUser && currentUser.uid === currentSellerId && currentUser.email !== "marveyno@gmail.com") {
+                                firebase.auth().signOut().then(() => {
+                                    window.location.reload();
+                                });
+                            }
+                            
+                            // Nonaktifkan toko di frontend untuk customer
+                            TOKO_CONFIG.isOpen = false;
+                            TOKO_CONFIG.nama = "[NONAKTIF] " + (TOKO_CONFIG.nama || "Toko");
+                            TOKO_CONFIG.deskripsi = "Masa aktif berlangganan toko ini telah habis. Silakan hubungi admin.";
+                        } else {
+                            const overlay = document.getElementById('admin-expired-overlay');
+                            if (overlay) {
+                                overlay.classList.add('hidden');
+                                overlay.classList.remove('flex');
+                            }
+                            
+                            // Set timer agar otomatis logout/reload saat waktunya tiba
+                            // Max safe timeout in JS is 2147483647 ms (sekitar 24.8 hari)
+                            const delay = Math.min(timeRemaining, 2147483647);
+                            window.subscriptionTimeout = setTimeout(() => {
+                                if (currentUser && currentUser.uid === currentSellerId && currentUser.email !== "marveyno@gmail.com") {
+                                    firebase.auth().signOut().then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    window.location.reload();
+                                }
+                            }, delay);
                         }
-                        // Nonaktifkan toko di frontend untuk customer
-                        TOKO_CONFIG.isOpen = false;
-                        TOKO_CONFIG.nama = "[NONAKTIF] " + (TOKO_CONFIG.nama || "Toko");
-                        TOKO_CONFIG.deskripsi = "Masa aktif berlangganan toko ini telah habis. Silakan hubungi admin.";
                     } else {
                         const overlay = document.getElementById('admin-expired-overlay');
                         if (overlay) {
