@@ -1933,14 +1933,20 @@
                 // Jika marveyno, biarkan dia mengedit halaman 'default' (Tampilan Awal)
                 if (user.email === "marveyno@gmail.com") {
                     var urlP = new URLSearchParams(window.location.search);
-                    currentSellerId = urlP.get('s') || urlP.get('seller') || "default";
+                    let sParam = urlP.get('s') || urlP.get('seller') || "default";
+                    if (sParam.includes('?')) sParam = sParam.split('?')[0];
+                    if (sParam.includes('&')) sParam = sParam.split('&')[0];
+                    currentSellerId = sParam;
                 } else {
                     currentSellerId = user.uid;
                 }
             } else {
                 currentUser = null;
                 var urlP = new URLSearchParams(window.location.search);
-                currentSellerId = urlP.get('s') || urlP.get('seller') || "default";
+                let sParam = urlP.get('s') || urlP.get('seller') || "default";
+                if (sParam.includes('?')) sParam = sParam.split('?')[0];
+                if (sParam.includes('&')) sParam = sParam.split('&')[0];
+                currentSellerId = sParam;
             }
             updateAdminButtonVisibility();
             updateCartBadge();
@@ -2079,7 +2085,10 @@
                 firebase.auth().signOut().then(() => {
                     currentUser = null;
                     var urlP = new URLSearchParams(window.location.search);
-                    currentSellerId = urlP.get('s') || urlP.get('seller') || "default";
+                    let sParam = urlP.get('s') || urlP.get('seller') || "default";
+                    if (sParam.includes('?')) sParam = sParam.split('?')[0];
+                    if (sParam.includes('&')) sParam = sParam.split('&')[0];
+                    currentSellerId = sParam;
                     authMode = "login";
                     
                     updateCartBadge();
