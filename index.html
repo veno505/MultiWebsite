@@ -2729,11 +2729,16 @@
             return updated;
         }
 
-        async function loadData() {
+        let unsubscribeData = null;
+        function loadData() {
             setCloudStatus("Menghubungkan cloud...", "amber");
             const docRef = db.collection("uangku_data").doc(currentSellerId);
-            try {
-                const docSnap = await docRef.get();
+            
+            if (unsubscribeData) {
+                unsubscribeData();
+            }
+
+            unsubscribeData = docRef.onSnapshot(async (docSnap) => {
                 if (docSnap.exists) {
                     const cloudData = docSnap.data();
                     PRODUK_DATA = cloudData.produk_data || [...DEFAULT_PRODUK];
@@ -2749,7 +2754,7 @@
                     }
                     
                     applyTheme(TOKO_CONFIG.tema || "default");
-            await checkOnlinePaymentAvailability();
+                    await checkOnlinePaymentAvailability();
             
                     // CHECK SUBSCRIPTION
                     if (cloudData.subscriptionUntil && new Date(cloudData.subscriptionUntil).getTime() < Date.now()) {
@@ -2776,9 +2781,9 @@
                     customerList = cloudData.customer_orders || [];
                     rekapList = cloudData.rekap_transaksi || [];
                     
-                    setCloudStatus("Sinkron dengan Cloud", "green");
+                    setCloudStatus("Sinkron Real-Time", "green");
                     if (updated) {
-                        saveData(false);
+                        docRef.set({ produk_data: PRODUK_DATA }, { merge: true });
                     }
                 } else {
                     PRODUK_DATA = [...DEFAULT_PRODUK];
@@ -2786,7 +2791,7 @@
                     rekapList = [];
                     TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
                     
-                    await docRef.set({
+                    docRef.set({
                         produk_data: PRODUK_DATA,
                         customer_orders: customerList,
                         rekap_transaksi: rekapList,
@@ -2794,8 +2799,23 @@
                     });
                     setCloudStatus("Sinkron dengan Cloud (Awal)", "green");
                 }
-            } catch (error) {
-                console.error("Gagal menarik data dari Firebase:", error);
+                
+                initStoreInfo();
+                renderCategories();
+                renderProducts();
+                renderAdminProductList();
+                renderCustomerTable();
+                renderRecapTable();
+                
+                const activeElement = document.activeElement;
+                const isTyping = activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName);
+                if (!isTyping) {
+                    renderAccountSettings();
+                }
+                
+                updateDrawerUI();
+            }, (error) => {
+                console.error("Gagal menarik data dari Firebase (Realtime):", error);
                 setCloudStatus("Offline Mode (Gagal Cloud)", "red");
                 
                 const localProd = localStorage.getItem("produk_data_" + currentSellerId);
@@ -2810,16 +2830,16 @@
                     TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
                 }
                 applyTheme(TOKO_CONFIG.tema || "default");
-            }
-            
-            initStoreInfo();
-            renderCategories();
-            renderProducts();
-            renderAdminProductList();
-            renderCustomerTable();
-            renderRecapTable();
-            renderAccountSettings();
-            updateDrawerUI();
+                
+                initStoreInfo();
+                renderCategories();
+                renderProducts();
+                renderAdminProductList();
+                renderCustomerTable();
+                renderRecapTable();
+                renderAccountSettings();
+                updateDrawerUI();
+            });
         }
 
         // --- SAVE DATA ---
@@ -2841,15 +2861,15 @@
                 localStorage.setItem("customer_orders_" + currentSellerId, JSON.stringify(customerList));
                 localStorage.setItem("rekap_transaksi_" + currentSellerId, JSON.stringify(rekapList));
                 localStorage.setItem("toko_config_" + currentSellerId, JSON.stringify(TOKO_CONFIG));
-            }
-            
-            if (render) {
-                renderCategories();
-                renderProducts();
-                renderAdminProductList();
-                renderCustomerTable();
-                renderRecapTable();
-                renderAccountSettings();
+                
+                if (render) {
+                    renderCategories();
+                    renderProducts();
+                    renderAdminProductList();
+                    renderCustomerTable();
+                    renderRecapTable();
+                    renderAccountSettings();
+                }
             }
         }
         
