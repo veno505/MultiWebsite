@@ -4422,7 +4422,7 @@
             history.forEach((h, index) => {
                 const dateStr = new Date(h.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'});
                 html += `
-                <div class="border border-[#334155] rounded-xl p-4 hover:border-brand-500 transition bg-[#1e293b] shadow-sm">
+                <div onclick="checkOrderStatusFromHistory('${h.orderId}')" class="cursor-pointer border border-[#334155] rounded-xl p-4 hover:border-brand-500 transition bg-[#1e293b] shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <p class="text-xs text-[#94a3b8] mb-1">${dateStr}</p>
@@ -4437,7 +4437,6 @@
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-bold text-brand-400">Rp ${(h.totalHarga || 0).toLocaleString('id-ID')}</p>
-                            <button onclick="checkOrderStatusFromHistory('${h.orderId}')" class="mt-2 text-xs text-brand-400 hover:text-brand-300 font-medium underline">Refresh / Bayar</button>
                         </div>
                     </div>
                 </div>`;
@@ -4489,7 +4488,7 @@
         
         async function checkOrderStatusFromHistory(orderId) {
             closeCustomerHistory();
-            resumeLastTransaction(orderId);
+            resumePendingTransaction(orderId);
         }
 
         function renderPaymentProcess(data) {
@@ -4621,10 +4620,12 @@
                         });
                         document.getElementById("payment-page").classList.remove("hidden");
                         document.body.style.overflow = "hidden";
-                    } else if (data.status === 'success') {
+                    } else if (data.status === 'success' || data.status === 'settlement' || data.status === 'capture') {
                         renderPaymentSuccess(data);
                         document.getElementById("payment-page").classList.remove("hidden");
                         document.body.style.overflow = "hidden";
+                    } else {
+                        showToast("Pesanan ini telah gagal atau kedaluwarsa.", "error");
                     }
                 }
             } catch (err) {
