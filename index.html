@@ -3006,6 +3006,9 @@
             } else {
                 grid.classList.remove("hidden");
                 if (emptyState) emptyState.classList.add("hidden");
+                
+                const isOpen = typeof isStoreCurrentlyOpen === 'function' ? isStoreCurrentlyOpen() : true;
+                const btnClass = isOpen ? "" : "opacity-50 grayscale cursor-not-allowed";
 
                 filteredProducts.forEach((p, index) => {
                     const animDelay = index * 50;
@@ -3055,15 +3058,15 @@
                                     <button onclick="copyProductLink('${p.id}')" title="Salin Tautan" class="py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-1.5">
                                         <i class="fa-solid fa-link text-indigo-500 text-sm md:text-xs"></i> <span class="hidden sm:inline">Salin</span>
                                     </button>
-                                    <button onclick="addToCart('${p.id}')" title="Keranjang" class="py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-1.5">
+                                    <button onclick="addToCart('${p.id}')" title="Keranjang" class="py-1.5 md:py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition flex flex-col md:flex-row items-center justify-center gap-0.5 md:gap-1.5 ${btnClass}">
                                         <i class="fa-solid fa-cart-plus text-teal-500 text-sm md:text-xs"></i> <span class="hidden sm:inline">Simpan</span>
                                     </button>
                                 </div>
                                 <div class="flex flex-col sm:flex-row gap-1.5 md:gap-2">
-                                    <button onclick="openPaymentPage('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 md:py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition shadow-sm">
+                                    <button onclick="openPaymentPage('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 md:py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition shadow-sm ${btnClass}">
                                         <i class="fa-solid fa-credit-card"></i> <span class="sm:inline">Beli</span>
                                     </button>
-                                    <button onclick="openCustomerForm('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 md:py-2.5 bg-wa text-white text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition hover:opacity-90">
+                                    <button onclick="openCustomerForm('${p.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-1.5 md:py-2.5 bg-wa text-white text-[10px] md:text-xs font-semibold rounded-lg md:rounded-xl transition hover:opacity-90 ${btnClass}">
                                         <i class="fa-brands fa-whatsapp text-xs"></i> via WA
                                     </button>
                                 </div>
@@ -3153,9 +3156,9 @@
                 
                 var checkoutBtn = document.getElementById("cart-checkout-btn");
                 if (checkoutBtn) {
-                    if (selectedCart.length === 0) {
+                    if (selectedCart.length === 0 || !isStoreCurrentlyOpen()) {
                         checkoutBtn.disabled = true;
-                        checkoutBtn.classList.add("opacity-50", "cursor-not-allowed");
+                        checkoutBtn.classList.add("opacity-50", "grayscale", "cursor-not-allowed");
                     } else {
                         checkoutBtn.disabled = false;
                         checkoutBtn.classList.remove("opacity-50", "cursor-not-allowed");
@@ -3165,6 +3168,7 @@
         }
         
         function checkoutAllCart() {
+            if (!isStoreCurrentlyOpen()) { showToast("Maaf, toko sedang tutup. Tidak dapat memesan saat ini.", "warning"); return; }
             var cart=getCart();
             var selected = cart.filter(function(i) { return i.checked !== false; });
             if(!selected.length){showToast("Pilih minimal 1 produk untuk dipesan.","warning");return;}
@@ -4053,12 +4057,27 @@
             document.getElementById("floating-wa").href = waGeneralUrl;
         }
         
+        let lastStoreOpenState = null;
+        
         // Auto update UI status toko setiap 30 detik agar Buka/Tutup sesuai jam secara realtime
         setInterval(() => {
             if (typeof TOKO_CONFIG !== 'undefined') {
+                const openState = isStoreCurrentlyOpen();
+                
+                if (lastStoreOpenState !== null && lastStoreOpenState !== openState) {
+                    lastStoreOpenState = openState;
+                    if (typeof renderProducts === 'function') renderProducts();
+                    const cartModal = document.getElementById("cart-modal");
+                    if (cartModal && !cartModal.classList.contains("hidden") && typeof renderCartModal === 'function') {
+                        renderCartModal();
+                    }
+                } else if (lastStoreOpenState === null) {
+                    lastStoreOpenState = openState;
+                }
+                
                 const heroStatus = document.getElementById("hero-store-status");
                 if (heroStatus) {
-                    if (isStoreCurrentlyOpen()) {
+                    if (openState) {
                         let text = "Toko Buka & Siap Melayani";
                         if (TOKO_CONFIG.openHour && TOKO_CONFIG.closeHour) {
                             text = `Buka (${TOKO_CONFIG.openHour} - ${TOKO_CONFIG.closeHour})`;
