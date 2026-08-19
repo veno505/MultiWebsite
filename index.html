@@ -3083,6 +3083,7 @@
         function saveCart(cart) { localStorage.setItem(getCartKey(), JSON.stringify(cart)); updateCartBadge(); }
 
         function addToCart(productId) {
+            if (!isStoreCurrentlyOpen()) { showToast("Maaf, toko sedang tutup. Tidak dapat memesan saat ini.", "warning"); return; }
             var p = PRODUK_DATA.find(function(x){return x.id===productId;});
             if (!p) return;
             p.views = (p.views || 0) + 1;
@@ -3226,6 +3227,7 @@
         // --- CUSTOMER FORM MODAL FLOW ---
         
         function openCustomerForm(productId) {
+            if (!isStoreCurrentlyOpen()) { showToast("Maaf, toko sedang tutup. Tidak dapat memesan saat ini.", "warning"); return; }
             if (!isOnlinePaymentAvailable) {
                 // Sembunyikan metode pembayaran online
                 const qrisOpt = document.querySelector('input[name="cf_payment_method"][value="qris"]');
@@ -4050,6 +4052,30 @@
             const waGeneralUrl = `https://wa.me/${TOKO_CONFIG.whatsapp}?text=${encodeURIComponent("Halo Admin " + TOKO_CONFIG.nama + ", saya mau bertanya-tanya...")}`;
             document.getElementById("floating-wa").href = waGeneralUrl;
         }
+        
+        // Auto update UI status toko setiap 30 detik agar Buka/Tutup sesuai jam secara realtime
+        setInterval(() => {
+            if (typeof TOKO_CONFIG !== 'undefined') {
+                const heroStatus = document.getElementById("hero-store-status");
+                if (heroStatus) {
+                    if (isStoreCurrentlyOpen()) {
+                        let text = "Toko Buka & Siap Melayani";
+                        if (TOKO_CONFIG.openHour && TOKO_CONFIG.closeHour) {
+                            text = `Buka (${TOKO_CONFIG.openHour} - ${TOKO_CONFIG.closeHour})`;
+                        }
+                        heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> ' + text;
+                        heroStatus.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-sm font-medium border border-emerald-100";
+                    } else {
+                        let text = "Toko Sedang Tutup";
+                        if (TOKO_CONFIG.openHour && TOKO_CONFIG.closeHour && TOKO_CONFIG.isOpen !== false) {
+                            text = `Tutup (Buka jam ${TOKO_CONFIG.openHour})`;
+                        }
+                        heroStatus.innerHTML = '<span class="relative flex h-2 w-2"><span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span></span> ' + text;
+                        heroStatus.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-600 text-sm font-medium border border-red-100";
+                    }
+                }
+            }
+        }, 30000);
 
         function handleSearch(val) {
             currentSearchQuery = val;
