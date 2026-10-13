@@ -133,6 +133,7 @@
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;  
             overflow: hidden;
         }
@@ -347,6 +348,11 @@
             <button id="nav-produk" class="admin-nav-item" onclick="switchTab('produk')">
               <i class="fa-solid fa-boxes-stacked"></i> Kelola Produk
             </button>
+            <button id="nav-approvals" class="admin-nav-item hidden" onclick="switchTab('approvals')">
+              <i class="fa-solid fa-user-check"></i>
+              <span class="flex-1">Persetujuan Akun</span>
+              <span id="badge-pending-count" class="px-2 py-0.5 bg-amber-500 text-white rounded-full text-[10px] font-bold hidden">0</span>
+            </button>
             <button id="nav-settings" class="admin-nav-item" onclick="switchTab('settings')">
               <i class="fa-solid fa-gears"></i> Toko &amp; Akun
             </button>
@@ -379,14 +385,28 @@
         
         <!-- Auth Form -->
         <div class="space-y-4">
+          <!-- Info Notice for Signup Mode -->
+          <div id="auth-signup-note" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-start gap-2.5">
+            <i class="fa-solid fa-clock text-amber-600 mt-0.5 text-sm flex-shrink-0"></i>
+            <div>
+              <p class="font-bold text-amber-900">Perhatian Persetujuan:</p>
+              <p class="text-amber-800 leading-relaxed mt-0.5">Setelah mendaftar, akun Anda tidak langsung aktif. Akun harus <strong>disetujui oleh Admin</strong> terlebih dahulu sebelum dapat digunakan untuk masuk.</p>
+            </div>
+          </div>
+
+          <!-- Seller full name (only for signup) -->
+          <div id="auth-group-seller" class="hidden">
+            <label class="form-label">Nama Lengkap Pemilik / Seller <span class="text-red-400">*</span></label>
+            <input type="text" id="auth-seller-name" class="form-input" placeholder="Contoh: Budi Santoso">
+          </div>
           <!-- Store name (only for signup) -->
           <div id="auth-group-store" class="hidden">
-            <label class="form-label">Nama Toko / Seller <span class="text-red-400">*</span></label>
+            <label class="form-label">Nama Toko / Bisnis <span class="text-red-400">*</span></label>
             <input type="text" id="auth-store-name" class="form-input" placeholder="Contoh: Veno Motor">
           </div>
           <!-- Whatsapp (only for signup) -->
           <div id="auth-group-wa" class="hidden">
-            <label class="form-label">Nomor WhatsApp <span class="text-red-400">*</span></label>
+            <label class="form-label">Nomor WhatsApp Aktif <span class="text-red-400">*</span></label>
             <input type="tel" id="auth-store-wa" class="form-input" placeholder="Contoh: 081229923834">
           </div>
           <!-- Email -->
@@ -434,6 +454,10 @@
           </button>
           <button id="tab-produk" class="admin-tab" onclick="switchTab('produk')">
             <i class="fa-solid fa-boxes-stacked mr-1.5"></i>Produk
+          </button>
+          <button id="tab-approvals" class="admin-tab hidden" onclick="switchTab('approvals')">
+            <i class="fa-solid fa-user-check mr-1.5"></i>Persetujuan
+            <span id="tab-badge-pending-count" class="ml-1 px-1.5 py-0.5 bg-amber-500 text-white rounded-full text-[9px] font-bold hidden">0</span>
           </button>
           <button id="tab-settings" class="admin-tab" onclick="switchTab('settings')">
             <i class="fa-solid fa-gears mr-1.5"></i>Akun
@@ -962,6 +986,96 @@
             </button>
           </div>
         </div>
+
+        <!-- TAB APPROVALS CONTENT (OWNER ONLY) -->
+        <div id="content-approvals" class="flex-1 overflow-y-auto p-4 md:p-6 hidden">
+          <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                  <i class="fa-solid fa-shield-halved mr-1"></i>Owner Area
+                </span>
+                <span id="approval-pending-alert-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-700 hidden animate-pulse">
+                  Ada pendaftar baru!
+                </span>
+              </div>
+              <h2 class="text-xl md:text-2xl font-bold text-slate-800 mt-1">Persetujuan Akun Seller</h2>
+              <p class="text-sm text-slate-500 mt-0.5">Daftar calon seller yang mendaftar. Akun harus Anda setujui terlebih dahulu agar dapat login dan mengelola toko.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="loadUserRegistrations()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                <i class="fa-solid fa-rotate"></i> Muat Ulang
+              </button>
+            </div>
+          </div>
+
+          <!-- Summary Stats -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card">
+              <p class="text-xs text-slate-500 font-medium">Total Pendaftar</p>
+              <h3 class="text-xl md:text-2xl font-bold text-slate-800 mt-1" id="reg-stat-total">0</h3>
+            </div>
+            <div class="stat-card border-amber-300 bg-amber-50/50">
+              <p class="text-xs text-amber-700 font-semibold flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span> Menunggu Persetujuan
+              </p>
+              <h3 class="text-xl md:text-2xl font-bold text-amber-600 mt-1" id="reg-stat-pending">0</h3>
+            </div>
+            <div class="stat-card border-emerald-300 bg-emerald-50/40">
+              <p class="text-xs text-emerald-700 font-medium">Telah Disetujui</p>
+              <h3 class="text-xl md:text-2xl font-bold text-emerald-600 mt-1" id="reg-stat-approved">0</h3>
+            </div>
+            <div class="stat-card border-red-200 bg-red-50/40">
+              <p class="text-xs text-red-600 font-medium">Ditolak</p>
+              <h3 class="text-xl md:text-2xl font-bold text-red-500 mt-1" id="reg-stat-rejected">0</h3>
+            </div>
+          </div>
+
+          <!-- Filters & Search -->
+          <div class="bg-slate-100 p-4 rounded-2xl border border-slate-200 mb-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="approval-filter-tabs">
+              <button onclick="filterApprovalList('all')" id="filter-app-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition whitespace-nowrap">Semua (<span id="count-flt-all">0</span>)</button>
+              <button onclick="filterApprovalList('pending')" id="filter-app-pending" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition whitespace-nowrap">Menunggu (<span id="count-flt-pending">0</span>)</button>
+              <button onclick="filterApprovalList('approved')" id="filter-app-approved" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition whitespace-nowrap">Disetujui (<span id="count-flt-approved">0</span>)</button>
+              <button onclick="filterApprovalList('rejected')" id="filter-app-rejected" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition whitespace-nowrap">Ditolak (<span id="count-flt-rejected">0</span>)</button>
+            </div>
+            <div class="relative w-full sm:w-64">
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="approval-search-input" oninput="renderUserRegistrationsTable()" placeholder="Cari nama, email, toko..." class="form-input pl-8 py-1.5 text-xs">
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+              <table class="w-full recap-table text-left border-collapse">
+                <thead>
+                  <tr>
+                    <th class="w-12 text-center">No</th>
+                    <th>Waktu Daftar</th>
+                    <th>Data Seller & Toko</th>
+                    <th>Email</th>
+                    <th>WhatsApp</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Tindakan Persetujuan</th>
+                  </tr>
+                </thead>
+                <tbody id="approvals-tbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="approvals-empty" class="p-12 text-center hidden">
+              <div class="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400">
+                <i class="fa-solid fa-users text-2xl"></i>
+              </div>
+              <h4 class="font-bold text-slate-700 text-base mb-1">Tidak Ada Data Pendaftaran</h4>
+              <p class="text-xs text-slate-400 max-w-sm mx-auto">Belum ada akun pendaftar yang cocok dengan filter yang dipilih.</p>
+            </div>
+          </div>
+        </div>
       </div>
         </div><!-- end main content area -->
       </div><!-- end body flex -->
@@ -974,7 +1088,7 @@
         <button onclick="closeProductDetail()" class="absolute top-3 right-3 z-10 w-8 h-8 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white transition">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
-        <img id="pd-gambar" src="" alt="" class="w-full h-48 md:h-56 object-cover flex-shrink-0 bg-slate-200">
+        <img id="pd-gambar" src="#" alt="" class="w-full h-48 md:h-56 object-cover flex-shrink-0 bg-slate-200">
         <div class="p-4 md:p-6 overflow-y-auto flex-1">
           <span id="pd-kategori" class="inline-block px-2.5 py-0.5 bg-brand-100 text-brand-600 rounded-full text-xs font-semibold mb-2"></span>
           <h3 id="pd-nama" class="text-xl font-bold text-slate-800 leading-tight"></h3>
@@ -1059,7 +1173,7 @@
 
         <!-- Product Preview inside Form -->
         <div id="cf-product-preview" class="mx-6 mt-4 p-3 bg-slate-50 rounded-xl flex items-center gap-3 border border-slate-200">
-          <img id="cf-product-img" src="" class="w-12 h-12 rounded-lg object-cover bg-slate-200 flex-shrink-0">
+          <img id="cf-product-img" src="#" class="w-12 h-12 rounded-lg object-cover bg-slate-200 flex-shrink-0">
           <div class="min-w-0">
             <p id="cf-product-name" class="text-sm font-bold text-slate-800 truncate"></p>
             <p id="cf-product-price" class="text-xs text-brand-600 font-semibold mt-0.5"></p>
@@ -1134,7 +1248,7 @@
             <label class="form-label">URL Gambar Produk <span class="text-red-400">*</span></label>
             <input type="text" id="form-gambar" class="form-input" placeholder="https://..." oninput="previewImage()">
             <div id="img-preview-wrap" class="mt-2 hidden">
-              <img id="img-preview" src="" class="w-full h-36 object-cover rounded-xl border border-slate-200 bg-slate-100">
+              <img id="img-preview" src="#" class="w-full h-36 object-cover rounded-xl border border-slate-200 bg-slate-100">
             </div>
           </div>
           <div>
@@ -1266,7 +1380,7 @@
           <div class="bg-slate-50 rounded-2xl p-4 md:p-6 shadow-sm border border-slate-200 space-y-4">
             <h3 class="font-bold text-slate-800 text-lg border-b border-slate-100 pb-3">Ringkasan Pesanan</h3>
             
-            <img id="pay-product-img" src="" alt="Produk" class="w-full h-48 object-cover rounded-xl border border-slate-100 bg-slate-50">
+            <img id="pay-product-img" src="#" alt="Produk" class="w-full h-48 object-cover rounded-xl border border-slate-100 bg-slate-50">
             
             <div>
               <h4 id="pay-product-title" class="font-bold text-slate-800 text-base leading-tight">Nama Produk</h4>
@@ -1428,7 +1542,7 @@
             <div id="proc-qr-wrap" class="text-center space-y-3 hidden">
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scan Kode QRIS di Bawah Ini</p>
               <div class="w-64 h-64 mx-auto border border-slate-200 bg-slate-50 rounded-2xl p-3 shadow-inner flex items-center justify-center">
-                <img id="proc-qr-img" src="" alt="QR Code" class="w-full h-full object-contain">
+                <img id="proc-qr-img" src="#" alt="QR Code" class="w-full h-full object-contain">
               </div>
               <p class="text-xs text-slate-500 leading-relaxed px-4">Buka aplikasi e-wallet Anda (GoPay, DANA, ShopeePay, OVO) atau M-Banking, lalu pilih fitur scan/pay untuk membayar.</p>
             </div>
@@ -1546,9 +1660,17 @@
                 </div>
 
                 <!-- Search Bar (Desktop) -->
-                
-                <!-- Admin Button (Desktop) -->
-                <div class="hidden md:flex items-center ml-4 gap-2">
+                <div class="hidden md:flex items-center flex-1 max-w-md mx-6">
+                    <div class="relative w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-slate-400"></i>
+                        </div>
+                        <input type="text" id="searchInputDesktop" onkeyup="handleSearch(this.value)" class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-full leading-5 bg-slate-100 placeholder-slate-400 focus:outline-none focus:bg-slate-200 focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 sm:text-sm transition-all shadow-inner" placeholder="Cari barang apa hari ini?">
+                    </div>
+                </div>
+
+                <!-- Admin & Cart Buttons (Desktop - Pojok Kanan Atas) -->
+                <div class="hidden md:flex items-center gap-2 flex-shrink-0">
                     <button onclick="openCartModal()" title="Keranjang Belanja" class="relative w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition border border-slate-200 flex-shrink-0">
                         <i class="fa-solid fa-cart-shopping text-sm"></i>
                         <span id="cart-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full items-center justify-center hidden">0</span>
@@ -1556,14 +1678,6 @@
                     <button onclick="openAdminPanel()" title="Panel Admin" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-brand-500 flex items-center justify-center transition border border-slate-200 flex-shrink-0">
                         <i class="fa-solid fa-user-tie text-sm"></i>
                     </button>
-                </div>
-                <div class="hidden md:flex items-center flex-1 max-w-md ml-8">
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-search text-slate-400"></i>
-                        </div>
-                        <input type="text" id="searchInputDesktop" onkeyup="handleSearch(this.value)" class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-full leading-5 bg-slate-100 placeholder-slate-400 focus:outline-none focus:bg-slate-200 focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 sm:text-sm transition-all shadow-inner" placeholder="Cari barang apa hari ini?">
-                    </div>
                 </div>
 
                 <!-- Mobile menu button -->
@@ -1757,7 +1871,7 @@
                             <span id="footer-phone">+62 812-3456-7890</span>
                         </li>
                     </ul>
-                    <div id="footer-social-links" class="mt-5 flex flex-wrap gap-3"></div>
+                    <div id="footer-social-links-2" class="mt-5 flex flex-wrap gap-3"></div>
                 </div>
             </div>
             
@@ -1783,7 +1897,7 @@
             <button onclick="closeModal()" class="absolute -top-4 -right-4 w-10 h-10 bg-slate-100 text-slate-800 rounded-full flex items-center justify-center shadow-lg hover:bg-slate-200 transition z-10">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
-            <img id="modal-image" src="" alt="Preview" class="w-full h-auto rounded-xl object-contain max-h-[80vh]">
+            <img id="modal-image" src="#" alt="Preview" class="w-full h-auto rounded-xl object-contain max-h-[80vh]">
         </div>
     </div>
 
@@ -1918,27 +2032,71 @@
             });
         }
         
-        // Check if signup mode is permitted
+        const OWNER_EMAIL = "marveyno@gmail.com";
+
+        // Check if signup mode is permitted (terbuka untuk publik dengan sistem persetujuan admin)
         function isSignupAllowed() {
-            const urlParams = new URLSearchParams(window.location.search);
-            // Pendaftaran akun seller dinonaktifkan secara publik (termasuk di halaman utama)
-            // dan hanya diperbolehkan bagi Owner/Admin utama via parameter khusus
-            return urlParams.get('register') === 'admin' || urlParams.get('action') === 'signup_admin';
+            return true;
         }
 
         // Listen for Authentication State
-        firebase.auth().onAuthStateChanged(function(user) {
+        firebase.auth().onAuthStateChanged(async function(user) {
             if (user) {
+                // Jika bukan Owner, verifikasi status persetujuan akun di Firestore
+                if (user.email !== OWNER_EMAIL) {
+                    try {
+                        let isApproved = false;
+                        const regDoc = await db.collection("user_registrations").doc(user.uid).get();
+                        if (regDoc.exists) {
+                            const st = regDoc.data().status;
+                            if (st === 'approved') {
+                                isApproved = true;
+                            } else if (st === 'pending' || st === 'rejected') {
+                                isApproved = false;
+                            }
+                        } else {
+                            // Check doc di uangku_data
+                            const uDoc = await db.collection("uangku_data").doc(user.uid).get();
+                            if (uDoc.exists && uDoc.data().account_status) {
+                                isApproved = (uDoc.data().account_status === 'approved');
+                            } else {
+                                isApproved = true; // Akun lama yang sudah terdaftar
+                            }
+                        }
+
+                        if (!isApproved) {
+                            await firebase.auth().signOut();
+                            currentUser = null;
+                            updateAdminButtonVisibility();
+                            updateDrawerUI();
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn("Auth check status error:", e);
+                    }
+                }
+
                 currentUser = user;
                 // Jika marveyno, biarkan dia mengedit halaman 'default' (Tampilan Awal)
-                if (user.email === "marveyno@gmail.com") {
+                if (user.email === OWNER_EMAIL) {
                     var urlP = new URLSearchParams(window.location.search);
                     let sParam = urlP.get('s') || urlP.get('seller') || "default";
                     if (sParam.includes('?')) sParam = sParam.split('?')[0];
                     if (sParam.includes('&')) sParam = sParam.split('&')[0];
                     currentSellerId = sParam;
+                    
+                    // Tampilkan menu Persetujuan Akun untuk Owner
+                    const navApp = document.getElementById("nav-approvals");
+                    const tabApp = document.getElementById("tab-approvals");
+                    if (navApp) navApp.classList.remove("hidden");
+                    if (tabApp) tabApp.classList.remove("hidden");
+                    loadPendingRegistrationsCount();
                 } else {
                     currentSellerId = user.uid;
+                    const navApp = document.getElementById("nav-approvals");
+                    const tabApp = document.getElementById("tab-approvals");
+                    if (navApp) navApp.classList.add("hidden");
+                    if (tabApp) tabApp.classList.add("hidden");
                 }
             } else {
                 currentUser = null;
@@ -1947,6 +2105,10 @@
                 if (sParam.includes('?')) sParam = sParam.split('?')[0];
                 if (sParam.includes('&')) sParam = sParam.split('&')[0];
                 currentSellerId = sParam;
+                const navApp = document.getElementById("nav-approvals");
+                const tabApp = document.getElementById("tab-approvals");
+                if (navApp) navApp.classList.add("hidden");
+                if (tabApp) tabApp.classList.add("hidden");
             }
             updateAdminButtonVisibility();
             updateCartBadge();
@@ -1955,36 +2117,37 @@
 
         // Toggle Login / Signup Mode
         function toggleAuthMode() {
-            if (!isSignupAllowed()) {
-                authMode = "login";
-                showToast("Pendaftaran publik dinonaktifkan.", "error");
-                return;
-            }
             authMode = authMode === "login" ? "signup" : "login";
             const title = document.getElementById("auth-title");
             const subtitle = document.getElementById("auth-subtitle");
+            const groupSeller = document.getElementById("auth-group-seller");
             const groupStore = document.getElementById("auth-group-store");
             const groupWa = document.getElementById("auth-group-wa");
+            const signupNote = document.getElementById("auth-signup-note");
             const submitBtn = document.getElementById("auth-submit-btn");
             const toggleText = document.getElementById("auth-toggle-text");
             const toggleBtn = document.getElementById("auth-toggle-btn");
             
             if (authMode === "signup") {
-                title.textContent = "Daftar Akun Seller";
-                subtitle.textContent = "Buat akun baru untuk mengelola katalog produk, data customer, dan data toko Anda sendiri.";
-                groupStore.classList.remove("hidden");
-                groupWa.classList.remove("hidden");
-                submitBtn.textContent = "Daftar Akun";
-                toggleText.textContent = "Sudah punya akun?";
-                toggleBtn.textContent = "Masuk";
+                if (title) title.textContent = "Daftar Akun Seller";
+                if (subtitle) subtitle.textContent = "Lengkapi data untuk mendaftar akun. Akun baru akan ditinjau & disetujui terlebih dahulu oleh Admin.";
+                if (groupSeller) groupSeller.classList.remove("hidden");
+                if (groupStore) groupStore.classList.remove("hidden");
+                if (groupWa) groupWa.classList.remove("hidden");
+                if (signupNote) signupNote.classList.remove("hidden");
+                if (submitBtn) submitBtn.textContent = "Ajukan Pendaftaran Akun";
+                if (toggleText) toggleText.textContent = "Sudah punya akun?";
+                if (toggleBtn) toggleBtn.textContent = "Masuk di Sini";
             } else {
-                title.textContent = "Masuk Seller";
-                subtitle.textContent = "Kelola katalog produk, rekap customer, dan hubungi pembeli secara profesional.";
-                groupStore.classList.add("hidden");
-                groupWa.classList.add("hidden");
-                submitBtn.textContent = "Masuk Akun";
-                toggleText.textContent = "Belum punya akun?";
-                toggleBtn.textContent = "Daftar Sekarang";
+                if (title) title.textContent = "Masuk Seller";
+                if (subtitle) subtitle.textContent = "Kelola katalog produk, rekap customer, dan hubungi pembeli secara profesional.";
+                if (groupSeller) groupSeller.classList.add("hidden");
+                if (groupStore) groupStore.classList.add("hidden");
+                if (groupWa) groupWa.classList.add("hidden");
+                if (signupNote) signupNote.classList.add("hidden");
+                if (submitBtn) submitBtn.textContent = "Masuk Akun";
+                if (toggleText) toggleText.textContent = "Belum punya akun?";
+                if (toggleBtn) toggleBtn.textContent = "Daftar Sekarang";
             }
         }
 
@@ -2006,6 +2169,7 @@
 
             const email = document.getElementById("auth-email").value.trim();
             const password = document.getElementById("auth-password").value.trim();
+            const sellerName = document.getElementById("auth-seller-name") ? document.getElementById("auth-seller-name").value.trim() : "";
             const storeName = document.getElementById("auth-store-name").value.trim();
             const storeWa = document.getElementById("auth-store-wa").value.trim();
             
@@ -2019,13 +2183,6 @@
             }
             
             const btn = document.getElementById("auth-submit-btn");
-
-            // Core Security Guard: Programmatically reject registration if URL token is not present
-            if (authMode === "signup" && !isSignupAllowed()) {
-                showAuthError("Pembuatan akun seller baru hanya dapat dilakukan oleh Administrator.");
-                return;
-            }
-
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Memproses...';
             
@@ -2034,39 +2191,113 @@
                     if (!storeName || !storeWa) {
                         showAuthError("Nama Toko dan Nomor WhatsApp wajib diisi saat mendaftar.");
                         btn.disabled = false;
-                        btn.textContent = "Daftar Akun";
+                        btn.textContent = "Ajukan Pendaftaran Akun";
                         return;
                     }
                     
-                    // Create account
+                    // 1. Buat akun di Firebase Auth
                     const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
                     const user = userCredential.user;
                     
-                    // Initialize default data with signup values
+                    const formattedWa = storeWa.replace(/^0/, '62').replace(/\D/g, '');
+                    const finalSellerName = sellerName || storeName;
+
+                    // 2. Simpan data pendaftaran di collection 'user_registrations' dengan status 'pending'
+                    const regData = {
+                        uid: user.uid,
+                        email: email,
+                        nama: finalSellerName,
+                        storeName: storeName,
+                        whatsapp: formattedWa,
+                        status: "pending", // pending | approved | rejected
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    await db.collection("user_registrations").doc(user.uid).set(regData);
+
+                    // 3. Simpan data toko awal di uangku_data dengan status account_status pending
                     const newTokoConfig = {
                         ...DEFAULT_TOKO_CONFIG,
                         nama: storeName,
-                        whatsapp: storeWa.replace(/^0/, '62')
+                        whatsapp: formattedWa,
+                        email: email
                     };
                     
                     await db.collection("uangku_data").doc(user.uid).set({
                         produk_data: [...DEFAULT_PRODUK],
                         customer_orders: [],
                         rekap_transaksi: [],
-                        store_config: newTokoConfig
+                        store_config: newTokoConfig,
+                        account_status: "pending"
                     });
                     
-                    showToast("Pendaftaran berhasil! Akun dan toko Anda telah dibuat.", "success");
+                    // 4. PENTING: Langsung keluarkan sesi login agar akun pending tidak langsung masuk!
+                    await firebase.auth().signOut();
+                    currentUser = null;
+
+                    // 5. Bersihkan field input dan kembalikan ke form login
+                    ["auth-email", "auth-password", "auth-store-name", "auth-store-wa", "auth-seller-name"].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = "";
+                    });
+                    
+                    toggleAuthMode(); // beralih kembali ke mode login
+
+                    // 6. Tampilkan modal informasi pendaftaran berhasil diajukan & menunggu persetujuan
+                    showRegistrationPendingModal(finalSellerName, email, formattedWa);
+
                 } else {
                     // Login
-                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                    const user = userCredential.user;
+
+                    // Jika user adalah Owner (marveyno@gmail.com), izinkan langsung
+                    if (user.email === OWNER_EMAIL) {
+                        showToast("Masuk berhasil sebagai Super Admin!", "success");
+                        btn.disabled = false;
+                        btn.textContent = "Masuk Akun";
+                        return;
+                    }
+
+                    // Periksa status persetujuan akun seller di Firestore
+                    let regStatus = "approved";
+                    try {
+                        const regDoc = await db.collection("user_registrations").doc(user.uid).get();
+                        if (regDoc.exists && regDoc.data().status) {
+                            regStatus = regDoc.data().status;
+                        } else {
+                            const uDoc = await db.collection("uangku_data").doc(user.uid).get();
+                            if (uDoc.exists && uDoc.data().account_status) {
+                                regStatus = uDoc.data().account_status;
+                            }
+                        }
+                    } catch (errCheck) {
+                        console.warn("Gagal cek status approval:", errCheck);
+                    }
+
+                    if (regStatus === "pending") {
+                        await firebase.auth().signOut();
+                        currentUser = null;
+                        btn.disabled = false;
+                        btn.textContent = "Masuk Akun";
+                        showApprovalBlockedModal("pending", email);
+                        return;
+                    } else if (regStatus === "rejected") {
+                        await firebase.auth().signOut();
+                        currentUser = null;
+                        btn.disabled = false;
+                        btn.textContent = "Masuk Akun";
+                        showApprovalBlockedModal("rejected", email);
+                        return;
+                    }
+
                     showToast("Masuk berhasil! Selamat datang kembali.", "success");
                 }
             } catch (error) {
                 console.error(error);
                 let readableMsg = error.message;
                 if (error.code === "auth/invalid-email" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-                    readableMsg = "email or password wrong";
+                    readableMsg = "Email atau password salah.";
                 } else if (error.code === "auth/email-already-in-use") {
                     readableMsg = "Email ini sudah digunakan oleh akun lain.";
                 } else if (error.code === "auth/user-disabled") {
@@ -2076,7 +2307,7 @@
             }
             
             btn.disabled = false;
-            btn.textContent = authMode === "signup" ? "Daftar Akun" : "Masuk Akun";
+            btn.textContent = authMode === "signup" ? "Ajukan Pendaftaran Akun" : "Masuk Akun";
         }
 
         // Handle Logout
@@ -3428,34 +3659,10 @@
 
         // --- ADMIN PANEL FULL PAGE LOGIC ---
         function openAdminPanel() {
-            const allowed = isSignupAllowed();
-            
-            // Show or hide the "Belum punya akun?" register link wrapper
+            // Tampilkan selalu opsi toggle daftar/masuk untuk publik
             const toggleWrapper = document.getElementById("auth-toggle-wrapper");
             if (toggleWrapper) {
-                if (allowed) {
-                    toggleWrapper.classList.remove("hidden");
-                } else {
-                    toggleWrapper.classList.add("hidden");
-                }
-            }
-            
-            // Strictly reset authMode back to login if signup is not allowed
-            if (!allowed && authMode === "signup") {
-                authMode = "login";
-                const title = document.getElementById("auth-title");
-                const subtitle = document.getElementById("auth-subtitle");
-                const groupStore = document.getElementById("auth-group-store");
-                const groupWa = document.getElementById("auth-group-wa");
-                const submitBtn = document.getElementById("auth-submit-btn");
-                const toggleText = document.getElementById("auth-toggle-text");
-                const toggleBtn = document.getElementById("auth-toggle-btn");
-                
-                if (title) title.textContent = "Masuk Seller";
-                if (subtitle) subtitle.textContent = "Kelola katalog produk, rekap customer, dan hubungi pembeli secara profesional.";
-                if (groupStore) groupStore.classList.add("hidden");
-                if (groupWa) groupWa.classList.add("hidden");
-                if (submitBtn) submitBtn.textContent = "Masuk Akun";
+                toggleWrapper.classList.remove("hidden");
             }
 
             document.getElementById("admin-panel").classList.add("open");
@@ -3469,6 +3676,16 @@
                 });
                 var headerName = document.getElementById("admin-store-name-header");
                 if (headerName) headerName.textContent = TOKO_CONFIG.nama || "Panel Admin";
+                
+                // Jika Owner, pastikan tab persetujuan terlihat & hitung pendaftar baru
+                if (currentUser.email === OWNER_EMAIL) {
+                    const navApp = document.getElementById("nav-approvals");
+                    const tabApp = document.getElementById("tab-approvals");
+                    if (navApp) navApp.classList.remove("hidden");
+                    if (tabApp) tabApp.classList.remove("hidden");
+                    loadPendingRegistrationsCount();
+                }
+
                 renderDashboard();
                 switchTab('dashboard');
                 updateDrawerUI();
@@ -3476,16 +3693,20 @@
                 authMode = "login";
                 const title = document.getElementById("auth-title");
                 const subtitle = document.getElementById("auth-subtitle");
+                const groupSeller = document.getElementById("auth-group-seller");
                 const groupStore = document.getElementById("auth-group-store");
                 const groupWa = document.getElementById("auth-group-wa");
+                const signupNote = document.getElementById("auth-signup-note");
                 const submitBtn = document.getElementById("auth-submit-btn");
                 if (title) title.textContent = "Masuk Seller";
                 if (subtitle) subtitle.textContent = "Kelola katalog produk, rekap customer, dan hubungi pembeli secara profesional.";
+                if (groupSeller) groupSeller.classList.add("hidden");
                 if (groupStore) groupStore.classList.add("hidden");
                 if (groupWa) groupWa.classList.add("hidden");
+                if (signupNote) signupNote.classList.add("hidden");
                 if (submitBtn) submitBtn.textContent = "Masuk Akun";
                 
-                ["auth-email", "auth-password", "auth-store-name", "auth-store-wa"].forEach(id => {
+                ["auth-email", "auth-password", "auth-store-name", "auth-store-wa", "auth-seller-name"].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.value = "";
                 });
@@ -3503,7 +3724,7 @@
         }
 
         function switchTab(tab) {
-            ["dashboard","customers","recap","transactions","produk","settings"].forEach(function(t) {
+            ["dashboard","customers","recap","transactions","produk","approvals","settings"].forEach(function(t) {
                 var elTab = document.getElementById("tab-" + t);
                 if (elTab) elTab.classList.toggle("active", t === tab);
                 var elContent = document.getElementById("content-" + t);
@@ -3516,7 +3737,375 @@
             if (tab === "recap") renderRecapTable();
             if (tab === "transactions") loadTransactions();
             if (tab === "produk") renderAdminProductList();
+            if (tab === "approvals") loadUserRegistrations();
             if (tab === "settings") renderAccountSettings();
+        }
+
+        // =============================================
+        // MODAL NOTIFIKASI REGISTRASI & PERSETUJUAN
+        // =============================================
+        let lastRegisteredData = { name: '', email: '', wa: '' };
+
+        function showRegistrationPendingModal(name, email, wa) {
+            lastRegisteredData = { name, email, wa };
+            const emailEl = document.getElementById("rpm-email");
+            if (emailEl) emailEl.textContent = email;
+            const modal = document.getElementById("reg-pending-modal");
+            if (modal) modal.classList.remove("hidden");
+        }
+
+        function closeRegPendingModal() {
+            const modal = document.getElementById("reg-pending-modal");
+            if (modal) modal.classList.add("hidden");
+        }
+
+        function showApprovalBlockedModal(status, email) {
+            lastRegisteredData.email = email;
+            const emailEl = document.getElementById("abm-email");
+            if (emailEl) emailEl.textContent = email;
+
+            const iconWrap = document.getElementById("abm-icon-wrap");
+            const iconEl = document.getElementById("abm-icon");
+            const badgeEl = document.getElementById("abm-badge");
+            const titleEl = document.getElementById("abm-title");
+            const descEl = document.getElementById("abm-desc");
+
+            if (status === "rejected") {
+                if (iconWrap) iconWrap.className = "w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner";
+                if (iconEl) iconEl.className = "fa-solid fa-ban";
+                if (badgeEl) {
+                    badgeEl.className = "inline-block px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold mb-2";
+                    badgeEl.textContent = "Pendaftaran Ditolak";
+                }
+                if (titleEl) titleEl.textContent = "Pendaftaran Akun Ditolak";
+                if (descEl) descEl.innerHTML = `Mohon maaf, pendaftaran akun Anda (<span class="font-mono font-bold text-slate-800">${email}</span>) telah ditolak oleh Admin. Silakan hubungi Admin jika Anda merasa ini adalah kekeliruan.`;
+            } else {
+                if (iconWrap) iconWrap.className = "w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner";
+                if (iconEl) iconEl.className = "fa-solid fa-hourglass-half";
+                if (badgeEl) {
+                    badgeEl.className = "inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold mb-2";
+                    badgeEl.textContent = "Menunggu Persetujuan";
+                }
+                if (titleEl) titleEl.textContent = "Akun Menunggu Persetujuan";
+                if (descEl) descEl.innerHTML = `Akun Anda (<span class="font-mono font-bold text-slate-800">${email}</span>) belum dapat masuk karena <strong>masih menunggu persetujuan dari Admin</strong>.`;
+            }
+
+            const modal = document.getElementById("approval-blocked-modal");
+            if (modal) modal.classList.remove("hidden");
+        }
+
+        function closeApprovalBlockedModal() {
+            const modal = document.getElementById("approval-blocked-modal");
+            if (modal) modal.classList.add("hidden");
+        }
+
+        function contactAdminForApproval() {
+            const adminWa = (TOKO_CONFIG.whatsapp || "6281229923834").replace(/^0/, '62').replace(/\D/g, '');
+            const email = lastRegisteredData.email || "akun saya";
+            const name = lastRegisteredData.name || "Seller";
+            const text = `Halo Admin, saya baru saja mendaftar akun seller dengan nama "${name}" (${email}). Mohon bantuan persetujuannya agar akun saya dapat aktif dan bisa login ke website. Terima kasih!`;
+            window.open(`https://wa.me/${adminWa}?text=${encodeURIComponent(text)}`, "_blank");
+        }
+
+        // =============================================
+        // MANAJEMEN PERSETUJUAN AKUN (OWNER ONLY)
+        // =============================================
+        let allRegistrationsList = [];
+        let approvalCurrentFilter = "all";
+
+        async function loadPendingRegistrationsCount() {
+            try {
+                const snap = await db.collection("user_registrations").get();
+                let pendingCount = 0;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.status === "pending") pendingCount++;
+                });
+
+                const badge = document.getElementById("badge-pending-count");
+                const tabBadge = document.getElementById("tab-badge-pending-count");
+                const alertBadge = document.getElementById("approval-pending-alert-badge");
+
+                if (pendingCount > 0) {
+                    if (badge) {
+                        badge.textContent = pendingCount;
+                        badge.classList.remove("hidden");
+                    }
+                    if (tabBadge) {
+                        tabBadge.textContent = pendingCount;
+                        tabBadge.classList.remove("hidden");
+                    }
+                    if (alertBadge) alertBadge.classList.remove("hidden");
+                } else {
+                    if (badge) badge.classList.add("hidden");
+                    if (tabBadge) tabBadge.classList.add("hidden");
+                    if (alertBadge) alertBadge.classList.add("hidden");
+                }
+            } catch (e) {
+                console.warn("loadPendingRegistrationsCount error:", e);
+            }
+        }
+
+        async function loadUserRegistrations() {
+            const tbody = document.getElementById("approvals-tbody");
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data pendaftar...</td></tr>`;
+            }
+
+            try {
+                const snap = await db.collection("user_registrations").get();
+                allRegistrationsList = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    data.docId = doc.id;
+                    allRegistrationsList.push(data);
+                });
+
+                // Sort terbaru di atas
+                allRegistrationsList.sort((a, b) => {
+                    const tA = new Date(a.createdAt || 0).getTime();
+                    const tB = new Date(b.createdAt || 0).getTime();
+                    return tB - tA;
+                });
+
+                // Update stats
+                const total = allRegistrationsList.length;
+                const pending = allRegistrationsList.filter(x => x.status === "pending").length;
+                const approved = allRegistrationsList.filter(x => x.status === "approved").length;
+                const rejected = allRegistrationsList.filter(x => x.status === "rejected").length;
+
+                const elTotal = document.getElementById("reg-stat-total");
+                const elPending = document.getElementById("reg-stat-pending");
+                const elApproved = document.getElementById("reg-stat-approved");
+                const elRejected = document.getElementById("reg-stat-rejected");
+
+                if (elTotal) elTotal.textContent = total;
+                if (elPending) elPending.textContent = pending;
+                if (elApproved) elApproved.textContent = approved;
+                if (elRejected) elRejected.textContent = rejected;
+
+                const cAll = document.getElementById("count-flt-all");
+                const cPending = document.getElementById("count-flt-pending");
+                const cApproved = document.getElementById("count-flt-approved");
+                const cRejected = document.getElementById("count-flt-rejected");
+
+                if (cAll) cAll.textContent = total;
+                if (cPending) cPending.textContent = pending;
+                if (cApproved) cApproved.textContent = approved;
+                if (cRejected) cRejected.textContent = rejected;
+
+                // Update sidebar badges
+                const badge = document.getElementById("badge-pending-count");
+                const tabBadge = document.getElementById("tab-badge-pending-count");
+                const alertBadge = document.getElementById("approval-pending-alert-badge");
+                if (pending > 0) {
+                    if (badge) { badge.textContent = pending; badge.classList.remove("hidden"); }
+                    if (tabBadge) { tabBadge.textContent = pending; tabBadge.classList.remove("hidden"); }
+                    if (alertBadge) alertBadge.classList.remove("hidden");
+                } else {
+                    if (badge) badge.classList.add("hidden");
+                    if (tabBadge) tabBadge.classList.add("hidden");
+                    if (alertBadge) alertBadge.classList.add("hidden");
+                }
+
+                renderUserRegistrationsTable();
+            } catch (err) {
+                console.error("Gagal load pendaftar:", err);
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-6 text-red-500 text-xs">Gagal memuat data pendaftar: ${err.message}</td></tr>`;
+                }
+            }
+        }
+
+        function filterApprovalList(filter) {
+            approvalCurrentFilter = filter;
+            ["all", "pending", "approved", "rejected"].forEach(f => {
+                const btn = document.getElementById("filter-app-" + f);
+                if (btn) {
+                    if (f === filter) {
+                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white transition whitespace-nowrap";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition whitespace-nowrap";
+                    }
+                }
+            });
+            renderUserRegistrationsTable();
+        }
+
+        function renderUserRegistrationsTable() {
+            const tbody = document.getElementById("approvals-tbody");
+            const emptyDiv = document.getElementById("approvals-empty");
+            const searchQ = (document.getElementById("approval-search-input")?.value || "").toLowerCase().trim();
+            if (!tbody) return;
+
+            let filtered = allRegistrationsList;
+            if (approvalCurrentFilter !== "all") {
+                filtered = filtered.filter(x => (x.status || "pending") === approvalCurrentFilter);
+            }
+
+            if (searchQ) {
+                filtered = filtered.filter(x => 
+                    (x.nama || "").toLowerCase().includes(searchQ) ||
+                    (x.storeName || "").toLowerCase().includes(searchQ) ||
+                    (x.email || "").toLowerCase().includes(searchQ) ||
+                    (x.whatsapp || "").toLowerCase().includes(searchQ)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = "";
+                if (emptyDiv) emptyDiv.classList.remove("hidden");
+                return;
+            }
+
+            if (emptyDiv) emptyDiv.classList.add("hidden");
+
+            tbody.innerHTML = filtered.map((item, idx) => {
+                const status = item.status || "pending";
+                let statusBadge = "";
+                if (status === "pending") {
+                    statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                        <i class="fa-solid fa-clock"></i> Menunggu Persetujuan
+                    </span>`;
+                } else if (status === "approved") {
+                    statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                        <i class="fa-solid fa-check"></i> Disetujui
+                    </span>`;
+                } else if (status === "rejected") {
+                    statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">
+                        <i class="fa-solid fa-xmark"></i> Ditolak
+                    </span>`;
+                }
+
+                const waNumber = (item.whatsapp || "").replace(/^0/, '62');
+                const cleanName = (item.nama || "Seller").replace(/'/g, "");
+                const cleanStore = (item.storeName || "Toko").replace(/'/g, "");
+                const uid = item.uid || item.docId;
+                const email = item.email || "-";
+
+                return `
+                    <tr class="hover:bg-slate-200/50 transition">
+                        <td class="text-center font-bold text-slate-400 text-xs">${idx + 1}</td>
+                        <td class="whitespace-nowrap text-slate-500 text-xs">${fDate(item.createdAt)}</td>
+                        <td>
+                            <p class="font-bold text-slate-800 text-xs">${item.nama || '--'}</p>
+                            <p class="text-[11px] text-brand-600 font-medium flex items-center gap-1 mt-0.5">
+                                <i class="fa-solid fa-store text-[10px]"></i> ${item.storeName || '--'}
+                            </p>
+                        </td>
+                        <td>
+                            <span class="font-mono text-xs text-slate-700 font-semibold">${item.email || '--'}</span>
+                        </td>
+                        <td>
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-mono text-xs text-slate-600">${item.whatsapp || '--'}</span>
+                                ${waNumber ? `
+                                    <button onclick="openRegistrantWA('${waNumber}', '${cleanName}', '${cleanStore}', '${status}')" title="Chat WhatsApp" class="w-6 h-6 rounded-lg bg-green-100 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition">
+                                        <i class="fa-brands fa-whatsapp text-xs"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                        <td class="text-center">${statusBadge}</td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                ${status !== 'approved' ? `
+                                    <button onclick="approveUserRegistration('${uid}', '${email}', '${cleanStore}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition flex items-center gap-1 shadow-sm" title="Setujui Akun">
+                                        <i class="fa-solid fa-check"></i> Setujui
+                                    </button>
+                                ` : `
+                                    <span class="text-[11px] font-semibold text-emerald-600 mr-1"><i class="fa-solid fa-circle-check"></i> Aktif</span>
+                                `}
+                                ${status !== 'rejected' ? `
+                                    <button onclick="rejectUserRegistration('${uid}', '${email}')" class="px-2.5 py-1 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white rounded-lg text-xs font-semibold transition flex items-center gap-1" title="Tolak Pendaftaran">
+                                        <i class="fa-solid fa-ban"></i> Tolak
+                                    </button>
+                                ` : ''}
+                                <button onclick="deleteUserRegistration('${uid}', '${email}')" class="w-7 h-7 rounded-lg bg-slate-200 hover:bg-red-100 text-slate-500 hover:text-red-600 flex items-center justify-center transition" title="Hapus Data">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        async function approveUserRegistration(uid, email, storeName) {
+            showCustomConfirm("Setujui Akun Seller", `Apakah Anda yakin ingin menyetujui akun ${email} (${storeName})?\nSetelah disetujui, seller akan langsung dapat masuk ke panel toko mereka.`, async () => {
+                try {
+                    showToast("Memproses persetujuan akun...", "info");
+                    
+                    // 1. Update di koleksi user_registrations
+                    await db.collection("user_registrations").doc(uid).set({
+                        status: "approved",
+                        approvedAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    // 2. Update di koleksi uangku_data
+                    await db.collection("uangku_data").doc(uid).set({
+                        account_status: "approved"
+                    }, { merge: true });
+
+                    showToast(`Akun ${email} berhasil disetujui!`, "success");
+                    loadUserRegistrations();
+                } catch (e) {
+                    console.error("Gagal menyetujui:", e);
+                    showToast("Gagal menyetujui akun: " + e.message, "error");
+                }
+            });
+        }
+
+        async function rejectUserRegistration(uid, email) {
+            showCustomConfirm("Tolak Akun Seller", `Apakah Anda yakin ingin menolak pendaftaran akun ${email}?\nAkun ini tidak akan dapat masuk ke sistem.`, async () => {
+                try {
+                    showToast("Memproses penolakan akun...", "info");
+                    
+                    await db.collection("user_registrations").doc(uid).set({
+                        status: "rejected",
+                        rejectedAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    await db.collection("uangku_data").doc(uid).set({
+                        account_status: "rejected"
+                    }, { merge: true });
+
+                    showToast(`Akun ${email} telah ditolak.`, "info");
+                    loadUserRegistrations();
+                } catch (e) {
+                    console.error("Gagal menolak:", e);
+                    showToast("Gagal menolak akun: " + e.message, "error");
+                }
+            });
+        }
+
+        async function deleteUserRegistration(uid, email) {
+            showCustomConfirm("Hapus Data Pendaftar", `Apakah Anda yakin ingin menghapus data permohonan akun ${email}?`, async () => {
+                try {
+                    await db.collection("user_registrations").doc(uid).delete();
+                    showToast("Data pendaftaran berhasil dihapus.", "info");
+                    loadUserRegistrations();
+                } catch (e) {
+                    showToast("Gagal menghapus data: " + e.message, "error");
+                }
+            });
+        }
+
+        function openRegistrantWA(phone, name, storeName, status) {
+            if (!phone) {
+                showToast("Nomor WhatsApp tidak tersedia", "warning");
+                return;
+            }
+            const cleanPhone = phone.replace(/^0/, '62').replace(/\D/g, '');
+            let msg = `Halo ${name || 'Kak'} (${storeName || 'Seller'}), `;
+            if (status === 'approved') {
+                msg += `selamat! Pendaftaran akun toko Anda telah disetujui oleh Admin. Anda sekarang sudah dapat login ke panel website kami. Silakan dicoba masuk. Terima kasih!`;
+            } else if (status === 'pending') {
+                msg += `terkait pendaftaran akun toko Anda yang sedang menunggu persetujuan Admin, apakah ada informasi tambahan yang ingin ditanyakan?`;
+            } else {
+                msg += `kami dari tim Admin mengonfirmasi mengenai pendaftaran akun toko Anda.`;
+            }
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         function renderDashboard() {
@@ -5077,6 +5666,60 @@
                 <!-- Injected via JS -->
             </div>
         </div>
+    </div>
+
+    <!-- MODAL NOTIFIKASI PENDAFTARAN MENUNGGU PERSETUJUAN -->
+    <div id="reg-pending-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeRegPendingModal()"></div>
+      <div class="relative bg-slate-50 rounded-2xl shadow-2xl w-full max-w-md p-6 modal-animate text-center border border-slate-200">
+        <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold mb-2">
+          Menunggu Persetujuan Admin
+        </span>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Pendaftaran Berhasil Diajukan!</h3>
+        <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+          Akun Anda (<span id="rpm-email" class="font-mono font-bold text-slate-800">--</span>) telah berhasil dibuat, namun <strong>belum aktif</strong>.
+        </p>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-left mb-6 text-xs text-amber-900 space-y-1.5">
+          <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-shield"></i> Syarat Masuk Panel:</p>
+          <p class="text-slate-600 leading-relaxed">Akun Anda harus <strong>disetujui terlebih dahulu oleh Admin (Owner)</strong> sebelum Anda dapat melakukan login ke panel.</p>
+        </div>
+        <div class="space-y-2">
+          <button onclick="contactAdminForApproval()" class="w-full py-3 bg-wa hover:opacity-90 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 shadow-md">
+            <i class="fa-brands fa-whatsapp text-lg"></i> Konfirmasi ke Admin via WhatsApp
+          </button>
+          <button onclick="closeRegPendingModal()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold transition">
+            Kembali ke Halaman Masuk
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL AKUN BELUM DISETUJUI SAAT LOGIN -->
+    <div id="approval-blocked-modal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeApprovalBlockedModal()"></div>
+      <div class="relative bg-slate-50 rounded-2xl shadow-2xl w-full max-w-md p-6 modal-animate text-center border border-slate-200">
+        <div id="abm-icon-wrap" class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+          <i id="abm-icon" class="fa-solid fa-hourglass-half"></i>
+        </div>
+        <span id="abm-badge" class="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold mb-2">
+          Belum Disetujui
+        </span>
+        <h3 id="abm-title" class="text-xl font-bold text-slate-800 mb-2">Akun Menunggu Persetujuan</h3>
+        <p id="abm-desc" class="text-sm text-slate-600 mb-4 leading-relaxed">
+          Akun Anda (<span id="abm-email" class="font-mono font-bold text-slate-800">--</span>) belum dapat digunakan karena masih menunggu persetujuan dari Admin.
+        </p>
+        <div class="space-y-2 pt-2">
+          <button onclick="contactAdminForApproval()" class="w-full py-3 bg-wa hover:opacity-90 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 shadow-md">
+            <i class="fa-brands fa-whatsapp text-lg"></i> Hubungi Admin via WhatsApp
+          </button>
+          <button onclick="closeApprovalBlockedModal()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold transition">
+            Tutup
+          </button>
+        </div>
+      </div>
     </div>
 
 </body>
