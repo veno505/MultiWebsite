@@ -788,6 +788,11 @@
                 <label class="form-label">URL Gambar Utama (Hero)</label>
                 <input type="text" id="setting-hero-image" class="form-input" placeholder="URL Gambar">
               </div>
+              <div class="col-span-2">
+                <label class="form-label"><i class="fa-solid fa-qrcode text-brand-600 mr-1"></i>URL Gambar QRIS Toko (Manual / Tanpa API)</label>
+                <input type="text" id="setting-store-qris" class="form-input" placeholder="https://... (Link gambar QRIS toko Anda)">
+                <p class="text-[10px] text-slate-400 mt-1">Masukkan link gambar barcode QRIS toko Anda. Gambar ini akan ditampilkan langsung ke pembeli saat memilih pembayaran QRIS Manual tanpa perlu API Midtrans.</p>
+              </div>
             </div>
             <!-- Theme Selection Section -->
             <div class="space-y-3 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
@@ -1508,6 +1513,21 @@
                     <div class="w-2.5 h-2.5 rounded-full radio-dot hidden" id="radio-shopeepay-dot"></div>
                   </div>
                 </label>
+                <label id="pay-method-qris-manual-card" class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer hidden">
+                  <input type="radio" name="pay-method" value="qris_manual" class="sr-only" onclick="selectPaymentMethod('qris_manual')">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
+                      <i class="fa-solid fa-qrcode text-emerald-600 text-xl"></i>
+                    </div>
+                    <div>
+                      <span class="block text-sm font-bold text-slate-800">QRIS Toko (Manual)</span>
+                      <span class="block text-[10px] text-slate-500">Scan QRIS toko &amp; verifikasi via WA</span>
+                    </div>
+                  </div>
+                  <div class="w-5 h-5 border border-slate-300 rounded-full flex items-center justify-center">
+                    <div class="w-2.5 h-2.5 rounded-full radio-dot hidden" id="radio-qris_manual-dot"></div>
+                  </div>
+                </label>
               </div>
             </div>
 
@@ -1526,6 +1546,20 @@
               <p class="text-xs text-slate-500">Nomor Transaksi: <span id="proc-order-id" class="font-mono font-bold text-slate-700">CH-XXXX</span></p>
             </div>
 
+            <!-- QRIS Toko Manual Display (Tanpa API) -->
+            <div id="proc-manual-qris-wrap" class="text-center space-y-3 hidden">
+              <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scan Kode QRIS Toko</p>
+              <div class="w-64 h-64 mx-auto border border-slate-200 bg-white rounded-2xl p-3 shadow-sm flex items-center justify-center overflow-hidden">
+                <img id="proc-manual-qris-img" src="#" alt="QRIS Toko" class="w-full h-full object-contain">
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed px-4">Buka aplikasi e-wallet (GoPay, DANA, OVO, ShopeePay) atau Mobile Banking Anda, lalu scan QRIS di atas sesuai nominal pesanan.</p>
+              <div class="pt-3">
+                <button onclick="confirmManualQrisPayment()" class="w-full py-3.5 bg-wa hover:opacity-90 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                  <i class="fa-brands fa-whatsapp text-lg"></i> Sudah Bayar &amp; Kirim Bukti ke WA
+                </button>
+              </div>
+            </div>
+
             <!-- Virtual Account Display -->
             <div id="proc-va-wrap" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 md:p-6 text-center space-y-3 hidden">
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nomor Virtual Account BRI</p>
@@ -1538,7 +1572,7 @@
               <p class="text-xs text-slate-500">Lakukan transfer dari ATM BRI, BRILink, atau BRImo menggunakan menu BRIVA.</p>
             </div>
 
-            <!-- QR Code Display -->
+            <!-- QR Code Display (Midtrans API) -->
             <div id="proc-qr-wrap" class="text-center space-y-3 hidden">
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scan Kode QRIS di Bawah Ini</p>
               <div class="w-64 h-64 mx-auto border border-slate-200 bg-slate-50 rounded-2xl p-3 shadow-inner flex items-center justify-center">
@@ -1556,8 +1590,8 @@
               <p class="text-xs text-slate-500 px-4 md:px-6">Jika tidak diarahkan otomatis, silakan klik tombol di atas untuk membuka aplikasi dompet digital Anda.</p>
             </div>
 
-            <!-- Status Check Box & Timer -->
-            <div class="border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <!-- Status Check Box & Timer (Midtrans API Only) -->
+            <div id="proc-status-poll-box" class="border-t border-slate-100 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div class="flex items-center gap-2.5">
                 <div class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-ping"></div>
                 <span class="text-xs text-slate-500">Mengecek status pembayaran otomatis...</span>
@@ -1930,7 +1964,8 @@
             mataUang: "Rp",
             pesanPembuka: "Halo Admin CommerceHub, saya tertarik untuk memesan paket jasa pembuatan website berikut:",
             heroTitle: "Temukan Kebutuhan Anda Lebih Mudah",
-            heroImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            heroImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            qrisImage: ""
         };
 
         let TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
@@ -2427,6 +2462,7 @@
             if (document.getElementById("setting-store-close")) document.getElementById("setting-store-close").value = TOKO_CONFIG.closeHour || "";
             document.getElementById("setting-hero-title").value = TOKO_CONFIG.heroTitle || "Temukan Kebutuhan Anda Lebih Mudah";
             document.getElementById("setting-hero-image").value = TOKO_CONFIG.heroImage || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+            if (document.getElementById("setting-store-qris")) document.getElementById("setting-store-qris").value = TOKO_CONFIG.qrisImage || "";
             if (document.getElementById("setting-user-email")) document.getElementById("setting-user-email").textContent = currentUser.email || "Anonymous";
             if (document.getElementById("setting-store-status")) document.getElementById("setting-store-status").value = (TOKO_CONFIG.isOpen !== false) ? "open" : "closed";
             renderAdminSocials();
@@ -2510,6 +2546,7 @@
             const email = document.getElementById("setting-store-email").value.trim();
             const heroTitle = document.getElementById("setting-hero-title").value.trim();
             const heroImage = document.getElementById("setting-hero-image").value.trim();
+            const qrisImage = document.getElementById("setting-store-qris") ? document.getElementById("setting-store-qris").value.trim() : "";
             
             if (!name || !wa) {
                 showToast("Nama Toko dan Nomor WhatsApp wajib diisi.", "warning");
@@ -2531,6 +2568,7 @@
             
             if (heroTitle) TOKO_CONFIG.heroTitle = heroTitle;
             if (heroImage) TOKO_CONFIG.heroImage = heroImage;
+            TOKO_CONFIG.qrisImage = qrisImage;
             TOKO_CONFIG.tema = selectedTheme;
             
             await saveData(true);
@@ -4884,11 +4922,25 @@
             document.getElementById("pay-cust-city").value = "";
             document.getElementById("pay-cust-note").value = "";
             
+            // Periksa ketersediaan QRIS Manual Toko
+            const manualCard = document.getElementById("pay-method-qris-manual-card");
+            const hasManualQris = !!(TOKO_CONFIG && TOKO_CONFIG.qrisImage && TOKO_CONFIG.qrisImage.trim());
+            if (manualCard) {
+                if (hasManualQris) {
+                    manualCard.classList.remove("hidden");
+                } else {
+                    manualCard.classList.add("hidden");
+                }
+            }
+
+            // Tentukan default payment method: jika QRIS manual diset seller, jadikan default atau fallback ke qris
+            const defaultMethod = hasManualQris ? "qris_manual" : "qris";
+
             // Reset Radio Button values
             document.querySelectorAll('input[name="pay-method"]').forEach(radio => {
-                radio.checked = radio.value === "qris";
+                radio.checked = (radio.value === defaultMethod);
             });
-            selectPaymentMethod("qris");
+            selectPaymentMethod(defaultMethod);
             
             // Toggle panels
             document.getElementById("payment-input-section").classList.remove("hidden");
@@ -4925,7 +4977,7 @@
         
         function selectPaymentMethod(method) {
             selectedPayMethod = method;
-            const methods = ['qris', 'bri', 'gopay', 'shopeepay'];
+            const methods = ['qris', 'qris_manual', 'bri', 'gopay', 'shopeepay'];
             
             methods.forEach(m => {
                 const dot = document.getElementById("radio-" + m + "-dot");
@@ -4958,6 +5010,75 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memproses Transaksi...';
             
+            // --- JIKA PILIH QRIS MANUAL (TANPA API) ---
+            if (selectedPayMethod === "qris_manual") {
+                const manualQrisUrl = (TOKO_CONFIG && TOKO_CONFIG.qrisImage) ? TOKO_CONFIG.qrisImage.trim() : "";
+                if (!manualQrisUrl) {
+                    showToast("Toko belum mengatur gambar QRIS di Pengaturan.", "warning");
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Bayar Sekarang';
+                    return;
+                }
+
+                const manualOrderId = "QRIS-" + Math.floor(100000 + Math.random() * 900000);
+                activeOrderId = manualOrderId;
+
+                // Simpan data order manual ke data transaksi/customer
+                const orderData = {
+                    orderId: manualOrderId,
+                    tanggal: new Date().toISOString(),
+                    nama: name,
+                    hp: hp,
+                    kota: city,
+                    catatan: note,
+                    produkId: payProductId,
+                    produkNama: payProduct.nama,
+                    qty: payQty,
+                    kategori: payProduct.kategori || "Umum",
+                    totalHarga: payProduct.harga * payQty,
+                    harga: payProduct.harga * payQty,
+                    paymentMethod: "qris_manual",
+                    status: "pending"
+                };
+
+                // Simpan ke riwayat customer di browser
+                let history = JSON.parse(localStorage.getItem(`customer_history_${currentSellerId}`) || '[]');
+                if (!history.find(h => h.orderId === manualOrderId)) {
+                    history.unshift({
+                        orderId: manualOrderId,
+                        tanggal: new Date().toISOString(),
+                        produkNama: payProduct.nama,
+                        qty: payQty,
+                        totalHarga: payProduct.harga * payQty,
+                        paymentMethod: "QRIS Manual"
+                    });
+                    localStorage.setItem(`customer_history_${currentSellerId}`, JSON.stringify(history));
+                }
+
+                // Catat ke antrean rekap lokal
+                if (typeof customerList !== "undefined") customerList.unshift(orderData);
+                if (typeof rekapList !== "undefined") rekapList.unshift(orderData);
+
+                // Tampilkan tampilan proses QRIS Manual
+                renderPaymentProcess({
+                    orderId: manualOrderId,
+                    paymentMethod: "qris_manual",
+                    paymentInfo: {
+                        qrCodeUrl: manualQrisUrl
+                    },
+                    customer: {
+                        name: name,
+                        hp: hp,
+                        city: city,
+                        note: note
+                    }
+                });
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Bayar Sekarang';
+                return;
+            }
+
             try {
                 const response = await fetch('/api/create-payment', {
                     method: 'POST',
@@ -5132,13 +5253,27 @@
             document.getElementById("proc-order-id").textContent = data.orderId;
             
             // Hide all sub layouts
+            if (document.getElementById("proc-manual-qris-wrap")) document.getElementById("proc-manual-qris-wrap").classList.add("hidden");
             document.getElementById("proc-va-wrap").classList.add("hidden");
             document.getElementById("proc-qr-wrap").classList.add("hidden");
             document.getElementById("proc-link-wrap").classList.add("hidden");
+            if (document.getElementById("proc-status-poll-box")) document.getElementById("proc-status-poll-box").classList.remove("hidden");
             
             const payInfo = data.paymentInfo || {};
             
-            if (data.paymentMethod === "bri") {
+            if (data.paymentMethod === "qris_manual") {
+                document.getElementById("proc-method-title").textContent = "Bayar via QRIS Toko (Manual)";
+                const manualWrap = document.getElementById("proc-manual-qris-wrap");
+                if (manualWrap) manualWrap.classList.remove("hidden");
+                const manualImg = document.getElementById("proc-manual-qris-img");
+                if (manualImg) manualImg.src = payInfo.qrCodeUrl || (TOKO_CONFIG && TOKO_CONFIG.qrisImage) || "";
+                
+                // Sembunyikan polling otomatis Midtrans untuk QRIS manual
+                if (document.getElementById("proc-status-poll-box")) {
+                    document.getElementById("proc-status-poll-box").classList.add("hidden");
+                }
+                return; // Tidak perlu polling API Midtrans
+            } else if (data.paymentMethod === "bri") {
                 document.getElementById("proc-method-title").textContent = "Selesaikan BRIVA Virtual Account";
                 document.getElementById("proc-va-wrap").classList.remove("hidden");
                 document.getElementById("proc-va-number").textContent = payInfo.vaNumber || "Belum tersedia";
@@ -5158,6 +5293,44 @@
             }
             
             startPaymentStatusPolling(data.orderId);
+        }
+
+        // Konfirmasi Pembayaran QRIS Manual (Kirim Bukti ke WhatsApp Penjual)
+        function confirmManualQrisPayment() {
+            const orderId = activeOrderId || document.getElementById("proc-order-id").textContent;
+            const prodName = payProduct ? payProduct.nama : (document.getElementById("pay-product-title") ? document.getElementById("pay-product-title").textContent : "Produk");
+            const total = payProduct ? (payProduct.harga * payQty) : 0;
+            const name = document.getElementById("pay-cust-name").value.trim();
+            const hp = document.getElementById("pay-cust-hp").value.trim();
+            const kota = document.getElementById("pay-cust-city").value.trim();
+            const note = document.getElementById("pay-cust-note").value.trim();
+
+            const nl = "\n";
+            let text = `Halo Admin *${TOKO_CONFIG.nama}*, saya sudah melakukan transfer via *QRIS Toko*.${nl}${nl}`;
+            text += `*Detail Pesanan:*${nl}`;
+            text += `- No. Transaksi: *${orderId}*${nl}`;
+            text += `- Produk: ${prodName} (x${payQty})${nl}`;
+            text += `- Total Tagihan: *${formatRupiah(total)}*${nl}${nl}`;
+            text += `*Data Pemesan:*${nl}`;
+            text += `- Nama: ${name || '-'}${nl}`;
+            text += `- WhatsApp: ${hp || '-'}${nl}`;
+            text += `- Kota/Alamat: ${kota || '-'}${nl}`;
+            if (note) text += `- Catatan: ${note}${nl}`;
+            text += `${nl}Berikut saya lampirkan bukti pembayaran QRIS saya. Mohon segera dicek dan diproses ya. Terima kasih!`;
+
+            const waTarget = TOKO_CONFIG.whatsapp || "";
+            window.open(`https://wa.me/${waTarget}?text=${encodeURIComponent(text)}`, "_blank");
+
+            // Tampilkan layar sukses/konfirmasi
+            renderPaymentSuccess({
+                orderId: orderId,
+                storeName: TOKO_CONFIG.nama,
+                productNama: prodName,
+                qty: payQty,
+                paymentMethod: "QRIS TOKO (MANUAL)",
+                totalHarga: total,
+                updatedAt: new Date().toISOString()
+            });
         }
         
         function startPaymentStatusPolling(orderId) {
