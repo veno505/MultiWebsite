@@ -19,6 +19,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    <!-- Creative FX: Three.js, GSAP, Vanilla-Tilt, HTML2Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -502,6 +507,311 @@
         .shake-screen {
             animation: shake 0.4s ease-in-out;
         }
+
+        /* ===== CREATIVE FX LAYER ===== */
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            pointer-events: all;
+        }
+
+        #preloader .pre-half {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 50.2%;
+            background: #05010f;
+            overflow: hidden;
+        }
+
+        #preloader .pre-half::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-linear-gradient(0deg, rgba(0, 240, 255, .06) 0 1px, transparent 1px 48px),
+                repeating-linear-gradient(90deg, rgba(168, 85, 247, .06) 0 1px, transparent 1px 48px);
+        }
+
+        #preloader .pre-top {
+            top: 0;
+            border-bottom: 2px solid #00F0FF;
+            box-shadow: 0 6px 40px rgba(0, 240, 255, .5);
+        }
+
+        #preloader .pre-bottom {
+            bottom: 0;
+        }
+
+        #preloader .pre-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        #preloader .pre-label {
+            font-family: 'Space Grotesk', monospace;
+            font-size: clamp(.7rem, 2.4vw, 1rem);
+            letter-spacing: .5em;
+            color: #00F0FF;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        #preloader .pre-num {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: clamp(7rem, 30vw, 24rem);
+            line-height: .9;
+            color: #fff;
+            letter-spacing: -.05em;
+            text-shadow: 0 0 30px rgba(0, 240, 255, .6), 4px 4px 0 #FF2E93, -4px -4px 0 #7000FF;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #preloader .pre-num small {
+            font-size: .28em;
+            letter-spacing: 0;
+            margin-left: .08em;
+            color: #00F0FF;
+            text-shadow: none;
+        }
+
+        #preloader .pre-bar {
+            width: min(60vw, 520px);
+            height: 4px;
+            background: rgba(255, 255, 255, .12);
+            margin-top: 1.6rem;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        #preloader .pre-bar i {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00F0FF, #A855F7, #FF2E93);
+            box-shadow: 0 0 14px #00F0FF;
+        }
+
+        /* Custom cursor (desktop only) */
+        html.has-custom-cursor,
+        html.has-custom-cursor * {
+            cursor: none !important;
+        }
+
+        #cursor-dot,
+        #cursor-ring {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100002;
+            pointer-events: none;
+            border-radius: 50%;
+            opacity: 0;
+            will-change: transform;
+            display: none;
+        }
+
+        html.has-custom-cursor #cursor-dot,
+        html.has-custom-cursor #cursor-ring {
+            display: block;
+        }
+
+        #cursor-dot {
+            width: 8px;
+            height: 8px;
+            margin: -4px 0 0 -4px;
+            background: #00F0FF;
+            box-shadow: 0 0 12px #00F0FF, 0 0 24px #00F0FF;
+        }
+
+        #cursor-ring {
+            width: 38px;
+            height: 38px;
+            margin: -19px 0 0 -19px;
+            border: 2px solid #00F0FF;
+            box-shadow: 0 0 14px rgba(0, 240, 255, .55), inset 0 0 10px rgba(0, 240, 255, .25);
+            transition: width .25s, height .25s, margin .25s, border-color .25s, background-color .25s !important;
+        }
+
+        #cursor-ring.is-hover {
+            width: 62px;
+            height: 62px;
+            margin: -31px 0 0 -31px;
+            border-color: #FF2E93;
+            background-color: rgba(255, 46, 147, .12);
+        }
+
+        #cursor-ring.is-down {
+            width: 26px;
+            height: 26px;
+            margin: -13px 0 0 -13px;
+        }
+
+        /* VS Screen */
+        #vs-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 99990;
+            display: none;
+            flex-direction: column;
+            align-items: stretch;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 50%, #1b0a40 0%, #05010f 75%);
+            pointer-events: all;
+        }
+
+        @media (min-width: 720px) {
+            #vs-screen {
+                flex-direction: row;
+            }
+        }
+
+        #vs-screen .vs-bg {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(115deg, rgba(0, 240, 255, .07) 0 2px, transparent 2px 38px);
+        }
+
+        #vs-screen .vs-side {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 1.5rem;
+            min-height: 0;
+            min-width: 0;
+        }
+
+        #vs-screen .vs-left {
+            background: linear-gradient(90deg, rgba(0, 240, 255, .25), transparent 85%);
+        }
+
+        #vs-screen .vs-right {
+            background: linear-gradient(270deg, rgba(255, 46, 147, .25), transparent 85%);
+        }
+
+        #vs-screen .vs-avatar {
+            font-size: clamp(4rem, 15vw, 8.5rem);
+            line-height: 1;
+            padding: .18em;
+            border-radius: 28px;
+            border: 3px solid;
+            background: rgba(0, 0, 0, .45);
+        }
+
+        #vs-screen .vs-left .vs-avatar {
+            border-color: #00F0FF;
+            box-shadow: 0 0 45px rgba(0, 240, 255, .6);
+        }
+
+        #vs-screen .vs-right .vs-avatar {
+            border-color: #FF2E93;
+            box-shadow: 0 0 45px rgba(255, 46, 147, .6);
+        }
+
+        #vs-screen .vs-name {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.4rem, 5vw, 2.8rem);
+            line-height: 1.1;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-shadow: 0 0 20px rgba(255, 255, 255, .35);
+        }
+
+        #vs-screen .vs-tag {
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 600;
+            font-size: .72rem;
+            letter-spacing: .45em;
+            color: rgba(255, 255, 255, .6);
+        }
+
+        #vs-screen .vs-center-wrap {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        #vs-screen .vs-center {
+            position: relative;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #vs-screen .vs-bolt {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: min(70vmin, 520px);
+            height: min(70vmin, 520px);
+            margin: calc(min(70vmin, 520px) / -2) 0 0 calc(min(70vmin, 520px) / -2);
+            filter: drop-shadow(0 0 18px #FFE600) drop-shadow(0 0 40px #FF2E93);
+            opacity: .35;
+        }
+
+        #vs-screen .vs-text {
+            position: relative;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-style: italic;
+            font-size: clamp(5rem, 24vw, 13rem);
+            line-height: .9;
+            color: #fff;
+            text-shadow: 0 0 25px #00F0FF, 0 0 60px #FF2E93, 6px 6px 0 #7000FF;
+        }
+
+        #vs-screen .vs-game {
+            position: relative;
+            margin-top: .6rem;
+            padding: .35rem 1.1rem;
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 700;
+            font-size: clamp(.75rem, 2.4vw, 1.1rem);
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: #05010f;
+            background: #00F0FF;
+            box-shadow: 0 0 20px #00F0FF;
+            transform: skewX(-12deg);
+        }
+
+        #vs-screen .vs-flash {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Share button */
+        #btn-share-match.is-busy {
+            opacity: .6;
+            pointer-events: none;
+        }
     </style>
     <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
 </head>
@@ -510,6 +820,231 @@
 
     <!-- Interactive Background Canvas -->
     <canvas id="bg-canvas"></canvas>
+
+    <!-- Cinematic Preloader -->
+    <div id="preloader" aria-label="Loading V-Games">
+        <div class="pre-half pre-top"></div>
+        <div class="pre-half pre-bottom"></div>
+        <div class="pre-center">
+            <div class="pre-label">V-Games // Booting Arena</div>
+            <div class="pre-num"><span id="preloader-num">0</span><small>%</small></div>
+            <div class="pre-bar"><i id="preloader-bar"></i></div>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor-ring"></div>
+    <div id="cursor-dot"></div>
+
+    <!-- VS Screen Overlay -->
+    <div id="vs-screen" aria-hidden="true">
+        <div class="vs-bg"></div>
+        <div class="vs-side vs-left" id="vs-p1">
+            <div class="vs-avatar" id="vs-p1-av">👤</div>
+            <div class="vs-name" id="vs-p1-name">PLAYER 1</div>
+            <div class="vs-tag">PLAYER 1</div>
+        </div>
+        <div class="vs-side vs-right" id="vs-p2">
+            <div class="vs-avatar" id="vs-p2-av">👤</div>
+            <div class="vs-name" id="vs-p2-name">PLAYER 2</div>
+            <div class="vs-tag">PLAYER 2</div>
+        </div>
+        <div class="vs-center-wrap">
+            <div class="vs-center" id="vs-center">
+                <svg class="vs-bolt" id="vs-bolt" viewBox="0 0 100 100" aria-hidden="true">
+                    <polygon points="58,0 22,56 46,56 36,100 80,38 54,38" fill="#FFE600" />
+                </svg>
+                <div class="vs-text">VS</div>
+                <div class="vs-game" id="vs-game-name">ARENA</div>
+            </div>
+        </div>
+        <div class="vs-flash" id="vs-flash"></div>
+    </div>
+
+    <!-- CREATIVE FX SCRIPT: 3D Background, Preloader, Cursor, Tilt -->
+    <script>
+        (() => {
+            // ---------- 3D CYBER SYNTHWAVE BACKGROUND (Three.js) ----------
+            const initBg3D = () => {
+                const canvas = document.getElementById('bg-canvas');
+                if (!canvas || typeof THREE === 'undefined') return;
+                let renderer;
+                try {
+                    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+                } catch (e) { console.log('WebGL unavailable, 3D background skipped.'); return; }
+                renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+                renderer.setClearColor(0x000000, 0);
+
+                const scene = new THREE.Scene();
+                scene.fog = new THREE.Fog(0x24272b, 25, 130);
+                const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 400);
+                camera.position.set(0, 2, 10);
+
+                const SIZE = 300, DIV = 60, CELL = SIZE / DIV, HALF = SIZE / 2;
+                const makeGrid = (opacity) => {
+                    const pts = [];
+                    for (let i = 0; i <= DIV; i++) {
+                        const p = -HALF + i * CELL;
+                        pts.push(-HALF, 0, p, HALF, 0, p);
+                        pts.push(p, 0, -HALF, p, 0, HALF);
+                    }
+                    const g = new THREE.BufferGeometry();
+                    g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+                    const m = new THREE.LineBasicMaterial({ color: 0x00F0FF, transparent: true, opacity });
+                    return new THREE.LineSegments(g, m);
+                };
+                const floor = makeGrid(0.75); floor.position.y = -7;
+                const ceil = makeGrid(0.28); ceil.position.y = 12;
+                scene.add(floor, ceil);
+
+                const shapes = [];
+                const shapeMats = [];
+                for (let i = 0; i < 18; i++) {
+                    const r = 1 + Math.random() * 1.6;
+                    const geo = i % 3 === 0 ? new THREE.IcosahedronGeometry(r, 0)
+                        : i % 3 === 1 ? new THREE.TorusGeometry(r * .9, r * .28, 8, 22)
+                            : new THREE.OctahedronGeometry(r, 0);
+                    const mat = new THREE.MeshBasicMaterial({ color: 0x00F0FF, wireframe: true, transparent: true, opacity: 0.6 });
+                    const mesh = new THREE.Mesh(geo, mat);
+                    mesh.position.set((Math.random() - .5) * 80, -2 + Math.random() * 11, -14 - Math.random() * 95);
+                    mesh.userData = { by: mesh.position.y, rx: (Math.random() - .5) * .6, ry: (Math.random() - .5) * .8, fs: .3 + Math.random() * .5, ph: Math.random() * 6.28, ci: i % 3 };
+                    shapes.push(mesh); shapeMats.push(mat); scene.add(mesh);
+                }
+
+                const applyPalette = () => {
+                    const root = document.documentElement;
+                    const light = root.classList.contains('light-theme');
+                    const bg = (getComputedStyle(root).getPropertyValue('--bg-primary') || '#24272b').trim();
+                    scene.fog.color.set(bg);
+                    const pal = light ? ['#954851', '#b05d61', '#753842'] : ['#00F0FF', '#FF2E93', '#A855F7'];
+                    floor.material.color.set(pal[0]);
+                    ceil.material.color.set(pal[2]);
+                    shapeMats.forEach((m, i) => m.color.set(pal[shapes[i].userData.ci]));
+                };
+                applyPalette();
+                new MutationObserver(applyPalette).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+                let w = 0, h = 0;
+                const resize = () => {
+                    w = window.innerWidth; h = window.innerHeight;
+                    renderer.setSize(w, h, false);
+                    camera.aspect = w / h;
+                    camera.updateProjectionMatrix();
+                };
+                window.addEventListener('resize', resize);
+                resize();
+
+                // Parallax input: mouse + gyroscope
+                let tx = 0, ty = 0, px = 0, py = 0, gyro = false;
+                const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+                window.addEventListener('mousemove', (e) => {
+                    if (gyro) return;
+                    tx = (e.clientX / window.innerWidth - .5) * 2;
+                    ty = -(e.clientY / window.innerHeight - .5) * 2;
+                }, { passive: true });
+                window.addEventListener('deviceorientation', (e) => {
+                    if (e.gamma == null) return;
+                    gyro = true;
+                    tx = clamp(e.gamma / 25, -1, 1);
+                    ty = clamp(-((e.beta || 0) - 50) / 25, -1, 1);
+                }, { passive: true });
+                // iOS needs an explicit permission from a user gesture
+                const askGyro = () => {
+                    try {
+                        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                            DeviceOrientationEvent.requestPermission().catch(() => { });
+                        }
+                    } catch (e) { }
+                    window.removeEventListener('touchend', askGyro);
+                };
+                window.addEventListener('touchend', askGyro, { passive: true });
+
+                const SPEED = 7;
+                let last = performance.now();
+                const tick = (now) => {
+                    requestAnimationFrame(tick);
+                    if (document.hidden) { last = now; return; }
+                    const dt = Math.min((now - last) / 1000, .05); last = now;
+                    const t = now / 1000;
+                    floor.position.z = (floor.position.z + SPEED * dt) % CELL;
+                    ceil.position.z = (ceil.position.z + SPEED * dt) % CELL;
+                    shapes.forEach(s => {
+                        const u = s.userData;
+                        s.rotation.x += u.rx * dt;
+                        s.rotation.y += u.ry * dt;
+                        s.position.y = u.by + Math.sin(t * u.fs + u.ph) * .8;
+                    });
+                    px += (tx - px) * .05;
+                    py += (ty - py) * .05;
+                    camera.position.x = px * 4;
+                    camera.position.y = 2 + py * 1.6;
+                    camera.lookAt(px * 1.5, py * .8 - .5, -30);
+                    camera.rotateZ(-px * .05);
+                    renderer.render(scene, camera);
+                };
+                requestAnimationFrame(tick);
+            };
+            try { initBg3D(); } catch (e) { console.log('3D background error', e); }
+
+            // ---------- CINEMATIC PRELOADER (GSAP) ----------
+            const initPreloader = () => {
+                const pre = document.getElementById('preloader');
+                if (!pre) return;
+                const num = document.getElementById('preloader-num');
+                const bar = document.getElementById('preloader-bar');
+                if (typeof gsap === 'undefined') { pre.remove(); return; }
+                const st = { v: 0 };
+                const tl = gsap.timeline({ onComplete: () => pre.remove() });
+                tl.to(st, {
+                    v: 100, duration: 2.2, ease: 'power2.inOut',
+                    onUpdate: () => { const v = Math.round(st.v); num.textContent = v; bar.style.width = v + '%'; }
+                })
+                    .to('.pre-center', { opacity: 0, scale: 1.15, duration: .4, ease: 'power2.in' }, '+=.15')
+                    .to('#preloader .pre-top', { yPercent: -100, duration: 1, ease: 'power4.inOut' }, '>-.05')
+                    .to('#preloader .pre-bottom', { yPercent: 100, duration: 1, ease: 'power4.inOut' }, '<');
+            };
+            initPreloader();
+
+            // ---------- CUSTOM CURSOR + TILT (after DOM ready) ----------
+            const initCursor = () => {
+                if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                const dot = document.getElementById('cursor-dot');
+                const ring = document.getElementById('cursor-ring');
+                if (!dot || !ring) return;
+                document.documentElement.classList.add('has-custom-cursor');
+                let mx = -100, my = -100, rx = -100, ry = -100;
+                window.addEventListener('mousemove', (e) => {
+                    mx = e.clientX; my = e.clientY;
+                    dot.style.opacity = ring.style.opacity = 1;
+                    dot.style.transform = `translate3d(${mx}px,${my}px,0)`;
+                }, { passive: true });
+                document.addEventListener('mouseleave', () => { dot.style.opacity = ring.style.opacity = 0; });
+                document.addEventListener('mouseover', (e) => {
+                    ring.classList.toggle('is-hover', !!(e.target.closest && e.target.closest('button, a, input, textarea, select, label, [onclick], .js-tilt')));
+                });
+                window.addEventListener('mousedown', () => ring.classList.add('is-down'));
+                window.addEventListener('mouseup', () => ring.classList.remove('is-down'));
+                const loop = () => {
+                    rx += (mx - rx) * .16; ry += (my - ry) * .16;
+                    ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+                    requestAnimationFrame(loop);
+                };
+                loop();
+            };
+
+            const initTilt = () => {
+                if (typeof VanillaTilt === 'undefined') return;
+                document.querySelectorAll('#host-game-list > button, #home-profile-card, #p1-card-box, #p2-card-box').forEach(el => {
+                    if (el.vanillaTilt) return;
+                    VanillaTilt.init(el, { max: 14, speed: 400, glare: true, 'max-glare': 0.3, perspective: 900, scale: 1.03, gyroscope: false });
+                });
+            };
+
+            const boot = () => { initCursor(); initTilt(); };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+            else boot();
+        })();
+    </script>
 
 
     <div id="turn-popup">
@@ -671,7 +1206,7 @@
             <div class="w-full max-w-md flex flex-col gap-5">
 
                 <!-- Player Banner Card -->
-                <div class="glass-panel p-4 rounded-3xl flex items-center justify-between shadow-xl">
+                <div id="home-profile-card" class="glass-panel p-4 rounded-3xl flex items-center justify-between shadow-xl">
                     <div class="flex items-center gap-3">
                         <div id="home-avatar"
                             class="text-4xl bg-dark-card p-2.5 rounded-3xl border border-theme-accent1/40 shadow-md">🐺
@@ -819,7 +1354,11 @@
 
             <!-- Room Host End Match Actions (Moved Up for Mobile) -->
             <div id="host-actions"
-                class="px-4 mt-2 w-full max-w-lg mx-auto shrink-0 hidden flex justify-center gap-2 z-20">
+                class="px-4 mt-2 w-full max-w-lg mx-auto shrink-0 hidden flex flex-wrap justify-center gap-2 z-20">
+                <button id="btn-share-match" onclick="shareMatchResult()"
+                    class="order-last w-full glass-panel border-theme-accent2 text-theme-accent2 py-3 rounded-3xl font-heading font-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-theme-accent2/10 transition active:scale-95 shadow-md">
+                    📸 SHARE HASIL MATCH
+                </button>
                 <button onclick="playAgain()"
                     class="glass-panel text-theme-accent1 border-theme-accent1 flex-1 py-3 rounded-3xl font-heading font-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-theme-accent1/10 transition active:scale-95 shadow-md">
                     <i class="fas fa-redo mr-1"></i> PLAY AGAIN
@@ -1507,79 +2046,182 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- 1. PARTICLE BACKGROUND CANVAS ---
-        const initParticles = () => {
-            const canvas = document.getElementById('bg-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            let particles = [];
-
-            const resize = () => {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            };
-            window.addEventListener('resize', resize);
-            resize();
-
-            class Particle {
-                constructor() {
-                    this.reset();
-                }
-                reset() {
-                    this.x = Math.random() * width;
-                    this.y = Math.random() * height;
-                    this.vx = (Math.random() - 0.5) * 0.4;
-                    this.vy = (Math.random() - 0.5) * 0.4;
-                    this.radius = Math.random() * 2 + 1;
-                    this.colors = ['#fdf6ca', '#f5c9b5', '#ffffff'];
-                    this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
-                    this.alpha = Math.random() * 0.3 + 0.1;
-                }
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
-                        this.reset();
-                    }
-                }
-                draw() {
-                    ctx.globalAlpha = this.alpha;
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            for (let i = 0; i < 45; i++) particles.push(new Particle());
-
-            const animate = () => {
-                ctx.clearRect(0, 0, width, height);
-
-                // Draw connecting lines between nearby particles
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 100) {
-                            ctx.globalAlpha = (1 - dist / 100) * 0.15;
-                            ctx.strokeStyle = particles[i].color;
-                            ctx.lineWidth = 0.5;
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-
-                particles.forEach(p => { p.update(); p.draw(); });
-                requestAnimationFrame(animate);
-            };
-            animate();
+        // --- 1b. VS SCREEN (eSports intro) ---
+        const VS_GAME_NAMES = {
+            rps: 'Rock Paper Scissors', dice: 'Quantum Dice', tictactoe: 'Tic-Tac-Toe', speed: 'Speed Reaction',
+            memory: 'Memory Match', uno: 'Cyber UNO', wordle: 'Tebak Kata', dots: 'Dots & Boxes',
+            seabattle: 'Sea Battle', ludo: 'Ludo Mini', handslap: 'Hand Slap', rope: 'Tug of Rope'
         };
-        initParticles();
+        let vsAudio = null;
+        let vsPromise = null;
+        let lastVsStart = null;
+
+        const playVSAudio = () => {
+            try {
+                if (typeof Tone === 'undefined' || !AudioEngine.initialized || AudioEngine.muted) return;
+                if (!vsAudio) {
+                    vsAudio = {
+                        boom: new Tone.MembraneSynth({ pitchDecay: 0.12, octaves: 7, envelope: { attack: 0.001, decay: 0.9, sustain: 0, release: 0.4 } }).toDestination(),
+                        crash: new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.5, sustain: 0 } }).toDestination(),
+                        riser: new Tone.Synth({ oscillator: { type: 'sawtooth' }, envelope: { attack: 0.25, decay: 0.1, sustain: 0.6, release: 0.15 } }).toDestination()
+                    };
+                    vsAudio.boom.volume.value = -2;
+                    vsAudio.crash.volume.value = -16;
+                    vsAudio.riser.volume.value = -22;
+                }
+                const t = Tone.now();
+                vsAudio.riser.triggerAttack('C3', t);
+                vsAudio.riser.frequency.exponentialRampTo(1046, 0.5, t);
+                vsAudio.riser.triggerRelease(t + 0.55);
+                vsAudio.boom.triggerAttackRelease('A0', '2n', t + 0.6);
+                vsAudio.crash.triggerAttackRelease('4n', t + 0.6);
+                AudioEngine.synth.triggerAttackRelease(['A2', 'E3', 'A3'], '8n', t + 0.6);
+            } catch (e) { console.log('VS audio skipped', e); }
+        };
+
+        // Shows the 2.5s VS overlay. Re-entrant calls share the same promise.
+        const showVSScreen = (data, gameId) => {
+            if (vsPromise) return vsPromise;
+            const root = document.getElementById('vs-screen');
+            if (!root) return Promise.resolve();
+            const p1 = (data && data.p1) || {};
+            const p2 = (data && data.p2) || {};
+            document.getElementById('vs-p1-av').textContent = p1.avatar || '👤';
+            document.getElementById('vs-p1-name').textContent = p1.name || 'Player 1';
+            document.getElementById('vs-p2-av').textContent = p2.avatar || '🤖';
+            document.getElementById('vs-p2-name').textContent = p2.name || 'Player 2';
+            document.getElementById('vs-game-name').textContent = VS_GAME_NAMES[gameId] || 'Arena Match';
+
+            vsPromise = new Promise(resolve => {
+                const done = () => { root.style.display = 'none'; vsPromise = null; resolve(); };
+                root.style.display = 'flex';
+                playVSAudio();
+                if (typeof gsap === 'undefined') { setTimeout(done, 2500); return; }
+                const tl = gsap.timeline({ onComplete: done });
+                tl.set(root, { opacity: 1, x: 0 })
+                    .fromTo('#vs-screen .vs-bg', { opacity: 0 }, { opacity: 1, duration: 0.25 }, 0)
+                    .fromTo('#vs-p1', { x: '-110vw', skewX: -18 }, { x: 0, skewX: 0, duration: 0.6, ease: 'expo.out' }, 0.1)
+                    .fromTo('#vs-p2', { x: '110vw', skewX: -18 }, { x: 0, skewX: 0, duration: 0.6, ease: 'expo.out' }, 0.1)
+                    .fromTo('#vs-center', { scale: 4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(2)' }, 0.6)
+                    .fromTo('#vs-flash', { opacity: 0 }, { opacity: 0.95, duration: 0.06, repeat: 3, yoyo: true, ease: 'none' }, 0.6)
+                    .fromTo('#vs-bolt', { opacity: 0 }, { opacity: 1, duration: 0.05, repeat: 5, yoyo: true, ease: 'none' }, 0.6)
+                    .to('#vs-bolt', { opacity: 0.35, duration: 0.25 }, 0.95)
+                    .to(root, { x: -12, duration: 0.05, repeat: 5, yoyo: true, ease: 'none' }, 0.62)
+                    .set(root, { x: 0 }, 0.95)
+                    .fromTo('#vs-game-name', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out' }, 0.95)
+                    .to(root, { opacity: 0, duration: 0.45, ease: 'power2.in' }, 2.05);
+            });
+            return vsPromise;
+        };
+
+        // Synchronise the VS intro on both devices when host broadcasts `vsStart`
+        const handleVSBroadcast = (data) => {
+            if (!data || !data.vsStart || data.vsStart === lastVsStart) return;
+            lastVsStart = data.vsStart;
+            if (Math.abs(Date.now() - data.vsStart) < 4000) showVSScreen(data, data.vsGame);
+        };
+
+        // --- 1c. FLEXING: MATCH RECEIPT / VICTORY CARD GENERATOR ---
+        window.shareMatchResult = async () => {
+            const btn = document.getElementById('btn-share-match');
+            if (!roomData || !roomData.p1) return;
+            if (typeof html2canvas === 'undefined') {
+                if (typeof showToast === 'function') showToast('Library screenshot belum termuat, coba lagi.', 'error');
+                return;
+            }
+            const origLabel = btn ? btn.innerHTML : '';
+            if (btn) { btn.classList.add('is-busy'); btn.innerHTML = '⏳ MEMBUAT STRUK...'; }
+
+            const mk = (tag, css, text) => {
+                const e = document.createElement(tag);
+                if (css) e.style.cssText = css;
+                if (text != null) e.textContent = text;
+                return e;
+            };
+            const FONT = "'Space Grotesk','Courier New',monospace";
+            const p1 = roomData.p1, p2 = roomData.p2 || { name: 'BOT', avatar: '🤖', score: 0 };
+            const s1 = Number(p1.score) || 0, s2 = Number(p2.score) || 0;
+            const gameName = VS_GAME_NAMES[roomData.currentGame] || 'Arena Match';
+            const winner = s1 === s2 ? 'DRAW / SERI' : (s1 > s2 ? p1.name : p2.name);
+            const now = new Date();
+            const stamp = now.toLocaleDateString('id-ID') + ' ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const orderNo = '#' + String(Math.floor(Math.random() * 900000) + 100000);
+
+            const card = mk('div', `position:fixed;left:-20000px;top:0;width:1080px;height:1920px;box-sizing:border-box;padding:110px 80px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:${FONT};background:linear-gradient(160deg,#14003a 0%,#05010f 55%,#00182b 100%);overflow:hidden;`);
+            card.appendChild(mk('div', 'position:absolute;left:0;top:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,rgba(0,240,255,.07) 0 2px,transparent 2px 60px),repeating-linear-gradient(90deg,rgba(168,85,247,.07) 0 2px,transparent 2px 60px);'));
+            card.appendChild(mk('div', 'position:relative;color:#00F0FF;font-size:34px;letter-spacing:18px;font-weight:700;margin-bottom:26px;', 'V-GAMES ARENA'));
+            card.appendChild(mk('div', 'position:relative;color:#fff;font-size:64px;font-weight:700;margin-bottom:60px;text-shadow:4px 4px 0 #FF2E93;', 'MATCH RESULT'));
+
+            const paper = mk('div', 'position:relative;width:880px;box-sizing:border-box;padding:70px 64px;background:#f7f2e4;color:#16161a;border-radius:10px;border-top:14px solid #FF2E93;border-bottom:14px solid #00F0FF;box-shadow:0 0 90px rgba(0,240,255,.45);');
+            const dash = () => mk('div', 'border-top:4px dashed #16161a;opacity:.45;margin:34px 0;');
+            const row = (l, r, big) => {
+                const d = mk('div', `display:flex;justify-content:space-between;align-items:center;font-size:${big ? 40 : 32}px;font-weight:${big ? 700 : 500};margin:12px 0;`);
+                d.appendChild(mk('span', 'max-width:520px;overflow:hidden;white-space:nowrap;', l));
+                d.appendChild(mk('span', '', r));
+                return d;
+            };
+            paper.appendChild(mk('div', 'text-align:center;font-size:44px;font-weight:700;letter-spacing:6px;', '*** MATCH RECEIPT ***'));
+            paper.appendChild(mk('div', 'text-align:center;font-size:28px;opacity:.7;margin-top:14px;', stamp + '  |  ORDER ' + orderNo));
+            paper.appendChild(dash());
+            paper.appendChild(mk('div', 'text-align:center;font-size:26px;letter-spacing:8px;opacity:.65;', 'GAME'));
+            paper.appendChild(mk('div', 'text-align:center;font-size:58px;font-weight:700;margin-top:8px;text-transform:uppercase;', gameName));
+            paper.appendChild(dash());
+
+            const vs = mk('div', 'display:flex;align-items:center;justify-content:space-between;');
+            const side = (p, color) => {
+                const s = mk('div', 'width:300px;text-align:center;');
+                s.appendChild(mk('div', `font-size:150px;line-height:1.1;padding:14px 0;border:6px solid ${color};border-radius:36px;background:#fff;`, p.avatar || '👤'));
+                s.appendChild(mk('div', 'font-size:36px;font-weight:700;margin-top:18px;overflow:hidden;white-space:nowrap;', String(p.name || 'Player').toUpperCase()));
+                return s;
+            };
+            vs.appendChild(side(p1, '#00B8C4'));
+            vs.appendChild(mk('div', 'font-size:76px;font-weight:700;font-style:italic;color:#FF2E93;', 'VS'));
+            vs.appendChild(side(p2, '#FF2E93'));
+            paper.appendChild(vs);
+            paper.appendChild(dash());
+
+            paper.appendChild(mk('div', 'text-align:center;font-size:26px;letter-spacing:8px;opacity:.65;', 'SKOR AKHIR'));
+            paper.appendChild(mk('div', 'text-align:center;font-size:190px;font-weight:700;line-height:1.05;letter-spacing:-4px;', s1 + ' - ' + s2));
+            paper.appendChild(dash());
+            paper.appendChild(row('PLAYER 1: ' + String(p1.name || '').toUpperCase(), String(s1) + ' PTS'));
+            paper.appendChild(row('PLAYER 2: ' + String(p2.name || '').toUpperCase(), String(s2) + ' PTS'));
+            paper.appendChild(dash());
+            paper.appendChild(row('WINNER', String(winner).toUpperCase(), true));
+            paper.appendChild(row('STATUS', 'GG WP ✔', true));
+            paper.appendChild(dash());
+            paper.appendChild(mk('div', 'height:90px;margin:10px 40px;background:repeating-linear-gradient(90deg,#16161a 0 4px,transparent 4px 9px,#16161a 9px 11px,transparent 11px 18px,#16161a 18px 24px,transparent 24px 27px);'));
+            paper.appendChild(mk('div', 'text-align:center;font-size:30px;font-weight:700;margin-top:30px;letter-spacing:3px;', 'Played on V-Games Arena'));
+            paper.appendChild(mk('div', 'text-align:center;font-size:24px;opacity:.6;margin-top:10px;', 'TERIMA KASIH - NO REFUND ON SKILL ISSUE'));
+            card.appendChild(paper);
+            card.appendChild(mk('div', 'position:relative;margin-top:60px;color:#fff;font-size:38px;font-weight:700;letter-spacing:6px;text-shadow:0 0 20px #00F0FF;', '#VGamesArena  📸  TAG KAMU!'));
+            document.body.appendChild(card);
+
+            try {
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+                const canvas = await html2canvas(card, {
+                    width: 1080, height: 1920, windowWidth: 1080, windowHeight: 1920, scale: 1,
+                    backgroundColor: '#05010f', useCORS: true, logging: false,
+                    onclone: (doc, el) => { el.style.left = '0px'; el.style.top = '0px'; }
+                });
+                const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `V-Games-Match-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+                if (typeof showToast === 'function') showToast('Struk match tersimpan! Pamerkan di IG Story 🔥', 'success');
+                triggerConfetti();
+            } catch (err) {
+                console.error('Share receipt failed', err);
+                if (typeof showToast === 'function') showToast('Gagal membuat gambar struk.', 'error');
+            } finally {
+                card.remove();
+                if (btn) { btn.classList.remove('is-busy'); btn.innerHTML = origLabel; }
+            }
+        };
 
         // --- 2. AUDIO & SFX ENGINE (Tone.js) ---
         const AudioEngine = {
@@ -2095,6 +2737,7 @@
         };
 
         const updateRoomUI = (data) => {
+            handleVSBroadcast(data);
             const isP1 = currentUser.uid === data.p1.uid;
             const me = isP1 ? data.p1 : data.p2;
 
@@ -2249,7 +2892,7 @@
             await syncRoomState({ [field]: !currentStatus });
         };
 
-        window.startGame = async (gameId) => {
+        const startGameCore = async (gameId) => {
             AudioEngine.playSelect();
             if (!isHost) return;
 
@@ -2357,6 +3000,15 @@
                 gameState: initialGameState,
                 chat: currentChat
             });
+        };
+
+        // Wrapper: broadcast + show the VS Screen (2.5s) before the original start logic runs
+        window.startGame = async (gameId) => {
+            if (!isHost || !roomData) return startGameCore(gameId);
+            if (vsPromise) return;
+            await syncRoomState({ vsStart: Date.now(), vsGame: gameId });
+            await showVSScreen(roomData, gameId);
+            return startGameCore(gameId);
         };
 
         window.playAgain = async () => {
