@@ -738,7 +738,19 @@
           <div class="p-4 bg-brand-50 border border-brand-100 rounded-2xl space-y-3">
             <h4 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-share-nodes text-brand-600 mr-1.5"></i>Bagikan Link Toko Anda</h4>
             <p class="text-xs text-slate-400 leading-relaxed">Gunakan link ini agar customer yang berkunjung langsung melihat etalase produk dan terhubung ke WhatsApp Anda secara eksklusif.</p>
-            <div class="flex gap-2">
+            
+            <!-- Custom Link Slug Input -->
+            <div>
+              <label class="form-label text-xs"><i class="fa-solid fa-link text-brand-500 mr-1"></i>Nama / Custom Link Toko (Slug URL)</label>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs text-slate-400 font-mono select-none px-2.5 py-2 bg-slate-100 border border-slate-200 rounded-lg">?s=</span>
+                <input type="text" id="setting-store-slug" oninput="handleStoreSlugChange()" class="form-input text-xs font-semibold text-slate-800" placeholder="nama-toko-anda">
+              </div>
+              <p class="text-[11px] text-slate-400 mt-1">Anda bisa memasukkan nama toko atau kata bebas tanpa spasi. Link otomatis menyesuaikan nama ini.</p>
+            </div>
+
+            <!-- Full Link Output -->
+            <div class="flex gap-2 pt-1">
               <input type="text" id="setting-store-link" readonly class="form-input bg-slate-100 text-slate-800 text-xs select-all cursor-pointer font-mono" value="">
               <button onclick="copyStoreLink()" class="px-4 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold transition flex-shrink-0 flex items-center gap-1.5">
                 <i class="fa-solid fa-copy"></i> Salin
@@ -940,10 +952,10 @@
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
               <div>
                 <label class="form-label font-bold text-slate-800"><i class="fa-solid fa-sliders text-brand-500 mr-1.5"></i>Pilihan Sistem Pembayaran Toko</label>
-                <select id="setting-payment-gateway-type" class="form-input bg-white font-medium" onchange="togglePaymentGatewayFields()">
-                  <option value="qris_manual">Tampilan Gambar QRIS Manual (Tanpa API / Konfirmasi WA)</option>
-                  <option value="midtrans">Payment Gateway Otomatis (API Midtrans)</option>
-                  <option value="both">Aktifkan Keduanya (Bisa Midtrans &amp; QRIS Manual)</option>
+                <select id="setting-payment-gateway-type" class="form-input font-medium cursor-pointer" style="background-color: #1e293b !important; color: #f8fafc !important; border-color: #334155 !important;" onchange="togglePaymentGatewayFields()">
+                  <option value="qris_manual" style="background-color: #1e293b !important; color: #f8fafc !important;">Tampilan Gambar QRIS Manual (Tanpa API / Konfirmasi WA)</option>
+                  <option value="midtrans" style="background-color: #1e293b !important; color: #f8fafc !important;">Payment Gateway Otomatis (API Midtrans)</option>
+                  <option value="both" style="background-color: #1e293b !important; color: #f8fafc !important;">Aktifkan Keduanya (Bisa Midtrans &amp; QRIS Manual)</option>
                 </select>
                 <p class="text-[11px] text-slate-500 mt-1">Pilih cara pembeli melakukan pembayaran di toko Anda.</p>
               </div>
@@ -2079,6 +2091,7 @@
 
         const DEFAULT_TOKO_CONFIG = {
             nama: "CommerceHub",
+            storeSlug: "",
             deskripsi: "Layanan jasa pembuatan website profesional, cepat, responsif, dan SEO-friendly. Sangat cocok untuk landing page, profil bisnis perusahaan, portofolio kreatif, hingga toko online (e-commerce).",
             whatsapp: "6281229923834",
             alamat: "Perum Pondok Jangli Indah, Tembalang, Kota Semarang, Jawa Tengah",
@@ -2090,6 +2103,57 @@
             qrisImage: "",
             paymentType: "qris_manual" // 'qris_manual', 'midtrans', atau 'both'
         };
+
+        // Helper untuk membersihkan dan membuat slug toko yang valid dan rapi
+        function generateStoreSlug(text) {
+            if (!text || typeof text !== 'string') return '';
+            return text
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9_-]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+        }
+
+        // Resolusi seller ID dari slug URL atau UID
+        async function resolveSellerIdFromParam(rawParam) {
+            if (!rawParam || rawParam === "default") return "default";
+            let clean = rawParam.trim();
+            if (clean.includes('?')) clean = clean.split('?')[0];
+            if (clean.includes('&')) clean = clean.split('&')[0];
+            if (!clean || clean === "default") return "default";
+
+            try {
+                // 1. Cek di koleksi store_slugs
+                const slugKey = clean.toLowerCase();
+                const slugSnap = await db.collection("store_slugs").doc(slugKey).get();
+                if (slugSnap.exists && slugSnap.data() && slugSnap.data().uid) {
+                    return slugSnap.data().uid;
+                }
+
+                // 2. Cek apakah ada di uangku_data dengan store_config.storeSlug atau store_config.nama yang cocok
+                const querySlug = await db.collection("uangku_data")
+                    .where("store_config.storeSlug", "==", slugKey)
+                    .limit(1)
+                    .get();
+                if (!querySlug.empty) {
+                    return querySlug.docs[0].id;
+                }
+
+                const queryName = await db.collection("uangku_data")
+                    .where("store_config.nama", "==", clean)
+                    .limit(1)
+                    .get();
+                if (!queryName.empty) {
+                    return queryName.docs[0].id;
+                }
+            } catch (err) {
+                console.warn("Resolve seller slug warning:", err);
+            }
+
+            // Fallback: anggap parameter adalah UID langsung
+            return clean;
+        }
 
         let TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
 
@@ -2274,13 +2338,11 @@
                 }
 
                 currentUser = user;
-                // Jika marveyno, biarkan dia mengedit halaman 'default' (Tampilan Awal)
+                // Jika marveyno, biarkan dia mengedit halaman 'default' (Tampilan Awal) atau toko yang dipilih di URL
                 if (user.email === OWNER_EMAIL) {
                     var urlP = new URLSearchParams(window.location.search);
-                    let sParam = urlP.get('s') || urlP.get('seller') || "default";
-                    if (sParam.includes('?')) sParam = sParam.split('?')[0];
-                    if (sParam.includes('&')) sParam = sParam.split('&')[0];
-                    currentSellerId = sParam;
+                    let rawParam = urlP.get('s') || urlP.get('seller') || "default";
+                    currentSellerId = await resolveSellerIdFromParam(rawParam);
                     
                     // Tampilkan menu Persetujuan Akun untuk Owner
                     const navApp = document.getElementById("nav-approvals");
@@ -2298,10 +2360,8 @@
             } else {
                 currentUser = null;
                 var urlP = new URLSearchParams(window.location.search);
-                let sParam = urlP.get('s') || urlP.get('seller') || "default";
-                if (sParam.includes('?')) sParam = sParam.split('?')[0];
-                if (sParam.includes('&')) sParam = sParam.split('&')[0];
-                currentSellerId = sParam;
+                let rawParam = urlP.get('s') || urlP.get('seller') || "default";
+                currentSellerId = await resolveSellerIdFromParam(rawParam);
                 const navApp = document.getElementById("nav-approvals");
                 const tabApp = document.getElementById("tab-approvals");
                 if (navApp) navApp.classList.add("hidden");
@@ -2413,9 +2473,11 @@
                     await db.collection("user_registrations").doc(user.uid).set(regData);
 
                     // 3. Simpan data toko awal di uangku_data dengan status account_status pending
+                    const initialSlug = generateStoreSlug(storeName) || user.uid;
                     const newTokoConfig = {
                         ...DEFAULT_TOKO_CONFIG,
                         nama: storeName,
+                        storeSlug: initialSlug,
                         whatsapp: formattedWa,
                         email: email
                     };
@@ -2427,6 +2489,19 @@
                         store_config: newTokoConfig,
                         account_status: "pending"
                     });
+
+                    // Simpan juga slug mapping awal
+                    if (initialSlug) {
+                        try {
+                            await db.collection("store_slugs").doc(initialSlug.toLowerCase()).set({
+                                uid: user.uid,
+                                storeName: storeName,
+                                createdAt: new Date().toISOString()
+                            }, { merge: true });
+                        } catch (eSlug) {
+                            console.warn("Save initial slug warning:", eSlug);
+                        }
+                    }
                     
                     // 4. PENTING: Langsung keluarkan sesi login agar akun pending tidak langsung masuk!
                     await firebase.auth().signOut();
@@ -2510,13 +2585,11 @@
         // Handle Logout
         function handleLogout() {
             showCustomConfirm("Konfirmasi Keluar", "Apakah Anda yakin ingin keluar dari akun Seller Anda?", () => {
-                firebase.auth().signOut().then(() => {
+                firebase.auth().signOut().then(async () => {
                     currentUser = null;
                     var urlP = new URLSearchParams(window.location.search);
-                    let sParam = urlP.get('s') || urlP.get('seller') || "default";
-                    if (sParam.includes('?')) sParam = sParam.split('?')[0];
-                    if (sParam.includes('&')) sParam = sParam.split('&')[0];
-                    currentSellerId = sParam;
+                    let rawParam = urlP.get('s') || urlP.get('seller') || "default";
+                    currentSellerId = await resolveSellerIdFromParam(rawParam);
                     authMode = "login";
                     
                     updateCartBadge();
@@ -2605,8 +2678,13 @@
         function renderAccountSettings() {
             if (!currentUser) return;
             
-            // Render share link
-            const shareLink = window.location.origin + window.location.pathname + '?s=' + currentUser.uid;
+            // Custom Slug / Nama Toko untuk link
+            const currentSlug = TOKO_CONFIG.storeSlug || generateStoreSlug(TOKO_CONFIG.nama) || currentUser.uid;
+            const slugInput = document.getElementById("setting-store-slug");
+            if (slugInput) slugInput.value = currentSlug;
+
+            // Render share link dengan nama toko/slug
+            const shareLink = window.location.origin + window.location.pathname + '?s=' + encodeURIComponent(currentSlug);
             const linkInput = document.getElementById("setting-store-link");
             if (linkInput) linkInput.value = shareLink;
             
@@ -2641,6 +2719,15 @@
                 const superAdminSec = document.getElementById("super-admin-section");
                 if (superAdminSec) superAdminSec.classList.remove("hidden");
             }
+        }
+
+        // Live update input link ketika seller mengetik nama/slug toko kustom
+        function handleStoreSlugChange() {
+            const slugInput = document.getElementById("setting-store-slug");
+            const linkInput = document.getElementById("setting-store-link");
+            if (!slugInput || !linkInput) return;
+            const clean = generateStoreSlug(slugInput.value);
+            linkInput.value = window.location.origin + window.location.pathname + '?s=' + encodeURIComponent(clean || "nama-toko");
         }
 
         // Toggle tampilan pengaturan pembayaran berdasarkan opsi yang dipilih penjual
@@ -2769,6 +2856,10 @@
             const heroTitle = document.getElementById("setting-hero-title").value.trim();
             const heroImage = formatDirectImageUrl(document.getElementById("setting-hero-image").value.trim());
             
+            // Baca custom slug toko
+            const rawSlug = document.getElementById("setting-store-slug") ? document.getElementById("setting-store-slug").value.trim() : "";
+            const cleanSlug = generateStoreSlug(rawSlug) || generateStoreSlug(name) || (currentUser ? currentUser.uid : "");
+
             // Baca QRIS dari section pembayaran atau info toko
             const qrisFromSec = document.getElementById("setting-store-qris-section") ? document.getElementById("setting-store-qris-section").value.trim() : "";
             const qrisFromInfo = document.getElementById("setting-store-qris") ? document.getElementById("setting-store-qris").value.trim() : "";
@@ -2786,6 +2877,7 @@
             const statusVal = document.getElementById("setting-store-status") ? document.getElementById("setting-store-status").value : "open";
             TOKO_CONFIG.isOpen = (statusVal === "open");
             TOKO_CONFIG.nama = name;
+            TOKO_CONFIG.storeSlug = cleanSlug;
             TOKO_CONFIG.whatsapp = wa.replace(/^0/, '62');
             TOKO_CONFIG.deskripsi = desc;
             TOKO_CONFIG.alamat = address;
@@ -2803,8 +2895,28 @@
             TOKO_CONFIG.tema = selectedTheme;
             
             await saveData(true);
+
+            // Daftarkan slug ke store_slugs jika seller sedang login
+            if (currentUser && cleanSlug) {
+                try {
+                    await db.collection("store_slugs").doc(cleanSlug.toLowerCase()).set({
+                        uid: currentUser.uid,
+                        storeName: name,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                } catch (slugErr) {
+                    console.warn("Daftar store_slugs warning:", slugErr);
+                }
+            }
+
+            // Perbarui tampilan link di tab setting
+            const linkInput = document.getElementById("setting-store-link");
+            if (linkInput) {
+                linkInput.value = window.location.origin + window.location.pathname + '?s=' + encodeURIComponent(cleanSlug);
+            }
+
             initStoreInfo(); // Update UI in real-time
-            showToast("Informasi toko berhasil disimpan!", "success");
+            showToast("Informasi & Link toko berhasil disimpan!", "success");
         }
 
         // Copy store link to clipboard
@@ -6236,7 +6348,12 @@
 
 
         // Inisialisasi Aplikasi Saat Halaman Selesai Dimuat
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', async function() {
+            var urlP = new URLSearchParams(window.location.search);
+            let rawParam = urlP.get('s') || urlP.get('seller') || "default";
+            if (rawParam && rawParam !== "default" && currentSellerId === "default") {
+                currentSellerId = await resolveSellerIdFromParam(rawParam);
+            }
             initStoreInfo();
             updateAdminButtonVisibility();
             updateCartBadge();
