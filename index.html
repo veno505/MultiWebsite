@@ -932,49 +932,98 @@
           <!-- Section 4: Pengaturan Pembayaran -->
           <div class="mt-8 pt-8 border-t border-slate-200">
             <div class="flex items-center justify-between mb-4">
-                <h4 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-credit-card text-brand-600 mr-1.5"></i>Pengaturan Pembayaran (Midtrans)</h4>
+                <h4 class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-credit-card text-brand-600 mr-1.5"></i>Metode & Sistem Pembayaran Toko</h4>
                 <span id="payment-status-badge" class="px-2 py-1 bg-slate-100 text-slate-500 rounded text-[10px] font-bold">Belum Diatur</span>
             </div>
             
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-4">
               <div>
-                <label class="form-label">Environment Mode</label>
-                <select id="payment-mode" class="form-input">
-                  <option value="sandbox">Sandbox (Testing)</option>
-                  <option value="production">Production (Live)</option>
+                <label class="form-label font-bold text-slate-800"><i class="fa-solid fa-sliders text-brand-500 mr-1.5"></i>Pilihan Sistem Pembayaran Toko</label>
+                <select id="setting-payment-gateway-type" class="form-input bg-white font-medium" onchange="togglePaymentGatewayFields()">
+                  <option value="qris_manual">Tampilan Gambar QRIS Manual (Tanpa API / Konfirmasi WA)</option>
+                  <option value="midtrans">Payment Gateway Otomatis (API Midtrans)</option>
+                  <option value="both">Aktifkan Keduanya (Bisa Midtrans &amp; QRIS Manual)</option>
                 </select>
-              </div>
-              
-              <div>
-                <label class="form-label">Merchant ID</label>
-                <input type="text" id="payment-merchant-id" class="form-input" placeholder="Mxxxxxxx">
-              </div>
-              
-              <div>
-                <label class="form-label">Client Key</label>
-                <input type="text" id="payment-client-key" class="form-input" placeholder="SB-Mid-client-xxx">
-              </div>
-              
-              <div>
-                <label class="form-label">Server Key <span class="text-xs text-brand-500 ml-2">(Sangat Rahasia)</span></label>
-                <input type="password" id="payment-server-key" class="form-input" placeholder="SB-Mid-server-xxx">
-                <p class="text-[10px] text-slate-400 mt-1">Server Key tidak akan pernah ditampilkan kembali demi keamanan.</p>
+                <p class="text-[11px] text-slate-500 mt-1">Pilih cara pembeli melakukan pembayaran di toko Anda.</p>
               </div>
 
-              <div>
-                <label class="form-label">Notification URL (Untuk Midtrans Dashboard)</label>
-                <div class="flex items-center gap-2">
-                    <input type="text" id="payment-notif-url" class="form-input bg-slate-100 text-slate-500 text-xs" readonly value="">
-                    <button onclick="copyNotifUrl()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold whitespace-nowrap"><i class="fa-solid fa-copy"></i> Salin</button>
+              <!-- PENGATURAN QRIS GAMBAR TOKO (MANUAL / TANPA API) -->
+              <div id="section-manual-qris-config" class="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-3">
+                <div class="flex items-center justify-between">
+                  <h5 class="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-qrcode text-emerald-600"></i> Pengaturan QRIS Gambar Manual (Tanpa API)
+                  </h5>
+                  <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-semibold">Mudah &amp; Langsung</span>
+                </div>
+                <div>
+                  <label class="form-label text-xs">Link Gambar Barcode QRIS Toko Anda</label>
+                  <input type="text" id="setting-store-qris-section" class="form-input bg-white text-xs" placeholder="https://... (Link gambar barcode QRIS Anda)" oninput="updateQrisPreview()">
+                  <p class="text-[10px] text-slate-500 mt-1">Masukkan link gambar barcode QRIS (bisa dari ImgBB, Postimages, atau link gambar WhatsApp/Drive publik). Pembeli tinggal scan dan kirim bukti ke nomor WA Anda.</p>
+                </div>
+                <!-- Preview Box -->
+                <div id="setting-qris-preview-box" class="hidden flex items-center gap-3 p-2.5 bg-white rounded-lg border border-emerald-100">
+                  <img id="setting-qris-preview-img" src="" alt="Preview QRIS" class="w-14 h-14 object-contain border border-slate-200 rounded">
+                  <div class="text-[11px]">
+                    <span class="font-bold text-emerald-800 block">Preview Gambar QRIS</span>
+                    <span class="text-slate-500">Gambar barcode QRIS terdeteksi dan siap ditampilkan ke pembeli.</span>
+                  </div>
                 </div>
               </div>
-              
-              <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                <button onclick="testMidtransConnection()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-plug"></i> Test Koneksi
-                </button>
-                <button onclick="savePaymentSettings()" class="flex-1 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-save"></i> Simpan Pengaturan
+
+              <!-- PENGATURAN MIDTRANS API (OTOMATIS) -->
+              <div id="section-midtrans-config" class="p-4 bg-slate-100/70 border border-slate-200 rounded-xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <h5 class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt text-brand-600"></i> Kredensial API Midtrans (Verifikasi Otomatis)
+                  </h5>
+                  <span class="px-2 py-0.5 bg-brand-50 text-brand-600 border border-brand-200 rounded text-[10px] font-semibold">Payment Gateway</span>
+                </div>
+                <div>
+                  <label class="form-label">Environment Mode</label>
+                  <select id="payment-mode" class="form-input bg-white">
+                    <option value="sandbox">Sandbox (Testing)</option>
+                    <option value="production">Production (Live)</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="form-label">Merchant ID</label>
+                  <input type="text" id="payment-merchant-id" class="form-input bg-white" placeholder="Mxxxxxxx">
+                </div>
+                
+                <div>
+                  <label class="form-label">Client Key</label>
+                  <input type="text" id="payment-client-key" class="form-input bg-white" placeholder="SB-Mid-client-xxx">
+                </div>
+                
+                <div>
+                  <label class="form-label">Server Key <span class="text-xs text-brand-500 ml-2">(Sangat Rahasia)</span></label>
+                  <input type="password" id="payment-server-key" class="form-input bg-white" placeholder="SB-Mid-server-xxx">
+                  <p class="text-[10px] text-slate-400 mt-1">Server Key tidak akan pernah ditampilkan kembali demi keamanan.</p>
+                </div>
+
+                <div>
+                  <label class="form-label">Notification URL (Untuk Midtrans Dashboard)</label>
+                  <div class="flex items-center gap-2">
+                      <input type="text" id="payment-notif-url" class="form-input bg-slate-100 text-slate-500 text-xs" readonly value="">
+                      <button onclick="copyNotifUrl()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold whitespace-nowrap"><i class="fa-solid fa-copy"></i> Salin</button>
+                  </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 pt-1">
+                  <button onclick="testMidtransConnection()" class="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plug"></i> Test Koneksi Midtrans
+                  </button>
+                  <button onclick="savePaymentSettings()" class="flex-1 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-save"></i> Simpan Kredensial Midtrans
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tombol Simpan Opsi Metode Utama -->
+              <div class="pt-2">
+                <button onclick="saveStoreSettings()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-bold shadow-sm transition flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-check-circle"></i> Simpan Pilihan Pembayaran Toko
                 </button>
               </div>
             </div>
@@ -1450,7 +1499,7 @@
               
               <!-- Payment Method Cards -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer active">
+                <label id="pay-method-qris-card" class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer active">
                   <input type="radio" name="pay-method" value="qris" class="sr-only" checked onclick="selectPaymentMethod('qris')">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
@@ -1466,7 +1515,7 @@
                   </div>
                 </label>
 
-                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
+                <label id="pay-method-bri-card" class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
                   <input type="radio" name="pay-method" value="bri" class="sr-only" onclick="selectPaymentMethod('bri')">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
@@ -1482,7 +1531,7 @@
                   </div>
                 </label>
 
-                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
+                <label id="pay-method-gopay-card" class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
                   <input type="radio" name="pay-method" value="gopay" class="sr-only" onclick="selectPaymentMethod('gopay')">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
@@ -1498,7 +1547,7 @@
                   </div>
                 </label>
 
-                <label class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
+                <label id="pay-method-shopeepay-card" class="pay-method-card relative flex items-center justify-between p-4 rounded-xl cursor-pointer">
                   <input type="radio" name="pay-method" value="shopeepay" class="sr-only" onclick="selectPaymentMethod('shopeepay')">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center icon-box">
@@ -1965,7 +2014,8 @@
             pesanPembuka: "Halo Admin CommerceHub, saya tertarik untuk memesan paket jasa pembuatan website berikut:",
             heroTitle: "Temukan Kebutuhan Anda Lebih Mudah",
             heroImage: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            qrisImage: ""
+            qrisImage: "",
+            paymentType: "qris_manual" // 'qris_manual', 'midtrans', atau 'both'
         };
 
         let TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
@@ -2463,6 +2513,12 @@
             document.getElementById("setting-hero-title").value = TOKO_CONFIG.heroTitle || "Temukan Kebutuhan Anda Lebih Mudah";
             document.getElementById("setting-hero-image").value = TOKO_CONFIG.heroImage || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
             if (document.getElementById("setting-store-qris")) document.getElementById("setting-store-qris").value = TOKO_CONFIG.qrisImage || "";
+            if (document.getElementById("setting-store-qris-section")) document.getElementById("setting-store-qris-section").value = TOKO_CONFIG.qrisImage || "";
+            if (document.getElementById("setting-payment-gateway-type")) {
+                document.getElementById("setting-payment-gateway-type").value = TOKO_CONFIG.paymentType || "qris_manual";
+            }
+            togglePaymentGatewayFields();
+            updateQrisPreview();
             if (document.getElementById("setting-user-email")) document.getElementById("setting-user-email").textContent = currentUser.email || "Anonymous";
             if (document.getElementById("setting-store-status")) document.getElementById("setting-store-status").value = (TOKO_CONFIG.isOpen !== false) ? "open" : "closed";
             renderAdminSocials();
@@ -2472,6 +2528,52 @@
             if (currentUser && currentUser.email === OWNER_EMAIL) {
                 const superAdminSec = document.getElementById("super-admin-section");
                 if (superAdminSec) superAdminSec.classList.remove("hidden");
+            }
+        }
+
+        // Toggle tampilan pengaturan pembayaran berdasarkan opsi yang dipilih penjual
+        function togglePaymentGatewayFields() {
+            const payTypeSelect = document.getElementById("setting-payment-gateway-type");
+            const manualSec = document.getElementById("section-manual-qris-config");
+            const midtransSec = document.getElementById("section-midtrans-config");
+            if (!payTypeSelect) return;
+
+            const mode = payTypeSelect.value;
+            if (mode === "qris_manual") {
+                if (manualSec) manualSec.classList.remove("hidden");
+                if (midtransSec) midtransSec.classList.add("hidden");
+            } else if (mode === "midtrans") {
+                if (manualSec) manualSec.classList.add("hidden");
+                if (midtransSec) midtransSec.classList.remove("hidden");
+            } else { // 'both'
+                if (manualSec) manualSec.classList.remove("hidden");
+                if (midtransSec) midtransSec.classList.remove("hidden");
+            }
+        }
+
+        // Update preview gambar QRIS toko
+        function updateQrisPreview() {
+            const inputSec = document.getElementById("setting-store-qris-section");
+            const inputStore = document.getElementById("setting-store-qris");
+            const previewBox = document.getElementById("setting-qris-preview-box");
+            const previewImg = document.getElementById("setting-qris-preview-img");
+            
+            let val = "";
+            if (inputSec && inputSec.value.trim()) {
+                val = inputSec.value.trim();
+                if (inputStore) inputStore.value = val;
+            } else if (inputStore && inputStore.value.trim()) {
+                val = inputStore.value.trim();
+                if (inputSec) inputSec.value = val;
+            }
+
+            if (previewBox && previewImg) {
+                if (val) {
+                    previewImg.src = val;
+                    previewBox.classList.remove("hidden");
+                } else {
+                    previewBox.classList.add("hidden");
+                }
             }
         }
 
@@ -2546,7 +2648,15 @@
             const email = document.getElementById("setting-store-email").value.trim();
             const heroTitle = document.getElementById("setting-hero-title").value.trim();
             const heroImage = document.getElementById("setting-hero-image").value.trim();
-            const qrisImage = document.getElementById("setting-store-qris") ? document.getElementById("setting-store-qris").value.trim() : "";
+            
+            // Baca QRIS dari section pembayaran atau info toko
+            const qrisFromSec = document.getElementById("setting-store-qris-section") ? document.getElementById("setting-store-qris-section").value.trim() : "";
+            const qrisFromInfo = document.getElementById("setting-store-qris") ? document.getElementById("setting-store-qris").value.trim() : "";
+            const qrisImage = qrisFromSec || qrisFromInfo;
+
+            // Baca tipe pembayaran toko
+            const payTypeSelect = document.getElementById("setting-payment-gateway-type");
+            const paymentType = payTypeSelect ? payTypeSelect.value : (TOKO_CONFIG.paymentType || "qris_manual");
             
             if (!name || !wa) {
                 showToast("Nama Toko dan Nomor WhatsApp wajib diisi.", "warning");
@@ -2569,6 +2679,7 @@
             if (heroTitle) TOKO_CONFIG.heroTitle = heroTitle;
             if (heroImage) TOKO_CONFIG.heroImage = heroImage;
             TOKO_CONFIG.qrisImage = qrisImage;
+            TOKO_CONFIG.paymentType = paymentType;
             TOKO_CONFIG.tema = selectedTheme;
             
             await saveData(true);
