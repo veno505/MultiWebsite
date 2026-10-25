@@ -1598,8 +1598,18 @@
             <!-- QRIS Toko Manual Display (Tanpa API) -->
             <div id="proc-manual-qris-wrap" class="text-center space-y-3 hidden">
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Scan Kode QRIS Toko</p>
-              <div class="w-64 h-64 mx-auto border border-slate-200 bg-white rounded-2xl p-3 shadow-sm flex items-center justify-center overflow-hidden">
-                <img id="proc-manual-qris-img" src="#" alt="QRIS Toko" class="w-full h-full object-contain">
+              <div class="w-64 h-64 md:w-72 md:h-72 mx-auto border border-slate-200 bg-white rounded-2xl p-3 shadow-md flex items-center justify-center overflow-hidden relative">
+                <img id="proc-manual-qris-img" src="#" alt="QRIS Toko" class="w-full h-full object-contain" onerror="handleManualQrisError(this)">
+                <div id="proc-manual-qris-err" class="hidden absolute inset-0 bg-white p-4 flex flex-col items-center justify-center text-center">
+                  <i class="fa-solid fa-triangle-exclamation text-amber-500 text-2xl mb-2"></i>
+                  <p class="text-xs font-bold text-slate-700">Gambar QRIS Belum Dimuat</p>
+                  <p class="text-[11px] text-slate-400 mt-1">Penjual belum mengunggah gambar QRIS yang valid. Anda dapat konfirmasi via WhatsApp.</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-center gap-2">
+                <a id="proc-manual-qris-link" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Gambar Ukuran Penuh
+                </a>
               </div>
               <p class="text-xs text-slate-500 leading-relaxed px-4">Buka aplikasi e-wallet (GoPay, DANA, OVO, ShopeePay) atau Mobile Banking Anda, lalu scan QRIS di atas sesuai nominal pesanan.</p>
               <div class="pt-3">
@@ -2020,13 +2030,41 @@
 
         let TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
 
+        // Helper untuk mengubah link sharing (Google Drive, Dropbox, ImgBB, Postimg) menjadi URL Direct Image Gambar Asli
+        function formatDirectImageUrl(url) {
+            if (!url || typeof url !== 'string') return '';
+            let cleanUrl = url.trim();
+
+            // 1. Google Drive: https://drive.google.com/file/d/FILE_ID/view atau ?id=FILE_ID
+            if (cleanUrl.includes('drive.google.com')) {
+                let idMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || cleanUrl.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                if (idMatch && idMatch[1]) {
+                    return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+                }
+            }
+
+            // 2. Dropbox: dl=0 -> dl=1 / raw=1
+            if (cleanUrl.includes('dropbox.com')) {
+                return cleanUrl.replace(/[?&]dl=0/, '?raw=1');
+            }
+
+            // 3. Postimages: https://postimg.cc/xxx -> direct i.postimg.cc jika bukan format gambar langsung
+            if (cleanUrl.includes('postimg.cc/') && !cleanUrl.includes('i.postimg.cc')) {
+                // Biarkan atau handle jika user memasukkan link halaman viewer
+            }
+
+            return cleanUrl;
+        }
+
+        const FALLBACK_PRODUCT_IMAGE = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80";
+
         const DEFAULT_PRODUK = [
             {
                 id: "W001",
                 nama: "Landing Page Startup/SaaS",
                 kategori: "Unggulan",
                 harga: 990000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Landing page modern dengan konversi tinggi, animasi interaktif, integrasi form email, dan responsif di semua perangkat."
             },
             {
@@ -2034,7 +2072,7 @@
                 nama: "Website E-Commerce Luxury",
                 kategori: "Terlaris",
                 harga: 2490000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Toko online premium dengan keranjang belanja, integrasi WhatsApp checkout, halaman katalog, dan panel admin mandiri."
             },
             {
@@ -2042,7 +2080,7 @@
                 nama: "Company Profile Perusahaan",
                 kategori: "Unggulan",
                 harga: 1490000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Website profil perusahaan profesional untuk membangun kredibilitas bisnis, lengkap dengan halaman kontak, visi misi, & karir."
             },
             {
@@ -2050,7 +2088,7 @@
                 nama: "Portofolio Kreatif & CV",
                 kategori: "Promo",
                 harga: 490000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Desain portofolio pribadi interaktif untuk desainer, developer, fotografer, atau CV digital profesional untuk melamar kerja."
             },
             {
@@ -2058,7 +2096,7 @@
                 nama: "Landing Page Event / Seminar",
                 kategori: "Promo",
                 harga: 390000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Halaman pendaftaran satu halaman khusus untuk webinar, konser, reuni, acara amal, atau seminar bisnis Anda."
             },
             {
@@ -2066,7 +2104,7 @@
                 nama: "Website Portal Berita / Blog",
                 kategori: "Terbaru",
                 harga: 1190000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Media portal berita atau blog pribadi dengan CMS mudah, kategori artikel dinamis, tata letak modern, dan Adsense-ready."
             },
             {
@@ -2074,7 +2112,7 @@
                 nama: "Website Instansi & Sekolah",
                 kategori: "Unggulan",
                 harga: 1990000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Situs web resmi sekolah, universitas, pesantren, atau yayasan lengkap dengan fitur pengumuman dan kalender akademik."
             },
             {
@@ -2082,7 +2120,7 @@
                 nama: "Sistem Informasi Custom",
                 kategori: "Terbaru",
                 harga: 4990000,
-                gambar: "https://cdn.phototourl.com/free/2026-08-14-9aacb7e8-46b0-4ea9-bfde-234070f6eaf7.jpg",
+                gambar: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
                 deskripsi: "Pengembangan sistem web custom, database relasional, dashboard monitoring, cetak laporan, sesuai dengan kebutuhan bisnis Anda."
             }
         ];
@@ -2558,18 +2596,26 @@
             const previewBox = document.getElementById("setting-qris-preview-box");
             const previewImg = document.getElementById("setting-qris-preview-img");
             
-            let val = "";
+            let rawVal = "";
             if (inputSec && inputSec.value.trim()) {
-                val = inputSec.value.trim();
-                if (inputStore) inputStore.value = val;
+                rawVal = inputSec.value.trim();
             } else if (inputStore && inputStore.value.trim()) {
-                val = inputStore.value.trim();
-                if (inputSec) inputSec.value = val;
+                rawVal = inputStore.value.trim();
             }
+
+            const val = formatDirectImageUrl(rawVal);
+            if (inputSec && rawVal && rawVal !== val) inputSec.value = val;
+            if (inputStore && rawVal && rawVal !== val) inputStore.value = val;
 
             if (previewBox && previewImg) {
                 if (val) {
                     previewImg.src = val;
+                    previewImg.onerror = function() {
+                        previewBox.classList.add("hidden");
+                    };
+                    previewImg.onload = function() {
+                        previewBox.classList.remove("hidden");
+                    };
                     previewBox.classList.remove("hidden");
                 } else {
                     previewBox.classList.add("hidden");
@@ -2647,12 +2693,12 @@
             const address = document.getElementById("setting-store-address").value.trim();
             const email = document.getElementById("setting-store-email").value.trim();
             const heroTitle = document.getElementById("setting-hero-title").value.trim();
-            const heroImage = document.getElementById("setting-hero-image").value.trim();
+            const heroImage = formatDirectImageUrl(document.getElementById("setting-hero-image").value.trim());
             
             // Baca QRIS dari section pembayaran atau info toko
             const qrisFromSec = document.getElementById("setting-store-qris-section") ? document.getElementById("setting-store-qris-section").value.trim() : "";
             const qrisFromInfo = document.getElementById("setting-store-qris") ? document.getElementById("setting-store-qris").value.trim() : "";
-            const qrisImage = qrisFromSec || qrisFromInfo;
+            const qrisImage = formatDirectImageUrl(qrisFromSec || qrisFromInfo);
 
             // Baca tipe pembayaran toko
             const payTypeSelect = document.getElementById("setting-payment-gateway-type");
@@ -3397,6 +3443,7 @@
                     card.style.animation = `fadeIn 0.5s ease forwards ${animDelay}ms`;
                     
                     const sn = (p.nama || "").replace(/'/g, "\\'");
+                    const pImg = formatDirectImageUrl(p.gambar) || FALLBACK_PRODUCT_IMAGE;
 
                     card.innerHTML = `
                         <!-- Admin Controls on Card -->
@@ -3410,8 +3457,8 @@
                         </div>
                         
                         <!-- Bagian Gambar -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-slate-100 cursor-pointer" onclick="openModal('${p.gambar}')">
-                            <img src="${p.gambar}" alt="${p.nama}" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="relative w-full aspect-square overflow-hidden bg-slate-100 cursor-pointer" onclick="openModal('${pImg}')">
+                            <img src="${pImg}" alt="${p.nama}" loading="lazy" onerror="this.onerror=null; this.src='${FALLBACK_PRODUCT_IMAGE}';" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute top-2 right-2 md:top-3 md:right-3 bg-slate-100/90 backdrop-blur-sm px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg text-[10px] md:text-xs font-semibold text-brand-500 border border-slate-200/50">
                                 ${p.kategori}
                             </div>
@@ -4573,8 +4620,9 @@
                 const item = document.createElement("div");
                 item.className = "flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0";
                 const sn = (p.nama || "").replace(/'/g, "\\'");
+                const adminImg = formatDirectImageUrl(p.gambar) || FALLBACK_PRODUCT_IMAGE;
                 item.innerHTML = `
-                    <img src="${p.gambar || ''}" class="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0 bg-slate-100">
+                    <img src="${adminImg}" onerror="this.onerror=null; this.src='${FALLBACK_PRODUCT_IMAGE}';" class="w-12 h-12 rounded-xl object-cover border border-slate-200 flex-shrink-0 bg-slate-100">
                     <div class="flex-grow min-w-0">
                         <p class="font-semibold text-slate-800 text-sm truncate">${p.nama || ''}</p>
                         <div class="flex items-center gap-2 mt-0.5">
@@ -4641,7 +4689,9 @@
         }
 
         function previewImage() {
-            const url = document.getElementById("form-gambar").value.trim();
+            const rawUrl = document.getElementById("form-gambar").value.trim();
+            const url = formatDirectImageUrl(rawUrl);
+            if (rawUrl && rawUrl !== url) document.getElementById("form-gambar").value = url;
             const wrap = document.getElementById("img-preview-wrap");
             const img = document.getElementById("img-preview");
             if (url) {
@@ -4658,7 +4708,7 @@
             const nama = document.getElementById("form-nama").value.trim();
             const kategori = document.getElementById("form-kategori").value.trim();
             const harga = parseInt(document.getElementById("form-harga").value);
-            const gambar = document.getElementById("form-gambar").value.trim();
+            const gambar = formatDirectImageUrl(document.getElementById("form-gambar").value.trim());
             const deskripsi = document.getElementById("form-deskripsi").value.trim();
             
             if (!nama || !kategori || isNaN(harga) || !gambar) {
@@ -5023,7 +5073,8 @@
             document.getElementById("pay-store-name").textContent = TOKO_CONFIG.nama;
             document.getElementById("pay-product-title").textContent = p.nama;
             document.getElementById("pay-product-price").textContent = formatRupiah(p.harga);
-            document.getElementById("pay-product-img").src = p.gambar || "";
+            document.getElementById("pay-product-img").src = formatDirectImageUrl(p.gambar) || FALLBACK_PRODUCT_IMAGE;
+            document.getElementById("pay-product-img").onerror = function() { this.src = FALLBACK_PRODUCT_IMAGE; };
             document.getElementById("pay-qty").textContent = "1";
             document.getElementById("pay-total-amount").textContent = formatRupiah(p.harga);
             
@@ -5033,19 +5084,44 @@
             document.getElementById("pay-cust-city").value = "";
             document.getElementById("pay-cust-note").value = "";
             
-            // Periksa ketersediaan QRIS Manual Toko
-            const manualCard = document.getElementById("pay-method-qris-manual-card");
+            // Saring metode pembayaran sesuai pilihan penjual di Pengaturan (paymentType)
+            const storePayType = (TOKO_CONFIG && TOKO_CONFIG.paymentType) || "qris_manual";
             const hasManualQris = !!(TOKO_CONFIG && TOKO_CONFIG.qrisImage && TOKO_CONFIG.qrisImage.trim());
-            if (manualCard) {
-                if (hasManualQris) {
-                    manualCard.classList.remove("hidden");
-                } else {
-                    manualCard.classList.add("hidden");
+            const manualCard = document.getElementById("pay-method-qris-manual-card");
+            
+            const midtransCards = [
+                document.getElementById("pay-method-qris-card"),
+                document.getElementById("pay-method-bri-card"),
+                document.getElementById("pay-method-gopay-card"),
+                document.getElementById("pay-method-shopeepay-card")
+            ];
+
+            if (storePayType === "qris_manual") {
+                // Hanya QRIS manual aktif
+                if (manualCard) manualCard.classList.remove("hidden");
+                midtransCards.forEach(c => { if (c) c.classList.add("hidden"); });
+            } else if (storePayType === "midtrans") {
+                // Hanya Midtrans aktif
+                if (manualCard) manualCard.classList.add("hidden");
+                midtransCards.forEach(c => { if (c) c.classList.remove("hidden"); });
+            } else {
+                // Aktifkan keduanya
+                if (manualCard) {
+                    if (hasManualQris) manualCard.classList.remove("hidden");
+                    else manualCard.classList.add("hidden");
                 }
+                midtransCards.forEach(c => { if (c) c.classList.remove("hidden"); });
             }
 
-            // Tentukan default payment method: jika QRIS manual diset seller, jadikan default atau fallback ke qris
-            const defaultMethod = hasManualQris ? "qris_manual" : "qris";
+            // Tentukan default payment method
+            let defaultMethod = "qris";
+            if (storePayType === "qris_manual") {
+                defaultMethod = "qris_manual";
+            } else if (storePayType === "both" && hasManualQris) {
+                defaultMethod = "qris_manual";
+            } else {
+                defaultMethod = "qris";
+            }
 
             // Reset Radio Button values
             document.querySelectorAll('input[name="pay-method"]').forEach(radio => {
@@ -5376,8 +5452,23 @@
                 document.getElementById("proc-method-title").textContent = "Bayar via QRIS Toko (Manual)";
                 const manualWrap = document.getElementById("proc-manual-qris-wrap");
                 if (manualWrap) manualWrap.classList.remove("hidden");
+                
+                const qrisUrl = formatDirectImageUrl(payInfo.qrCodeUrl || (TOKO_CONFIG && TOKO_CONFIG.qrisImage) || "");
                 const manualImg = document.getElementById("proc-manual-qris-img");
-                if (manualImg) manualImg.src = payInfo.qrCodeUrl || (TOKO_CONFIG && TOKO_CONFIG.qrisImage) || "";
+                const errBox = document.getElementById("proc-manual-qris-err");
+                const fullLink = document.getElementById("proc-manual-qris-link");
+                
+                if (errBox) errBox.classList.add("hidden");
+                if (manualImg) {
+                    if (qrisUrl) {
+                        manualImg.src = qrisUrl;
+                        manualImg.classList.remove("hidden");
+                        if (fullLink) fullLink.href = qrisUrl;
+                    } else {
+                        manualImg.classList.add("hidden");
+                        if (errBox) errBox.classList.remove("hidden");
+                    }
+                }
                 
                 // Sembunyikan polling otomatis Midtrans untuk QRIS manual
                 if (document.getElementById("proc-status-poll-box")) {
@@ -5404,6 +5495,13 @@
             }
             
             startPaymentStatusPolling(data.orderId);
+        }
+
+        function handleManualQrisError(imgEl) {
+            if (!imgEl) return;
+            imgEl.classList.add("hidden");
+            const errBox = document.getElementById("proc-manual-qris-err");
+            if (errBox) errBox.classList.remove("hidden");
         }
 
         // Konfirmasi Pembayaran QRIS Manual (Kirim Bukti ke WhatsApp Penjual)
