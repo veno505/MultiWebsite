@@ -700,6 +700,7 @@
                   <th class="text-center">Metode</th>
                   <th class="text-center">Status</th>
                   <th class="text-center" style="width: 80px">Hubungi</th>
+                  <th class="text-center" style="width: 140px">Aksi Seller</th>
                 </tr>
               </thead>
               <tbody id="tx-tbody">
@@ -1661,6 +1662,68 @@
             </div>
           </div>
 
+          <!-- Step 2.5: Payment Pending Approval Screen (Menunggu ACC Seller) -->
+          <div id="payment-pending-approval-section" class="bg-slate-50 rounded-2xl p-4 md:p-8 shadow-sm border border-slate-200 text-center space-y-6 hidden">
+            <div class="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto border border-amber-200 animate-pulse">
+              <i class="fa-solid fa-clock-rotate-left text-amber-500 text-4xl md:text-5xl"></i>
+            </div>
+            
+            <div class="space-y-1">
+              <span class="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold mb-1">
+                Menunggu Konfirmasi Penjual
+              </span>
+              <h3 class="font-bold text-slate-800 text-xl">Menunggu di-ACC Seller</h3>
+              <p class="text-sm text-slate-500 max-w-sm mx-auto">Bukti transfer Anda sudah dikirimkan. Penjual akan memeriksa mutasi pembayaran Anda di panel admin.</p>
+            </div>
+
+            <!-- Transaction Details Table Card -->
+            <div class="bg-white rounded-2xl p-4 md:p-6 border border-slate-200 text-left space-y-3 max-w-md mx-auto shadow-sm">
+              <div class="flex justify-between text-xs pb-2 border-b border-slate-100">
+                <span class="text-slate-400">Nomor Transaksi</span>
+                <span id="pend-order-id" class="font-mono font-bold text-slate-700">QRIS-XXXX</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Toko</span>
+                <span id="pend-store-name" class="font-semibold text-slate-700">CommerceHub</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Produk</span>
+                <span id="pend-product-name" class="font-semibold text-slate-700">--</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Metode Pembayaran</span>
+                <span id="pend-method" class="font-semibold text-slate-700">QRIS TOKO (MANUAL)</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Status Saat Ini</span>
+                <span class="inline-flex items-center gap-1 font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded text-[11px] border border-amber-200">
+                  <i class="fa-solid fa-hourglass-half"></i> Menunggu ACC Seller
+                </span>
+              </div>
+              <div class="flex justify-between text-sm pt-2 border-t border-slate-100 font-bold">
+                <span class="text-slate-800">Total Tagihan</span>
+                <span id="pend-total" class="text-brand-600">Rp 0</span>
+              </div>
+            </div>
+
+            <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 text-xs text-amber-800 text-left max-w-md mx-auto flex items-start gap-2.5">
+              <i class="fa-solid fa-circle-info text-amber-500 mt-0.5"></i>
+              <span>Halaman ini akan otomatis berubah menjadi <strong>Pembayaran Berhasil</strong> begitu penjual menekan tombol <strong>ACC</strong> di panel admin.</span>
+            </div>
+
+            <div class="space-y-2.5 max-w-md mx-auto pt-1">
+              <button onclick="confirmManualQrisPayment()" class="w-full py-3 bg-wa hover:opacity-90 text-white rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                <i class="fa-brands fa-whatsapp text-lg"></i> Kirim Ulang Bukti ke WhatsApp
+              </button>
+              <button onclick="checkPaymentStatusManual()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition border border-slate-200 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-arrows-rotate"></i> Cek Status Pembayaran Sekarang
+              </button>
+              <button onclick="closePaymentPage()" class="w-full py-2.5 text-slate-500 hover:text-slate-700 text-xs font-medium transition">
+                Tutup Sementara
+              </button>
+            </div>
+          </div>
+
           <!-- Step 3: Payment Success Screen -->
           <div id="payment-success-section" class="bg-slate-50 rounded-2xl p-4 md:p-8 shadow-sm border border-slate-200 text-center space-y-6 hidden">
             <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto border border-emerald-100 animate-bounce">
@@ -2030,7 +2093,7 @@
 
         let TOKO_CONFIG = { ...DEFAULT_TOKO_CONFIG };
 
-        // Helper untuk mengubah link sharing (Google Drive, Dropbox, ImgBB, Postimg) menjadi URL Direct Image Gambar Asli
+        // Helper untuk mengubah link sharing (Google Drive, Dropbox, Freeimage, ImgBB, Postimages) menjadi URL Direct Image Gambar Asli
         function formatDirectImageUrl(url) {
             if (!url || typeof url !== 'string') return '';
             let cleanUrl = url.trim();
@@ -2048,9 +2111,20 @@
                 return cleanUrl.replace(/[?&]dl=0/, '?raw=1');
             }
 
-            // 3. Postimages: https://postimg.cc/xxx -> direct i.postimg.cc jika bukan format gambar langsung
-            if (cleanUrl.includes('postimg.cc/') && !cleanUrl.includes('i.postimg.cc')) {
-                // Biarkan atau handle jika user memasukkan link halaman viewer
+            // 3. Freeimage.host: https://freeimage.host/i/nkxIUMl atau https://freeimage.host/i/qris.nkxIUMl -> https://iili.io/nkxIUMl.jpg
+            if (cleanUrl.includes('freeimage.host/i/')) {
+                let match = cleanUrl.match(/freeimage\.host\/i\/(?:[a-zA-Z0-9_.-]+\.)?([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    return `https://iili.io/${match[1]}.jpg`;
+                }
+            }
+
+            // 4. ImgBB: https://ibb.co/ID -> perbaiki jika menempel link halaman penampil
+            if (cleanUrl.includes('ibb.co/') && !cleanUrl.includes('i.ibb.co/')) {
+                let match = cleanUrl.match(/ibb\.co\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    return `https://i.ibb.co/${match[1]}/image.jpg`;
+                }
             }
 
             return cleanUrl;
@@ -4751,8 +4825,8 @@
         // --- FRONTEND CORE FUNCTIONS ---
         function initStoreInfo() {
             document.title = `${TOKO_CONFIG.nama} - Katalog Digital`;
-            document.getElementById("store-name-display").textContent = TOKO_CONFIG.nama;
-            document.getElementById("store-desc-display").textContent = TOKO_CONFIG.deskripsi;
+            if (document.getElementById("store-name-display")) document.getElementById("store-name-display").textContent = TOKO_CONFIG.nama;
+            if (document.getElementById("store-desc-display")) document.getElementById("store-desc-display").textContent = TOKO_CONFIG.deskripsi;
             
             var heroTitleEl = document.getElementById("hero-title-display");
             if (heroTitleEl) {
@@ -4765,7 +4839,19 @@
                     heroTitleEl.textContent = titleText;
                 }
             }
-        } // ADDED MISSING BRACE HERE
+
+            var heroImgEl = document.getElementById("hero-image-display");
+            if (heroImgEl) {
+                var heroSrc = formatDirectImageUrl(TOKO_CONFIG.heroImage) || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+                heroImgEl.src = heroSrc;
+                heroImgEl.onerror = function() {
+                    this.onerror = null;
+                    this.src = FALLBACK_PRODUCT_IMAGE;
+                };
+            }
+            
+            renderHero();
+        }
         
         // Fungsi pembantu mengecek status buka/tutup toko
         function isStoreCurrentlyOpen() {
@@ -4798,7 +4884,12 @@
             
             const heroImgEl = document.getElementById("hero-image-display");
             if (heroImgEl) {
-                heroImgEl.src = TOKO_CONFIG.heroImage || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+                const heroSrc = formatDirectImageUrl(TOKO_CONFIG.heroImage) || "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+                heroImgEl.src = heroSrc;
+                heroImgEl.onerror = function() {
+                    this.onerror = null;
+                    this.src = FALLBACK_PRODUCT_IMAGE;
+                };
             }
             
             const heroStatus = document.getElementById("hero-store-status");
@@ -5242,6 +5333,29 @@
                     localStorage.setItem(`customer_history_${currentSellerId}`, JSON.stringify(history));
                 }
 
+                // Simpan ke Firestore transactions agar muncul di Admin Panel Tab Transaksi
+                try {
+                    const txPayload = {
+                        orderId: manualOrderId,
+                        createdAt: new Date().toISOString(),
+                        sellerId: currentSellerId,
+                        customerName: name,
+                        customerHp: hp,
+                        customerCity: city,
+                        customerNote: note,
+                        productNama: payProduct.nama,
+                        productId: payProductId || "",
+                        productGambar: payProduct.gambar || "",
+                        qty: payQty,
+                        totalHarga: payProduct.harga * payQty,
+                        paymentMethod: "QRIS TOKO (MANUAL)",
+                        status: "pending"
+                    };
+                    await db.collection("transactions").doc(manualOrderId).set(txPayload);
+                } catch (txErr) {
+                    console.warn("Gagal menyimpan transaksi manual ke Firestore:", txErr);
+                }
+
                 // Catat ke antrean rekap lokal
                 if (typeof customerList !== "undefined") customerList.unshift(orderData);
                 if (typeof rekapList !== "undefined") rekapList.unshift(orderData);
@@ -5530,8 +5644,8 @@
             const waTarget = TOKO_CONFIG.whatsapp || "";
             window.open(`https://wa.me/${waTarget}?text=${encodeURIComponent(text)}`, "_blank");
 
-            // Tampilkan layar sukses/konfirmasi
-            renderPaymentSuccess({
+            // Tampilkan layar Menunggu ACC Penjual (Bukan langsung sukses)
+            renderPaymentPendingApproval({
                 orderId: orderId,
                 storeName: TOKO_CONFIG.nama,
                 productNama: prodName,
@@ -5541,6 +5655,28 @@
                 updatedAt: new Date().toISOString()
             });
         }
+
+        // Tampilkan layar status menunggu ACC penjual
+        function renderPaymentPendingApproval(data) {
+            document.getElementById("payment-process-section").classList.add("hidden");
+            if (document.getElementById("payment-success-section")) {
+                document.getElementById("payment-success-section").classList.add("hidden");
+            }
+            const pendingSec = document.getElementById("payment-pending-approval-section");
+            if (pendingSec) pendingSec.classList.remove("hidden");
+
+            if (document.getElementById("pend-order-id")) document.getElementById("pend-order-id").textContent = data.orderId;
+            if (document.getElementById("pend-store-name")) document.getElementById("pend-store-name").textContent = data.storeName || TOKO_CONFIG.nama;
+            if (document.getElementById("pend-product-name")) document.getElementById("pend-product-name").textContent = `${data.productNama} (x${data.qty})`;
+            if (document.getElementById("pend-method")) document.getElementById("pend-method").textContent = data.paymentMethod || "QRIS TOKO (MANUAL)";
+            if (document.getElementById("pend-total")) document.getElementById("pend-total").textContent = formatRupiah(data.totalHarga);
+
+            // Simpan status transaksi aktif di local storage untuk widget floating
+            localStorage.setItem(`last_transaction_${currentSellerId}`, data.orderId);
+
+            // Jalankan polling / listener Firestore agar layar pembeli otomatis berubah saat di-ACC seller
+            startPaymentStatusPolling(data.orderId);
+        }
         
         function startPaymentStatusPolling(orderId) {
             if (statusIntervalId) clearInterval(statusIntervalId);
@@ -5549,11 +5685,42 @@
             
             statusIntervalId = setInterval(() => {
                 checkPaymentStatus(orderId);
-            }, 4000);
+            }, 3000);
         }
         
         async function checkPaymentStatus(orderId) {
             try {
+                // 1. Cek Firestore langsung (agar real-time saat seller klik tombol ACC di Admin Panel)
+                try {
+                    const snap = await db.collection("transactions").doc(orderId).get();
+                    if (snap.exists) {
+                        const tx = snap.data();
+                        if (tx.status === "success") {
+                            clearInterval(statusIntervalId);
+                            statusIntervalId = null;
+                            renderPaymentSuccess({
+                                orderId: tx.orderId,
+                                storeName: TOKO_CONFIG.nama,
+                                productNama: tx.productNama,
+                                qty: tx.qty,
+                                paymentMethod: tx.paymentMethod,
+                                totalHarga: tx.totalHarga,
+                                updatedAt: tx.approvedAt || tx.updatedAt || new Date().toISOString()
+                            });
+                            return;
+                        } else if (tx.status === "expire" || tx.status === "failed") {
+                            clearInterval(statusIntervalId);
+                            statusIntervalId = null;
+                            showToast("Pembayaran ditolak atau dibatalkan oleh seller.", "error");
+                            closePaymentPage();
+                            return;
+                        }
+                    }
+                } catch (fsErr) {
+                    console.warn("Firestore status check warning:", fsErr);
+                }
+
+                // 2. Cek API backend (untuk transaksi Midtrans API)
                 const response = await fetch(`/api/get-status?orderId=${orderId}`);
                 if (!response.ok) return;
                 const data = await response.json();
@@ -5590,6 +5757,9 @@
         
         function renderPaymentSuccess(data) {
             document.getElementById("payment-process-section").classList.add("hidden");
+            if (document.getElementById("payment-pending-approval-section")) {
+                document.getElementById("payment-pending-approval-section").classList.add("hidden");
+            }
             document.getElementById("payment-success-section").classList.remove("hidden");
             
             document.getElementById("succ-order-id").textContent = data.orderId;
@@ -5827,6 +5997,24 @@
                     minute: "2-digit"
                 });
                 
+                let actionBtns = "";
+                if (t.status === "pending") {
+                    actionBtns = `
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="approveTransaction('${t.orderId}')" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold transition flex items-center gap-1 shadow-sm" title="ACC & Verifikasi Pembayaran">
+                                <i class="fa-solid fa-check"></i> ACC
+                            </button>
+                            <button onclick="rejectTransaction('${t.orderId}')" class="px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-[11px] font-bold transition flex items-center gap-1" title="Tolak Transaksi">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    `;
+                } else if (t.status === "success") {
+                    actionBtns = `<span class="text-[11px] font-bold text-emerald-600 flex items-center justify-center gap-1"><i class="fa-solid fa-circle-check"></i> Terverifikasi</span>`;
+                } else {
+                    actionBtns = `<span class="text-[11px] font-semibold text-slate-400">--</span>`;
+                }
+
                 tr.innerHTML = `
                     <td class="text-center text-slate-400 text-xs">${i + 1}</td>
                     <td class="whitespace-nowrap text-slate-500 text-xs">${dateFormatted}</td>
@@ -5838,13 +6026,78 @@
                     <td class="text-center text-slate-500 text-xs uppercase">${t.paymentMethod}</td>
                     <td class="text-center">${statusBadge}</td>
                     <td class="px-2 py-1.5 flex items-center justify-center">
-                        <a href="https://wa.me/${t.customerHp.replace(/[^0-9]/g, '')}" target="_blank" class="w-6 h-6 bg-emerald-600 text-white rounded hover:bg-emerald-700 flex items-center justify-center transition" title="Hubungi via WA">
+                        <a href="https://wa.me/${(t.customerHp || '').replace(/[^0-9]/g, '')}" target="_blank" class="w-6 h-6 bg-emerald-600 text-white rounded hover:bg-emerald-700 flex items-center justify-center transition" title="Hubungi via WA">
                             <i class="fa-brands fa-whatsapp text-xs"></i>
                         </a>
                     </td>
+                    <td class="px-2 py-1.5 text-center">${actionBtns}</td>
                 `;
                 
                 tbody.appendChild(tr);
+            });
+        }
+
+        // Fungsi ACC / Menyetujui Pembayaran Masuk
+        async function approveTransaction(orderId) {
+            const tx = transactionsList.find(x => x.orderId === orderId);
+            const custName = tx ? tx.customerName : orderId;
+            showCustomConfirm("ACC Pembayaran?", `Apakah Anda yakin ingin memverifikasi & ACC pembayaran untuk transaksi "${orderId}" (${custName})?`, async () => {
+                try {
+                    showToast("Memverifikasi pembayaran...", "info");
+                    
+                    // 1. Update status transaksi di Firestore
+                    await db.collection("transactions").doc(orderId).set({
+                        status: "success",
+                        approvedAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    // 2. Tambahkan ke rekap transaksi omzet jika belum ada
+                    if (typeof rekapList !== "undefined") {
+                        const exists = rekapList.some(r => r.orderId === orderId);
+                        if (!exists && tx) {
+                            rekapList.unshift({
+                                orderId: tx.orderId,
+                                tanggal: new Date().toISOString(),
+                                nama: tx.customerName,
+                                hp: tx.customerHp,
+                                kota: tx.customerCity,
+                                produkNama: tx.productNama,
+                                kategori: "Penjualan QRIS",
+                                harga: tx.totalHarga,
+                                paymentMethod: tx.paymentMethod || "QRIS TOKO (MANUAL)",
+                                status: "success"
+                            });
+                            await saveData(false);
+                            renderRecapTable();
+                            renderDashboard();
+                        }
+                    }
+
+                    showToast(`Transaksi ${orderId} berhasil di-ACC!`, "success");
+                    await loadTransactions();
+                } catch (err) {
+                    console.error("Gagal ACC transaksi:", err);
+                    showToast("Gagal memverifikasi: " + err.message, "error");
+                }
+            });
+        }
+
+        // Fungsi Tolak Pembayaran Masuk
+        async function rejectTransaction(orderId) {
+            showCustomConfirm("Tolak Pembayaran?", `Tolak pesanan ${orderId}? Status akan berubah menjadi ditolak/gagal.`, async () => {
+                try {
+                    showToast("Menolak transaksi...", "info");
+                    await db.collection("transactions").doc(orderId).set({
+                        status: "failed",
+                        rejectedAt: new Date().toISOString()
+                    }, { merge: true });
+
+                    showToast(`Transaksi ${orderId} telah ditolak.`, "info");
+                    await loadTransactions();
+                } catch (err) {
+                    console.error("Gagal menolak transaksi:", err);
+                    showToast("Gagal: " + err.message, "error");
+                }
             });
         }
 
