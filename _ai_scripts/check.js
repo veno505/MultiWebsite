@@ -1,0 +1,1 @@
+const fs=require('fs'); const html=fs.readFileSync('WEBSITE GAME.html','utf8'); const match=html.match(/<script>([\s\S]*?)<\/script>/g); if(match) { fs.writeFileSync('temp.js', match[match.length-1].replace(/<script>|<\/script>/g, '')); }

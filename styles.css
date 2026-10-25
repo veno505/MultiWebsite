@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+  background-color: #F3F4F6;
+  color: #1F2937;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #F3F4F6; }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+/* Modal Animation */
+.modal-enter { opacity: 0; transform: scale(0.95); }
+.modal-enter-active {
+  opacity: 1; transform: scale(1);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.nav-item.active { background-color: #EEF2FF; color: #4F46E5; font-weight: 600; }
+.nav-item.active i { color: #4F46E5; }
+
+/* Toast Animations */
+@keyframes slideInUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.toast-enter { animation: slideInUp 0.3s ease-out forwards; }
+.toast-exit { animation: fadeOut 0.3s ease-out forwards; }

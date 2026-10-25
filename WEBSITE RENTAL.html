@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UndipRide - Premium & Deep Rental Motor Tembalang</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50:  '#C1E8FF',
+                            100: '#C1E8FF',
+                            200: '#C1E8FF',
+                            300: '#7DA0CA',
+                            400: '#7DA0CA', // Soft Blue
+                            500: '#5483B3', // Mid Blue
+                            600: '#052659', // Deep Navy
+                            900: '#052659',
+                            950: '#021024',
+                        },
+                        secondary: {
+                            400: '#7DA0CA',
+                            500: '#5483B3',
+                            600: '#052659',
+                            900: '#021024',
+                        },
+                        deep: {
+                            800: '#052659',
+                            900: '#021024',
+                            950: '#021024', // Very dark navy background
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(84, 131, 179, 0.2)',
+                        'glow': '0 0 20px rgba(125, 160, 202, 0.35)',
+                        'float': '0 20px 40px -5px rgba(2, 16, 36, 0.5)',
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float-slow': 'float 6s ease-in-out infinite',
+                        'float-fast': 'float 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                            '100%': { transform: 'translateY(0px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar – Soft Blue Palette */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #021024;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #5483B3;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7DA0CA;
+        }
+
+        /* Deep Navy Backgrounds */
+        body {
+            background-color: #021024;
+            color: #C1E8FF;
+        }
+
+        .mesh-bg {
+            background-color: #021024;
+            background-image:
+                radial-gradient(at 80% 0%, rgba(5, 38, 89, 0.55) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(84, 131, 179, 0.2) 0px, transparent 50%);
+        }
+
+        /* Glassmorphism Soft Blue Utilities */
+        .glass-nav {
+            background: rgba(2, 16, 36, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(125, 160, 202, 0.12);
+        }
+
+        .glass-card {
+            background: rgba(5, 38, 89, 0.45);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(125, 160, 202, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(2, 16, 36, 0.4);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(125, 160, 202, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(84, 131, 179, 0.25);
+        }
+
+        /* Gradient Text – Soft Blue */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #C1E8FF, #7DA0CA);
+        }
+
+        /* Hide number input spinners */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Smooth reveal for sections */
+        .section-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-brand-600 selection:text-brand-50 overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
+                    <div
+                        class="w-12 h-12 bg-gradient-to-tr from-brand-600 to-brand-400 rounded-2xl flex items-center justify-center text-white shadow-glow group-hover:scale-105 transition-transform duration-300">
+                        <i class="fa-solid fa-motorcycle text-2xl"></i>
+                    </div>
+                    <span class="font-extrabold text-2xl tracking-tight text-white">Undip<span
+                            class="text-brand-400">Ride</span></span>
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#beranda"
+                        class="nav-link text-brand-300 hover:text-white font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-400 after:transition-all hover:after:w-full">Beranda</a>
+                    <a href="#keunggulan"
+                        class="nav-link text-brand-300 hover:text-white font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-400 after:transition-all hover:after:w-full">Keunggulan</a>
+                    <a href="#armada"
+                        class="nav-link text-brand-300 hover:text-white font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-400 after:transition-all hover:after:w-full">Armada</a>
+                    <a href="#syarat"
+                        class="nav-link text-brand-300 hover:text-white font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-400 after:transition-all hover:after:w-full">Syarat</a>
+                    <a href="#faq"
+                        class="nav-link text-brand-300 hover:text-white font-medium transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-brand-400 after:transition-all hover:after:w-full">FAQ</a>
+                    <a href="#armada"
+                        class="nav-link bg-gradient-to-r from-brand-500 to-brand-400 hover:from-brand-400 hover:to-brand-300 text-white px-7 py-2.5 rounded-full font-semibold transition-all shadow-float hover:shadow-[0_0_20px_rgba(125,160,202,0.5)] transform hover:-translate-y-1">Sewa
+                        Sekarang</a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn"
+                        class="text-brand-300 hover:text-white focus:outline-none p-2 rounded-xl shadow-sm" style="background:rgba(5,38,89,0.7);border:1px solid rgba(125,160,202,0.25)">
+                        <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden glass-card absolute w-full shadow-2xl" style="border-top:1px solid rgba(125,160,202,0.2)">
+            <div class="px-4 pt-4 pb-6 space-y-3">
+                <a href="#beranda"
+                    class="nav-link block px-4 py-3 rounded-xl text-base font-semibold text-brand-300 hover:text-white transition-colors" style="hover-bg:rgba(5,38,89,0.6)">Beranda</a>
+                <a href="#keunggulan"
+                    class="nav-link block px-4 py-3 rounded-xl text-base font-semibold text-brand-300 hover:text-white transition-colors">Keunggulan</a>
+                <a href="#armada"
+                    class="nav-link block px-4 py-3 rounded-xl text-base font-semibold text-brand-300 hover:text-white transition-colors">Armada
+                    Motor</a>
+                <a href="#syarat"
+                    class="nav-link block px-4 py-3 rounded-xl text-base font-semibold text-brand-300 hover:text-white transition-colors">Syarat
+                    &amp; Ketentuan</a>
+                <a href="#faq"
+                    class="nav-link block px-4 py-3 rounded-xl text-base font-semibold text-brand-300 hover:text-white transition-colors">Tanya
+                    Jawab</a>
+                <a href="#armada"
+                    class="nav-link block text-center mt-6 bg-gradient-to-r from-brand-500 to-brand-400 text-white px-4 py-3 rounded-xl font-bold shadow-md">Sewa
+                    Sekarang</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="beranda" class="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden mesh-bg">
+        <!-- Animated Blobs Background Soft Blue -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+            <div
+                class="absolute top-0 -left-4 w-96 h-96 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob" style="background:#052659">
+            </div>
+            <div
+                class="absolute top-0 -right-4 w-96 h-96 rounded-full mix-blend-screen filter blur-[100px] opacity-25 animate-blob animation-delay-2000" style="background:#5483B3">
+            </div>
+            <div
+                class="absolute -bottom-8 left-20 w-96 h-96 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-blob animation-delay-4000" style="background:#7DA0CA">
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="text-center lg:text-left section-reveal active">
+                    <div
+                        class="inline-flex items-center gap-2 px-5 py-2 rounded-full glass-card text-brand-300 font-semibold text-sm mb-6 shadow-sm" style="border:1px solid rgba(125,160,202,0.3)">
+                        <span class="relative flex h-3 w-3">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span>
+                        </span>
+                        Area Tembalang &amp; Gerbang Undip
+                    </div>
+                    <h1
+                        class="text-4xl sm:text-5xl lg:text-[4rem] font-extrabold text-white leading-[1.1] mb-6 drop-shadow-lg">
+                        Sewa Motor Mahasiswa <br />
+                        <span class="text-gradient">Lebih Elegan</span>
+                    </h1>
+                    <p class="text-lg mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium" style="color:#7DA0CA">
+                        Mobilitas tanpa batas dengan standar premium. Syarat mudah pakai KTM, armada eksklusif, dan
+                        harga tetap bersahabat untuk mahasiswa.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="#armada"
+                            class="nav-link text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-glow hover:shadow-[0_0_30px_rgba(193,232,255,0.3)] transform hover:-translate-y-1 flex items-center justify-center gap-3" style="background:linear-gradient(135deg,#5483B3,#7DA0CA)">
+                            Pilih Motor <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <a href="#syarat"
+                            class="nav-link glass-card text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2" style="border:1px solid rgba(125,160,202,0.25)">
+                            <i class="fa-solid fa-id-card" style="color:#7DA0CA"></i> Lihat Syarat
+                        </a>
+                    </div>
+
+                    <!-- Trust Indicators -->
+                    <div
+                        class="mt-12 flex flex-wrap items-center justify-center lg:justify-start gap-x-8 gap-y-4 text-sm font-bold" style="color:#7DA0CA">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-6 h-6 rounded-full flex items-center justify-center" style="background:rgba(125,160,202,0.15);color:#7DA0CA;border:1px solid rgba(125,160,202,0.3)">
+                                <i class="fa-solid fa-check text-xs"></i></div> Servis Rutin
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-6 h-6 rounded-full flex items-center justify-center" style="background:rgba(125,160,202,0.15);color:#7DA0CA;border:1px solid rgba(125,160,202,0.3)">
+                                <i class="fa-solid fa-check text-xs"></i></div> 2 Helm Premium
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-6 h-6 rounded-full flex items-center justify-center" style="background:rgba(125,160,202,0.15);color:#7DA0CA;border:1px solid rgba(125,160,202,0.3)">
+                                <i class="fa-solid fa-check text-xs"></i></div> Jas Hujan
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image / Illustration -->
+                <div class="relative mt-12 lg:mt-0 flex justify-center section-reveal active">
+                    <div class="relative w-full max-w-md">
+                        <!-- Floating badges soft blue -->
+                        <div
+                            class="absolute -top-6 -right-6 w-24 h-24 glass-card rounded-2xl flex flex-col items-center justify-center shadow-lg animate-float-slow z-20 transform rotate-6" style="border:1px solid rgba(125,160,202,0.2)">
+                            <i class="fa-brands fa-whatsapp text-3xl text-emerald-400 mb-1"></i>
+                            <span class="text-[10px] font-bold" style="color:#7DA0CA">Fast Respon</span>
+                        </div>
+                        <div
+                            class="absolute -bottom-8 -left-6 px-6 py-4 glass-card rounded-2xl flex items-center gap-4 shadow-xl animate-float-fast z-20" style="border:1px solid rgba(125,160,202,0.2)">
+                            <div
+                                class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold" style="background:rgba(5,38,89,0.6);color:#C1E8FF;border:1px solid rgba(125,160,202,0.3)">
+                                4.9
+                            </div>
+                            <div>
+                                <div class="flex text-amber-400 text-sm mb-1">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                        class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                        class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="text-xs font-bold" style="color:#7DA0CA">Rating Mahasiswa</p>
+                            </div>
+                        </div>
+
+                        <!-- Main Image -->
+                        <div
+                            class="relative rounded-[2rem] p-2 backdrop-blur-sm shadow-2xl" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.2)">
+                            <img src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                                alt="Motor Matic Rental Semarang"
+                                class="rounded-[1.5rem] w-full h-[450px] object-cover opacity-90">
+                            <div
+                                class="absolute inset-0 rounded-[1.5rem] pointer-events-none" style="background:linear-gradient(to top, rgba(2,16,36,0.7) 0%, transparent 60%)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Keunggulan Section -->
+    <section id="keunggulan" class="py-24 relative overflow-hidden" style="background:#021024">
+        <!-- Decor -->
+        <div
+            class="absolute top-0 right-0 w-64 h-64 rounded-full mix-blend-screen filter blur-[80px] opacity-15 -translate-y-1/2 translate-x-1/3" style="background:#5483B3">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-2xl mx-auto mb-16 section-reveal">
+                <span
+                    class="px-4 py-1.5 rounded-full glass-card font-bold text-xs uppercase tracking-widest mb-4 inline-block" style="color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">Kenapa
+                    UndipRide?</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-6">Didesain Khusus Buat <span
+                        class="text-gradient">Anak Kuliahan</span></h2>
+                <p class="text-lg" style="color:#7DA0CA">Mulai dari harga hemat, syarat gampang pakai KTM, sampai lokasi yang
+                    super dekat dengan kampus.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div
+                    class="glass-card p-8 rounded-[2rem] transition-all duration-300 group hover:-translate-y-2 section-reveal" style="hover-bg:rgba(5,38,89,0.7)">
+                    <div
+                        class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-sm" style="background:rgba(5,38,89,0.7);color:#7DA0CA;border:1px solid rgba(125,160,202,0.2)">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Lokasi Strategis</h4>
+                    <p class="text-sm leading-relaxed" style="color:#7DA0CA">Garasi kami ada di area Tembalang, sangat dekat
+                        dari gerbang Undip. Gampang diambil dan dibalikin.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="glass-card p-8 rounded-[2rem] transition-all duration-300 group hover:-translate-y-2 section-reveal"
+                    style="transition-delay: 100ms;">
+                    <div
+                        class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-sm" style="background:rgba(5,38,89,0.7);color:#C1E8FF;border:1px solid rgba(193,232,255,0.2)">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Syarat Anti Ribet</h4>
+                    <p class="text-sm leading-relaxed" style="color:#7DA0CA">Khusus mahasiswa aktif Undip, cukup jaminkan e-KTP
+                        dan KTM asli. Verifikasi cepat via WhatsApp.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="glass-card p-8 rounded-[2rem] transition-all duration-300 group hover:-translate-y-2 section-reveal"
+                    style="transition-delay: 200ms;">
+                    <div
+                        class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-sm" style="background:rgba(5,38,89,0.7);color:#5483B3;border:1px solid rgba(84,131,179,0.25)">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Harga Mahasiswa</h4>
+                    <p class="text-sm leading-relaxed" style="color:#7DA0CA">Sewa harian, mingguan, atau bulanan dengan harga
+                        spesial yang dijamin ramah untuk kantong.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="glass-card p-8 rounded-[2rem] transition-all duration-300 group hover:-translate-y-2 section-reveal"
+                    style="transition-delay: 300ms;">
+                    <div
+                        class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-sm" style="background:rgba(5,38,89,0.7);color:#7DA0CA;border:1px solid rgba(125,160,202,0.2)">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <h4 class="text-xl font-bold text-white mb-3">Motor Terawat</h4>
+                    <p class="text-sm leading-relaxed" style="color:#7DA0CA">Servis rutin berkala. Dilengkapi 2 helm SNI bersih
+                        dan jas hujan. Siap gas ke kampus!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Armada Section (Katalog) -->
+    <section id="armada" class="py-24 relative" style="background:#021024">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 section-reveal">
+                <div class="max-w-2xl">
+                    <span
+                        class="px-4 py-1.5 rounded-full glass-card font-bold text-xs uppercase tracking-widest mb-4 inline-block" style="color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">Katalog
+                        Eksklusif</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Pilih Kendaraanmu</h2>
+                    <p class="text-lg" style="color:#7DA0CA">Berbagai pilihan motor dari Matic praktis hingga Sport premium.
+                    </p>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap gap-2 p-2 rounded-2xl shadow-sm" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.15)"
+                    id="filter-container">
+                    <button
+                        class="filter-btn active px-5 py-2.5 text-sm font-bold rounded-xl text-white transition-all"
+                        style="background:#052659;box-shadow:0 0 12px rgba(84,131,179,0.3)"
+                        data-filter="all">Semua</button>
+                    <button
+                        class="filter-btn px-5 py-2.5 text-sm font-bold rounded-xl transition-all" style="color:#7DA0CA"
+                        data-filter="matic">Matic</button>
+                    <button
+                        class="filter-btn px-5 py-2.5 text-sm font-bold rounded-xl transition-all" style="color:#7DA0CA"
+                        data-filter="maxi">Maxi</button>
+                    <button
+                        class="filter-btn px-5 py-2.5 text-sm font-bold rounded-xl transition-all" style="color:#7DA0CA"
+                        data-filter="sport">Sport</button>
+                </div>
+            </div>
+
+            <!-- Grid Motor -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="motor-grid">
+
+                <!-- 1. Motor: Beat Street -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal"
+                    data-category="matic">
+                    <div
+                        class="relative h-56 bg-slate-800/50 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 right-4 bg-emerald-500/20 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-emerald-400 border border-emerald-500/30 z-10 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Tersedia
+                        </div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-afd3b913-4a58-450d-a44e-c638d6c8a2c3.jpg"
+                            alt="Honda Beat Street"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold shadow-lg" style="background:#021024;border:1px solid rgba(125,160,202,0.3)">
+                            Rp 70k<span class="text-[10px] font-normal" style="color:#7DA0CA">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Honda Beat Street</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Gesit, irit, cocok buat
+                            selap-selip di Tembalang.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Honda Beat Street', 70000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:rgba(5,38,89,0.7);border:1px solid rgba(125,160,202,0.25)" onmouseover="this.style.background='#052659'" onmouseout="this.style.background='rgba(5,38,89,0.7)'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Motor: Scoopy -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal"
+                    data-category="matic" style="transition-delay: 50ms;">
+                    <div
+                        class="relative h-56 bg-slate-800/50 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 right-4 bg-emerald-500/20 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-emerald-400 border border-emerald-500/30 z-10 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Tersedia
+                        </div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-9a852c31-f543-4123-8e7e-30bf854d3e63.jpg"
+                            alt="Honda Scoopy"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold shadow-lg" style="background:#021024;border:1px solid rgba(125,160,202,0.3)">
+                            Rp 80k<span class="text-[10px] font-normal" style="color:#7DA0CA">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Honda Scoopy</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Desain retro stylish, bagasi
+                            luas, favorit mahasiswi.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Honda Scoopy', 80000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:rgba(5,38,89,0.7);border:1px solid rgba(125,160,202,0.25)" onmouseover="this.style.background='#052659'" onmouseout="this.style.background='rgba(5,38,89,0.7)'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Motor: NMAX -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal border-brand-500/30"
+                    data-category="maxi" style="transition-delay: 100ms;">
+                    <div
+                        class="relative h-56 bg-slate-800/50 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 left-4 bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-1 rounded text-[10px] font-extrabold shadow-sm z-10 uppercase tracking-wide backdrop-blur-sm">
+                            Premium</div>
+                        <div
+                            class="absolute top-4 right-4 bg-emerald-500/20 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-emerald-400 border border-emerald-500/30 z-10 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Tersedia
+                        </div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-eee58220-b15e-48f1-94bd-5e21cff7b48f.jpg"
+                            alt="Yamaha NMAX"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold" style="background:#052659;border:1px solid rgba(125,160,202,0.4);box-shadow:0 0 12px rgba(84,131,179,0.3)">
+                            Rp 130k<span class="text-[10px] font-normal" style="color:#C1E8FF">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Yamaha NMAX 155</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Sangat nyaman untuk touring atau
+                            perjalanan jauh.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Yamaha NMAX 155', 130000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:#052659" onmouseover="this.style.background='#5483B3'" onmouseout="this.style.background='#052659'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking NMAX
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Motor: Ninja ZX-25R -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal border-red-500/30"
+                    data-category="sport" style="transition-delay: 150ms;">
+                    <div
+                        class="relative h-56 bg-slate-50 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 left-4 bg-red-500/90 text-white px-2 py-1 rounded text-[10px] font-extrabold shadow-sm z-10 uppercase tracking-wide backdrop-blur-sm">
+                            Exclusive</div>
+                        <div
+                            class="absolute top-4 right-4 bg-amber-500/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-slate-900 border border-amber-500 z-10 flex items-center gap-1.5">
+                            Sisa 1 Unit
+                        </div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-da43432c-fad1-493d-8073-a4cfedc25173.jpg" alt="Kawasaki Ninja ZX-25R"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold" style="background:#5483B3;border:1px solid rgba(193,232,255,0.3);box-shadow:0 0 12px rgba(84,131,179,0.35)">
+                            Rp 350k<span class="text-[10px] font-normal" style="color:#C1E8FF">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Kawasaki Ninja ZX-25R</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Mesin 4 silinder, suara gahar.
+                            Sunmori makin pede.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Kawasaki Ninja ZX-25R', 350000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:#5483B3" onmouseover="this.style.background='#7DA0CA'" onmouseout="this.style.background='#5483B3'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking Ninja
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Motor: MX King -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal"
+                    data-category="sport" style="transition-delay: 200ms;">
+                    <div
+                        class="relative h-56 bg-slate-200 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 right-4 bg-emerald-500/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold text-white z-10 flex items-center gap-1.5 shadow-md">
+                            Tersedia
+                        </div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-7fcea63d-de82-404c-a446-386cacde3959.jpg" alt="Yamaha MX King 150"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-lg">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold shadow-lg" style="background:#021024;border:1px solid rgba(125,160,202,0.3)">
+                            Rp 100k<span class="text-[10px] font-normal" style="color:#7DA0CA">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Yamaha MX King 150</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Bebek sport kopling super
+                            responsif nan lincah.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Yamaha MX King 150', 100000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:rgba(5,38,89,0.7);border:1px solid rgba(125,160,202,0.25)" onmouseover="this.style.background='#052659'" onmouseout="this.style.background='rgba(5,38,89,0.7)'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Motor: XMAX -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal border-brand-500/30"
+                    data-category="maxi" style="transition-delay: 250ms;">
+                    <div
+                        class="relative h-56 bg-slate-50 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 left-4 bg-amber-500/90 text-slate-900 px-2 py-1 rounded text-[10px] font-extrabold shadow-sm z-10 uppercase tracking-wide">
+                            Premium</div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-88285ca8-3913-465f-bb2e-c89fe61c2980.jpg" alt="Yamaha XMAX"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-2xl">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold" style="background:#052659;border:1px solid rgba(125,160,202,0.4);box-shadow:0 0 12px rgba(84,131,179,0.3)">
+                            Rp 200k<span class="text-[10px] font-normal" style="color:#C1E8FF">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Yamaha XMAX 250</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Kasta tertinggi Maxi scooter.
+                            Mewah &amp; bertenaga.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Yamaha XMAX', 200000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:#052659" onmouseover="this.style.background='#5483B3'" onmouseout="this.style.background='#052659'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking XMAX
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Motor: Beat Merah -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal"
+                    data-category="matic" style="transition-delay: 300ms;">
+                    <div
+                        class="relative h-56 bg-slate-50 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 right-4 bg-emerald-500/90 px-3 py-1 rounded-full text-[10px] font-bold text-white shadow-md z-10">
+                            Tersedia</div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-d98fc4a6-8a8d-4bdb-b72a-9d10ffce776c.jpg" alt="Honda Beat Merah"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold shadow-lg" style="background:#021024;border:1px solid rgba(125,160,202,0.3)">
+                            Rp 70k<span class="text-[10px] font-normal" style="color:#7DA0CA">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Honda Beat Merah</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Pilihan klasik yang super irit
+                            BBM. Andalan harian.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Honda Beat Merah', 70000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:rgba(5,38,89,0.7);border:1px solid rgba(125,160,202,0.25)" onmouseover="this.style.background='#052659'" onmouseout="this.style.background='rgba(5,38,89,0.7)'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Motor: Vario 160 -->
+                <div class="motor-card glass-card rounded-[2rem] overflow-hidden flex flex-col group transition-all duration-500 section-reveal"
+                    data-category="matic" style="transition-delay: 350ms;">
+                    <div
+                        class="relative h-56 bg-slate-50 p-4 flex justify-center items-center overflow-hidden border-b border-slate-800">
+                        <div
+                            class="absolute top-4 right-4 bg-emerald-500/90 px-3 py-1 rounded-full text-[10px] font-bold text-white shadow-md z-10">
+                            Tersedia</div>
+                        <img src="https://cdn.phototourl.com/free/2026-08-13-2a559870-55a3-4313-a28a-9127a66bdfb5.jpg" alt="Honda Vario 160"
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700 drop-shadow-xl">
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div
+                            class="absolute -top-5 right-6 text-white px-4 py-1.5 rounded-lg font-bold shadow-lg" style="background:#021024;border:1px solid rgba(125,160,202,0.3)">
+                            Rp 100k<span class="text-[10px] font-normal" style="color:#7DA0CA">/hari</span>
+                        </div>
+                        <h4 class="text-xl font-extrabold text-white mb-2 mt-2">Honda Vario 150</h4>
+                        <p class="text-sm mb-5 font-medium line-clamp-2" style="color:#7DA0CA">Desain agresif dan performa
+                            mumpuni di jalanan kota.</p>
+                        <div class="mt-auto">
+                            <button onclick="window.openBookingModal('Honda Vario 150', 100000)"
+                                class="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 text-sm" style="background:rgba(5,38,89,0.7);border:1px solid rgba(125,160,202,0.25)" onmouseover="this.style.background='#052659'" onmouseout="this.style.background='rgba(5,38,89,0.7)'">
+                                <i class="fa-regular fa-calendar-check"></i> Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                class="mt-16 text-center max-w-3xl mx-auto glass-card rounded-[2rem] p-8 section-reveal relative overflow-hidden" style="border:1px solid rgba(125,160,202,0.25);background:linear-gradient(135deg,rgba(5,38,89,0.5) 0%,rgba(2,16,36,0.7) 100%)">
+                <div
+                    class="absolute top-0 right-0 w-40 h-40 rounded-full filter blur-[60px] opacity-20 -translate-y-1/2 translate-x-1/2" style="background:#5483B3">
+                </div>
+
+                <h4 class="text-2xl font-bold text-white mb-3">Mau sewa Mingguan / Bulanan?</h4>
+                <p class="text-slate-400 font-medium mb-6">Dapatkan harga super spesial khusus untuk kamu yang butuh
+                    mobilitas rutin di sekitaran Undip!</p>
+                <button onclick="window.openBookingModal('Konsultasi Sewa Panjang', 0)"
+                    class="inline-flex items-center gap-3 text-white px-8 py-4 rounded-xl font-bold transition-all hover:shadow-[0_0_20px_rgba(125,160,202,0.3)] transform hover:-translate-y-1" style="background:rgba(5,38,89,0.7);border:1px solid rgba(125,160,202,0.3)">
+                    <i class="fa-brands fa-whatsapp text-emerald-400 text-xl"></i> Tanya Promo ke Admin
+                </button>
+            </div>
+        </div>
+    </section>    <!-- Syarat & Ketentuan -->
+    <section id="syarat" class="py-24 relative" style="background:#021024">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                class="rounded-[2.5rem] overflow-hidden relative shadow-2xl section-reveal" style="background:linear-gradient(135deg,rgba(5,38,89,0.6) 0%,rgba(2,16,36,0.9) 50%,rgba(5,38,89,0.5) 100%);border:1px solid rgba(125,160,202,0.2)">
+                <!-- Soft blue glow elements -->
+                <div
+                    class="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 rounded-full opacity-15 blur-[80px]" style="background:#5483B3">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 rounded-full opacity-15 blur-[80px]" style="background:#7DA0CA">
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 p-8 md:p-14 gap-12 relative z-10 items-center">
+                    <div class="lg:col-span-5">
+                        <span
+                            class="px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-widest mb-6 inline-block backdrop-blur-sm" style="background:rgba(125,160,202,0.1);color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">Syarat
+                            &amp; Ketentuan</span>
+                        <h3 class="text-3xl md:text-4xl font-extrabold text-white mb-6 leading-tight">Gampang Banget
+                            Buat Anak Undip</h3>
+                        <p class="mb-8 leading-relaxed text-lg" style="color:#7DA0CA">Siapkan dokumen asli ini saat serah
+                            terima motor. <strong style="color:#C1E8FF">Tanpa deposit uang tunai!</strong></p>
+
+                        <div
+                            class="hidden lg:flex items-start gap-4 p-5 rounded-2xl backdrop-blur-sm" style="background:rgba(2,16,36,0.4);border:1px solid rgba(125,160,202,0.15)">
+                            <i class="fa-solid fa-shield-halved text-2xl mt-1" style="color:#7DA0CA"></i>
+                            <div>
+                                <h5 class="text-white font-bold mb-1">Keamanan Data Terjamin</h5>
+                                <p class="text-sm leading-relaxed" style="color:#5483B3">Dokumen identitas akan disimpan dengan
+                                    aman di brankas garasi kami.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 grid sm:grid-cols-2 gap-5">
+                        <!-- Requirements Cards Soft Blue -->
+                        <div
+                            class="p-6 rounded-2xl backdrop-blur-sm transition-colors group" style="background:rgba(5,38,89,0.35);border:1px solid rgba(125,160,202,0.18)">
+                            <div
+                                class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform" style="background:rgba(5,38,89,0.6);color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">
+                                <i class="fa-regular fa-id-badge"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-2">KTM Undip (Asli)</h4>
+                            <p class="text-sm leading-relaxed" style="color:#5483B3">Kartu Tanda Mahasiswa yang masih aktif dan
+                                fisik terbaca jelas.</p>
+                        </div>
+                        <div
+                            class="p-6 rounded-2xl backdrop-blur-sm transition-colors group" style="background:rgba(5,38,89,0.35);border:1px solid rgba(125,160,202,0.18)">
+                            <div
+                                class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform" style="background:rgba(5,38,89,0.6);color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">
+                                <i class="fa-solid fa-address-card"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-2">E-KTP (Asli)</h4>
+                            <p class="text-sm leading-relaxed" style="color:#5483B3">Kartu Tanda Penduduk milik penyewa (nama
+                                harus sama dengan KTM).</p>
+                        </div>
+                        <div
+                            class="p-6 rounded-2xl backdrop-blur-sm transition-colors group" style="background:rgba(5,38,89,0.35);border:1px solid rgba(125,160,202,0.18)">
+                            <div
+                                class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform" style="background:rgba(5,38,89,0.6);color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">
+                                <i class="fa-regular fa-id-card"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-2">Punya SIM C</h4>
+                            <p class="text-sm leading-relaxed" style="color:#5483B3">Penyewa wajib memiliki dan bisa
+                                menunjukkan SIM C (Bisa difoto).</p>
+                        </div>
+                        <div
+                            class="p-6 rounded-2xl backdrop-blur-sm transition-colors group" style="background:rgba(5,38,89,0.35);border:1px solid rgba(125,160,202,0.18)">
+                            <div
+                                class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform" style="background:rgba(5,38,89,0.6);color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">
+                                <i class="fa-brands fa-instagram"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-2">Media Sosial</h4>
+                            <p class="text-sm leading-relaxed" style="color:#5483B3">Bersedia memberikan ID IG/TikTok yang
+                                aktif dan tidak diprivate.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 mesh-bg" style="background:#021024">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14 section-reveal">
+                <span
+                    class="px-4 py-1.5 rounded-full glass-card font-bold text-xs uppercase tracking-widest mb-4 inline-block" style="color:#7DA0CA;border:1px solid rgba(125,160,202,0.25)">Bantuan</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white">Tanya Jawab (FAQ)</h2>
+            </div>
+
+            <div class="space-y-4 section-reveal">
+                <!-- FAQ Item 1 -->
+                <div
+                    class="glass-card rounded-2xl overflow-hidden transition-all duration-300 FAQ-item" style="border:1px solid rgba(125,160,202,0.15)">
+                    <button
+                        class="flex justify-between items-center w-full p-6 text-left focus:outline-none FAQ-btn transition-colors">
+                        <span class="font-bold text-white text-lg flex items-center gap-3">
+                            <i class="fa-solid fa-circle-question" style="color:#7DA0CA"></i> Apakah motor bisa diantar ke
+                            kosan?
+                        </span>
+                        <div
+                            class="w-8 h-8 rounded-full flex items-center justify-center icon-container transition-transform duration-300" style="background:rgba(5,38,89,0.6);border:1px solid rgba(125,160,202,0.2)">
+                            <i class="fa-solid fa-plus transition-transform duration-300" style="color:#7DA0CA"></i>
+                        </div>
+                    </button>
+                    <div class="px-6 pb-6 pt-0 font-medium hidden FAQ-content leading-relaxed pl-14" style="color:#5483B3">
+                        Bisa banget! Untuk pengantaran di area Tembalang (radius 3KM dari garasi kami), ada layanan
+                        pesan-antar dengan biaya sangat murah (atau Gratis saat promo).
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div
+                    class="glass-card rounded-2xl overflow-hidden transition-all duration-300 FAQ-item" style="border:1px solid rgba(125,160,202,0.15)">
+                    <button
+                        class="flex justify-between items-center w-full p-6 text-left focus:outline-none FAQ-btn transition-colors">
+                        <span class="font-bold text-white text-lg flex items-center gap-3">
+                            <i class="fa-solid fa-circle-question" style="color:#7DA0CA"></i> Boleh dipakai keluar kota
+                            Semarang?
+                        </span>
+                        <div
+                            class="w-8 h-8 rounded-full flex items-center justify-center icon-container transition-transform duration-300" style="background:rgba(5,38,89,0.6);border:1px solid rgba(125,160,202,0.2)">
+                            <i class="fa-solid fa-plus transition-transform duration-300" style="color:#7DA0CA"></i>
+                        </div>
+                    </button>
+                    <div class="px-6 pb-6 pt-0 font-medium hidden FAQ-content leading-relaxed pl-14" style="color:#5483B3">
+                        Secara standar, penggunaan dikhususkan untuk area Semarang Raya. Jika ingin dibawa keluar
+                        (seperti sunmori jauh atau mudik), wajib menginfokan kepada admin terlebih dahulu.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Soft Blue -->
+    <footer class="pt-20 pb-10" style="background:#021024;border-top:1px solid rgba(125,160,202,0.15)">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <!-- Brand Info -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background:linear-gradient(135deg,#052659,#5483B3);box-shadow:0 0 14px rgba(84,131,179,0.35)">
+                            <i class="fa-solid fa-motorcycle text-lg"></i>
+                        </div>
+                        <span class="font-extrabold text-2xl tracking-tight text-white">Undip<span
+                                style="color:#7DA0CA">Ride</span></span>
+                    </div>
+                    <p class="mb-8 max-w-md font-medium leading-relaxed" style="color:#5483B3">Partner mobilitas premium
+                        terbaik untuk mahasiswa Universitas Diponegoro. Eksklusif, mudah, dan profesional.</p>
+                    <div class="flex space-x-4">
+                        <a href="#"
+                            class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300" style="background:rgba(5,38,89,0.5);color:#5483B3;border:1px solid rgba(125,160,202,0.2)" onmouseover="this.style.background='#052659';this.style.color='#C1E8FF'" onmouseout="this.style.background='rgba(5,38,89,0.5)';this.style.color='#5483B3'">
+                            <i class="fa-brands fa-instagram text-xl"></i>
+                        </a>
+                        <a href="https://wa.me/6281229923834" target="_blank"
+                            class="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 text-emerald-400" style="background:rgba(5,38,89,0.5);border:1px solid rgba(125,160,202,0.2)" onmouseover="this.style.background='#16a34a'" onmouseout="this.style.background='rgba(5,38,89,0.5)'">
+                            <i class="fa-brands fa-whatsapp text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tautan -->
+                <div>
+                    <h4 class="font-bold text-white text-lg mb-6">Jelajahi</h4>
+                    <ul class="space-y-4">
+                        <li><a href="#beranda"
+                                class="font-medium transition-colors" style="color:#5483B3" onmouseover="this.style.color='#C1E8FF'" onmouseout="this.style.color='#5483B3'">Beranda</a>
+                        </li>
+                        <li><a href="#armada"
+                                class="font-medium transition-colors" style="color:#5483B3" onmouseover="this.style.color='#C1E8FF'" onmouseout="this.style.color='#5483B3'">Katalog
+                                Motor</a></li>
+                        <li><a href="#syarat"
+                                class="font-medium transition-colors" style="color:#5483B3" onmouseover="this.style.color='#C1E8FF'" onmouseout="this.style.color='#5483B3'">Syarat
+                                Sewa</a></li>
+                    </ul>
+                </div>
+
+                <!-- Kontak -->
+                <div>
+                    <h4 class="font-bold text-white text-lg mb-6">Kontak Garasi</h4>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-4 font-medium" style="color:#5483B3">
+                            <i class="fa-solid fa-location-dot mt-1" style="color:#7DA0CA"></i>
+                            <span>Tembalang (Area Undip), Semarang</span>
+                        </li>
+                        <li class="flex items-center gap-4 font-medium" style="color:#5483B3">
+                            <i class="fa-brands fa-whatsapp" style="color:#7DA0CA"></i>
+                            <span>+62 812-2992-3834</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4" style="border-top:1px solid rgba(125,160,202,0.12)">
+                <p class="font-medium text-sm" style="color:#5483B3">&copy;
+                    <script>document.write(new Date().getFullYear())</script> UndipRide Rental Semarang.
+                </p>
+                <div class="flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.15)">
+                    <p class="font-bold text-sm" style="color:#7DA0CA">Dibuat khusus untuk Mahasiswa Undip 🎓</p>
+                </div>
+            </div>
+        </div>
+    </footer>    <!-- Booking Modal – Soft Blue Theme -->
+    <div id="booking-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 backdrop-blur-md transition-opacity opacity-0 duration-300" style="background:rgba(2,16,36,0.85)"
+            id="modal-backdrop"></div>
+
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="relative rounded-[2rem] text-left overflow-hidden shadow-[0_20px_60px_-15px_rgba(2,16,36,0.7)] transform transition-all scale-95 opacity-0 duration-300 sm:my-8 sm:max-w-lg w-full max-h-[90vh] flex flex-col" style="background:#021024;border:1px solid rgba(125,160,202,0.2)"
+                id="modal-content">
+
+                <div
+                    class="px-6 py-5 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md" style="background:rgba(2,16,36,0.9);border-bottom:1px solid rgba(125,160,202,0.15)">
+                    <div>
+                        <h3 class="text-xl font-extrabold text-white" id="modal-title">Formulir Pesanan</h3>
+                        <p class="text-xs font-bold mt-1" style="color:#7DA0CA">Sistem Cepat &amp; Aman</p>
+                    </div>
+                    <button type="button"
+                        class="w-10 h-10 rounded-full flex items-center justify-center transition-colors" style="background:rgba(5,38,89,0.6);color:#7DA0CA;border:1px solid rgba(125,160,202,0.2)"
+                        onclick="window.closeBookingModal()">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="px-6 py-6 overflow-y-auto custom-scrollbar">
+
+                    <!-- Selected Bike Info -->
+                    <div
+                        class="rounded-2xl p-5 mb-6 flex justify-between items-center" style="background:rgba(5,38,89,0.5);border:1px solid rgba(125,160,202,0.2)">
+                        <div>
+                            <p class="text-[10px] font-extrabold uppercase tracking-wider mb-1" style="color:#7DA0CA">Motor
+                                Pilihan</p>
+                            <p class="font-extrabold text-white text-lg" id="selected-bike-name">Honda Beat</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-extrabold text-xl" style="color:#C1E8FF" id="selected-bike-price">Rp 70.000</p>
+                        </div>
+                    </div>
+
+                    <!-- Booking Form -->
+                    <form id="rental-form" class="space-y-6">
+                        <div>
+                            <h4 class="text-sm font-extrabold text-white flex items-center gap-2 mb-4"><i
+                                    class="fa-regular fa-user" style="color:#5483B3"></i> Data Mahasiswa</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold mb-1.5 ml-1" style="color:#7DA0CA">Nama Lengkap
+                                        (Sesuai KTP) <span class="text-red-400">*</span></label>
+                                    <input type="text" id="namaLengkap" required
+                                        class="w-full px-5 py-3 rounded-xl outline-none text-white font-medium" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.25)">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold mb-1.5 ml-1" style="color:#7DA0CA">NIM <span
+                                                class="text-red-400">*</span></label>
+                                        <input type="number" id="nim" required
+                                            class="w-full px-5 py-3 rounded-xl outline-none text-white font-medium" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.25)">
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold mb-1.5 ml-1" style="color:#7DA0CA">Fakultas</label>
+                                        <input type="text" id="fakultas"
+                                            class="w-full px-5 py-3 rounded-xl outline-none text-white font-medium" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.25)">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1.5 ml-1" style="color:#7DA0CA">Akun IG/TikTok
+                                        Aktif <span class="text-red-400">*</span></label>
+                                    <input type="text" id="sosmed" required
+                                        class="w-full px-5 py-3 rounded-xl outline-none text-white font-medium" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.25)"
+                                        placeholder="@username">
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="border-color:rgba(125,160,202,0.15)">
+
+                        <div>
+                            <h4 class="text-sm font-extrabold text-white flex items-center gap-2 mb-4"><i
+                                    class="fa-regular fa-calendar" style="color:#5483B3"></i> Detail Sewa</h4>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold mb-1.5 ml-1" style="color:#7DA0CA">Tgl Mulai
+                                            <span class="text-red-400">*</span></label>
+                                        <input type="date" id="tglMulai" required
+                                            class="w-full px-5 py-3 rounded-xl outline-none text-white font-medium [color-scheme:dark]" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.25)">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold mb-1.5 ml-1" style="color:#7DA0CA">Durasi <span
+                                                class="text-red-400">*</span></label>
+                                        <select id="durasi" required
+                                            class="w-full px-5 py-3 rounded-xl outline-none text-white font-medium appearance-none" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.25)">
+                                            <option value="1 Hari" style="background:#021024">1 Hari</option>
+                                            <option value="2 Hari" style="background:#021024">2 Hari</option>
+                                            <option value="3 Hari" style="background:#021024">3 Hari</option>
+                                            <option value="1 Minggu" style="background:#021024">1 Minggu (Promo)</option>
+                                            <option value="1 Bulan" style="background:#021024">1 Bulan (Termurah)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-1.5 ml-1" style="color:#7DA0CA">Metode
+                                        Pengambilan</label>
+                                    <select id="lokasiAmbil"
+                                        class="w-full px-5 py-3 rounded-xl outline-none text-white font-medium appearance-none" style="background:rgba(5,38,89,0.4);border:1px solid rgba(125,160,202,0.25)">
+                                        <option value="Ambil di Garasi (Tembalang)" style="background:#021024">Ambil di Garasi (Tembalang)</option>
+                                        <option value="Antar ke Kos (Konfirmasi WA)" style="background:#021024">Antar ke Kos (Area Tembalang)
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notifikasi Database (Status) -->
+                        <div id="db-status" class="hidden text-xs text-center font-bold text-emerald-400 mb-2">
+                            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Menyimpan data ke sistem...
+                        </div>
+                    </form>
+                </div>
+
+                <div
+                    class="px-6 py-4 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end" style="background:rgba(2,16,36,0.95);border-top:1px solid rgba(125,160,202,0.15)">
+                    <button type="button"
+                        class="w-full sm:w-auto px-6 py-3 text-white font-bold rounded-xl transition-colors" style="background:rgba(5,38,89,0.6);border:1px solid rgba(125,160,202,0.2)"
+                        onclick="window.closeBookingModal()">Batal</button>
+                    <button type="button"
+                        class="w-full sm:w-auto px-6 py-3 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2" style="background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 0 15px rgba(16,185,129,0.3)"
+                        onclick="window.submitToWhatsApp()">
+                        <i class="fa-brands fa-whatsapp text-xl"></i> Kirim ke Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logika Interaksi UI Dasar -->
+    <script>
+        // Smooth Scrolling & Navbar Effects
+        document.querySelectorAll('.nav-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = href.substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        const navbarHeight = document.getElementById('navbar').offsetHeight;
+                        window.scrollTo({ top: targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight, behavior: 'smooth' });
+                        document.getElementById('mobile-menu').classList.add('hidden');
+                        document.getElementById('menu-icon').classList.replace('fa-xmark', 'fa-bars');
+                    }
+                }
+            });
+        });
+
+        const navbar = document.getElementById('navbar');
+        const reveals = document.querySelectorAll('.section-reveal');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('shadow-md');
+                navbar.classList.remove('glass-nav');
+                navbar.style.background = 'rgba(2,16,36,0.92)';
+                navbar.style.backdropFilter = 'blur(20px)';
+            } else {
+                navbar.classList.remove('shadow-md');
+                navbar.classList.add('glass-nav');
+                navbar.style.background = '';
+                navbar.style.backdropFilter = '';
+            }
+
+            reveals.forEach(reveal => {
+                if (reveal.getBoundingClientRect().top < window.innerHeight - 100) {
+                    reveal.classList.add("active");
+                }
+            });
+        });
+
+        // Mobile Menu
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            menu.classList.toggle('hidden');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-xmark');
+        });
+
+        // Filter Armada
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const motorCards = document.querySelectorAll('.motor-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.style.background = 'transparent';
+                    b.style.color = '#5483B3';
+                    b.style.boxShadow = 'none';
+                });
+                btn.style.background = '#052659';
+                btn.style.color = '#ffffff';
+                btn.style.boxShadow = '0 0 12px rgba(84,131,179,0.3)';
+
+                const filterValue = btn.getAttribute('data-filter');
+                motorCards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                        card.style.display = 'flex';
+                        setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'scale(1)'; }, 50);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.95)';
+                        setTimeout(() => { card.style.display = 'none'; }, 300);
+                    }
+                });
+            });
+        });
+
+        // FAQ Toggle
+        document.querySelectorAll('.FAQ-item').forEach(item => {
+            item.querySelector('.FAQ-btn').addEventListener('click', () => {
+                const content = item.querySelector('.FAQ-content');
+                const icon = item.querySelector('.fa-plus');
+                const isOpen = !content.classList.contains('hidden');
+
+                document.querySelectorAll('.FAQ-item').forEach(other => {
+                    other.querySelector('.FAQ-content').classList.add('hidden');
+                    let otherIcon = other.querySelector('.fa-plus');
+                    if (otherIcon) otherIcon.classList.remove('rotate-45');
+                    other.style.borderColor = 'rgba(125,160,202,0.15)';
+                    other.style.background = '';
+                });
+
+                if (!isOpen) {
+                    content.classList.remove('hidden');
+                    icon.classList.add('rotate-45');
+                    item.style.borderColor = 'rgba(125,160,202,0.4)';
+                    item.style.background = 'rgba(5,38,89,0.3)';
+                }
+            });
+        });
+
+        // Setup Date Picker Minimum Today
+        const dateInput = document.getElementById('tglMulai');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+        dateInput.value = today;
+    </script>
+
+    <!-- Integrasi Firebase & Logika Modal (Module) -->
+    <script type="module">
+        // Menggunakan Firebase Config yang diberikan oleh User
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRqtDo6I0JRBxV-2Cr4D0W8xRr0rDYXpI",
+            authDomain: "keuangan-project-91d0a.firebaseapp.com",
+            projectId: "keuangan-project-91d0a",
+            storageBucket: "keuangan-project-91d0a.firebasestorage.app",
+            messagingSenderId: "412887443168",
+            appId: "1:412887443168:web:bb38eb69e2b677df805285",
+            measurementId: "G-95KQYRMYCC"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State variables
+        let currentSelectedBike = '';
+        const modal = document.getElementById('booking-modal');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalContent = document.getElementById('modal-content');
+
+        // Expose functions to global window object agar bisa dipanggil dari HTML onclick
+        window.openBookingModal = function (bikeName, pricePerDay) {
+            currentSelectedBike = bikeName;
+            document.getElementById('selected-bike-name').textContent = bikeName;
+
+            if (pricePerDay > 0) {
+                const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(pricePerDay);
+                document.getElementById('selected-bike-price').innerHTML = `${formattedPrice}<span class="text-xs text-slate-400 font-medium">/hari</span>`;
+            } else {
+                document.getElementById('selected-bike-price').textContent = "Harga Khusus";
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalBackdrop.classList.remove('opacity-0');
+                modalBackdrop.classList.add('opacity-100');
+                modalContent.classList.remove('opacity-0', 'scale-95');
+                modalContent.classList.add('opacity-100', 'scale-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeBookingModal = function () {
+            modalBackdrop.classList.remove('opacity-100');
+            modalBackdrop.classList.add('opacity-0');
+            modalContent.classList.remove('opacity-100', 'scale-100');
+            modalContent.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                document.getElementById('db-status').classList.add('hidden'); // reset status message
+            }, 300);
+        };
+
+        // Tutup modal jika klik di luar
+        modalBackdrop.addEventListener('click', window.closeBookingModal);
+
+        // Submit Data (Firebase + WhatsApp)
+        window.submitToWhatsApp = async function () {
+            const form = document.getElementById('rental-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Ambil data form
+            const dataPesanan = {
+                nama: document.getElementById('namaLengkap').value,
+                nim: document.getElementById('nim').value,
+                fakultas: document.getElementById('fakultas').value || '-',
+                sosmed: document.getElementById('sosmed').value,
+                tglMulai: document.getElementById('tglMulai').value,
+                durasi: document.getElementById('durasi').value,
+                lokasi: document.getElementById('lokasiAmbil').value,
+                motor: currentSelectedBike,
+                waktu_pemesanan: new Date().toISOString()
+            };
+
+            // 1. Simpan ke Firebase (Sesuai permintaan)
+            const statusEl = document.getElementById('db-status');
+            statusEl.classList.remove('hidden');
+
+            try {
+                // Menyimpan ke koleksi 'pesanan_rental' di database yang Anda berikan
+                await addDoc(collection(db, "pesanan_rental"), dataPesanan);
+                console.log("Data pesanan berhasil tersimpan di Firebase Cloud Firestore.");
+                statusEl.innerHTML = '<i class="fa-solid fa-check text-emerald-500 mr-1"></i> Data diverifikasi, mengalihkan ke WA...';
+            } catch (error) {
+                console.error("Firebase Error (Ignored untuk memprioritaskan WA):", error);
+                // Jika error (misal masalah rule firestore), kita tetap lanjutkan ke WA
+            }
+
+            // 2. Redirect ke WhatsApp (Update ke nomor yang baru: 081229923834)
+            setTimeout(() => {
+                const adminPhone = "6281229923834";
+
+                let message = `Halo Admin UndipRide,\n\n`;
+                message += `Saya ingin mengajukan permohonan sewa motor dengan rincian sebagai berikut:\n\n`;
+                message += `[DATA PENYEWA]\n`;
+                message += `- Nama Lengkap : ${dataPesanan.nama}\n`;
+                message += `- NIM          : ${dataPesanan.nim}\n`;
+                message += `- Fakultas     : ${dataPesanan.fakultas}\n`;
+                message += `- Akun Medsos  : ${dataPesanan.sosmed}\n\n`;
+                message += `[DETAIL SEWA]\n`;
+                message += `- Unit Motor   : *${dataPesanan.motor}*\n`;
+                message += `- Tanggal Mulai: ${dataPesanan.tglMulai}\n`;
+                message += `- Durasi Sewa  : ${dataPesanan.durasi}\n`;
+                message += `- Pengambilan  : ${dataPesanan.lokasi}\n\n`;
+                message += `Mohon informasi lebih lanjut mengenai ketersediaan unit tersebut. Terima kasih.`;
+
+                const encodedMessage = encodeURIComponent(message);
+                const waUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
+
+                window.open(waUrl, '_blank');
+                window.closeBookingModal();
+            }, 800); // Sedikit delay agar efek loading terlihat profesional
+        };
+    </script>
+</body>
+
+</html>

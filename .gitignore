@@ -1,0 +1,27 @@
+# Node
+node_modules/
+
+# Mac / System
+.DS_Store
+
+# Temporary Files / Scripts / Patches
+temp*.js
+refactor_*.js
+patch_*.js
+extract_*.js
+inline_*.js
+check_*.js
+scratch*.js
+*.log
+temp.ps1
+* temp *
+
+# Environment Variables
+.env
+.env.local
+
+# IDE
+.vscode/
+
+# Vercel
+.vercel/

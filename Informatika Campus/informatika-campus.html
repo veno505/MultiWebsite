@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informatika Shooter & Life Simulator</title>
+    <link rel="stylesheet" href="css/campus.css">
+    <!-- Load Three.js dari CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <canvas id="game-canvas"></canvas>
+    
+    <div id="ui-layer">
+        <!-- Shooter UI -->
+        <div id="crosshair"></div>
+        <div id="hit-marker">X</div>
+        
+        <!-- Dashboard UI -->
+        <div id="dashboard">
+            <div class="dash-title">INFORMATIKA LIFE</div>
+            <div class="stat-row">Semester <span class="stat-val" id="val-sem">1</span></div>
+            <div class="stat-row">IPK <span class="stat-val" id="val-ipk">3.00</span></div>
+            <div class="stat-row">Uang <span class="stat-val" id="val-money">Rp 500.000</span></div>
+            
+            <div style="margin-top:15px; border-top: 1px solid rgba(0,243,255,0.3); padding-top:10px;">
+                <!-- Health Bar -->
+                <div class="stat-row" style="color:#ff4444">Health <span class="stat-val" id="val-health" style="color:#ff4444">100%</span></div>
+                <div class="bar-bg"><div class="bar-fill" id="bar-health" style="width:100%; background: linear-gradient(90deg, #ff3333, #ff6666); box-shadow: 0 0 10px #ff3333;"></div></div>
+
+                <!-- Energy Bar -->
+                <div class="stat-row" style="margin-top:10px">Energy <span class="stat-val" id="val-energy">100%</span></div>
+                <div class="bar-bg"><div class="bar-fill bar-energy" id="bar-energy" style="width:100%"></div></div>
+                
+                <!-- Ammo Status -->
+                <div class="stat-row" style="margin-top:10px; color:#ffcc00">Ammo <span class="stat-val" id="val-ammo" style="color:#ffcc00">30 / 30</span></div>
+                
+                <div class="stat-row" style="margin-top:10px">Skill Programming <span class="stat-val" id="val-skill">Lv 1</span></div>
+            </div>
+            
+            <!-- Menu Panduan -->
+            <div style="margin-top:15px; font-size:0.75rem; color:#888; text-align:center;">
+                [Klik Layar] Kunci Kamera (Pointer Lock) <br>
+                [Tahan Klik Kiri] Tembak Otomatis | [Tahan Klik Kanan] Bidik (ADS)<br>
+                [W A S D] Bergerak | [Spasi] Lompat | [E] Interaksi
+            </div>
+        </div>
+        
+        <!-- Objective & Time HUD (Top Right) -->
+        <div id="objective-panel" style="position: absolute; top: 20px; right: 20px; background: rgba(10, 20, 30, 0.85); border: 1px solid #00f3ff; border-radius: 8px; padding: 15px; min-width: 200px; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);">
+            <div style="font-weight: 800; color: #00f3ff; font-size: 1.2rem; letter-spacing: 1px; margin-bottom: 5px; text-align: right;" id="val-time">SENIN | 06:30</div>
+            <div style="font-weight: bold; font-size: 0.9rem; margin-top: 15px; color: #ffcc00; text-transform: uppercase;">Current Objective:</div>
+            <div id="val-objective" style="font-size: 0.95rem; margin-top: 5px; text-align: right; line-height: 1.4;">Bersiap dan pergi ke kampus.</div>
+        </div>
+        
+        <!-- Interaksi Prompt -->
+        <div id="interact-prompt">
+            <span class="key-prompt">E</span> <span id="interact-text">Interact</span>
+        </div>
+        
+        <!-- Sistem Notifikasi -->
+        <div id="notif-container"></div>
+        
+        <!-- NPC Bubble Chats Container -->
+        <div id="npc-bubbles-container"></div>
+        
+        <!-- Modal Minigame Coding -->
+        <div id="minigame-modal" class="modal">
+            <div class="modal-title" id="mg-title">Mini Game: Debugging</div>
+            <div class="modal-content" id="mg-content">
+                Selesaikan tantangan ini untuk meningkatkan skill!
+            </div>
+            <div class="btn-group" id="mg-options">
+                <!-- Pilihan disuntik dari JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Logika Game (Three.js + State) -->
+    <!-- Managers -->
+    <script src="js/games/managers/GameTimeManager.js"></script>
+    <script src="js/games/managers/QuestManager.js"></script>
+    <script src="js/games/managers/NPCManager.js"></script>
+    <script src="js/games/managers/WorldManager.js"></script>
+
+    <!-- TPS Controllers -->
+    <script src="js/games/tps/TPSConfig.js"></script>
+    <script src="js/games/tps/StanceController.js"></script>
+    <script src="js/games/tps/CameraStateController.js"></script>
+    <script src="js/games/tps/FreeLookController.js"></script>
+    <script src="js/games/tps/RecoilController.js"></script>
+    <script src="js/games/tps/CameraCollisionController.js"></script>
+    <script src="js/games/tps/ThirdPersonCameraController.js"></script>
+    <script src="js/games/tps/CharacterMovementController.js"></script>
+    <script src="js/games/tps/CharacterRotationController.js"></script>
+    <script src="js/games/tps/WeaponAimController.js"></script>
+    
+    <script src="js/games/campusSimulator.js"></script>
+</body>
+</html>

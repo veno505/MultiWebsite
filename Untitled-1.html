@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ARCADE HUB PRO — Gen Z Multiplayer & Bot Arena</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tone.js Audio Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    },
+                    colors: {
+                        dark: {
+                            base: '#0A0D18',
+                            panel: '#121629',
+                            card: '#1A2038',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                        },
+                        cyber: {
+                            cyan: '#00F0FF',
+                            purple: '#A855F7',
+                            pink: '#FF2E93',
+                            violet: '#7000FF',
+                            green: '#00F5D4',
+                            yellow: '#FFB800'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'bounce-short': 'bounceShort 0.5s ease-out',
+                        'spin-slow': 'spin 12s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-8px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.6', filter: 'drop-shadow(0 0 10px rgba(0, 240, 255, 0.4))' },
+                            '50%': { opacity: '1', filter: 'drop-shadow(0 0 20px rgba(112, 0, 255, 0.8))' },
+                        },
+                        bounceShort: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '50%': { transform: 'scale(1.08)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            background-color: #0A0D18;
+            color: #F3F4F6;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Modern Glassmorphism Styling */
+        .glass-panel {
+            background: rgba(18, 22, 41, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(0, 240, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #FFFFFF;
+            transition: all 0.2s ease;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #00F0FF;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            outline: none;
+        }
+
+        /* Neon & Cyber Buttons */
+        .btn-cyber-primary {
+            background: linear-gradient(135deg, #00F0FF 0%, #7000FF 100%);
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.35);
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-cyber-primary:hover {
+            box-shadow: 0 6px 25px rgba(0, 240, 255, 0.5);
+            transform: translateY(-1px);
+        }
+        .btn-cyber-primary:active {
+            transform: scale(0.96);
+        }
+
+        .btn-cyber-pink {
+            background: linear-gradient(135deg, #FF2E93 0%, #A855F7 100%);
+            box-shadow: 0 4px 20px rgba(255, 46, 147, 0.35);
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-cyber-pink:hover {
+            box-shadow: 0 6px 25px rgba(255, 46, 147, 0.5);
+            transform: translateY(-1px);
+        }
+        .btn-cyber-pink:active {
+            transform: scale(0.96);
+        }
+
+        .btn-cyber-green {
+            background: linear-gradient(135deg, #00F5D4 0%, #10B981 100%);
+            box-shadow: 0 4px 20px rgba(0, 245, 212, 0.35);
+            border: none;
+            color: #0A0D18;
+            transition: all 0.2s ease;
+        }
+
+        /* Avatar Selection */
+        .avatar-opt {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: grayscale(80%) opacity(0.6);
+            border: 2px solid transparent;
+        }
+        .avatar-opt.selected {
+            filter: grayscale(0%) opacity(1);
+            border-color: #00F0FF;
+            transform: scale(1.15);
+            background: rgba(0, 240, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.25); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 240, 255, 0.5); }
+
+        /* Floating Emotes Animation */
+        .floating-emote {
+            position: absolute;
+            animation: floatUpFade 1.8s ease-out forwards;
+            pointer-events: none;
+            font-size: 2.5rem;
+            z-index: 100;
+        }
+        @keyframes floatUpFade {
+            0% { opacity: 0; transform: translateY(10px) scale(0.5); }
+            20% { opacity: 1; transform: translateY(-15px) scale(1.3); }
+            80% { opacity: 1; transform: translateY(-50px) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
+        }
+
+        /* Tic-Tac-Toe Win Line Glow */
+        .ttt-win-cell {
+            animation: tttWinGlow 1.2s infinite alternate ease-in-out;
+            background: rgba(0, 245, 212, 0.25) !important;
+            border-color: #00F5D4 !important;
+        }
+        @keyframes tttWinGlow {
+            0% { box-shadow: inset 0 0 15px rgba(0, 245, 212, 0.3), 0 0 15px rgba(0, 245, 212, 0.3); }
+            100% { box-shadow: inset 0 0 30px rgba(0, 245, 212, 0.8), 0 0 30px rgba(0, 245, 212, 0.8); }
+        }
+
+        /* Memory Flip Cards */
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Sound Wave Visualizer Indicator */
+        .sound-bar {
+            width: 3px;
+            background-color: #00F0FF;
+            border-radius: 3px;
+            animation: soundWave 1.2s ease-in-out infinite alternate;
+        }
+        .sound-bar:nth-child(1) { height: 8px; animation-delay: 0.1s; }
+        .sound-bar:nth-child(2) { height: 16px; animation-delay: 0.3s; }
+        .sound-bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
+        @keyframes soundWave {
+            0% { transform: scaleY(0.4); }
+            100% { transform: scaleY(1.3); }
+        }
+        .sound-muted .sound-bar {
+            animation: none !important;
+            height: 4px !important;
+            background-color: #6B7280 !important;
+        }
+
+        /* Background Particle Canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        #ui-layer {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+        }
+        /* UNO Cards */
+        .uno-card {
+            width: 60px;
+            height: 90px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.2);
+            user-select: none;
+        }
+        .uno-card-red { background: linear-gradient(135deg, #ef4444, #991b1b); }
+        .uno-card-blue { background: linear-gradient(135deg, #3b82f6, #1e3a8a); }
+        .uno-card-green { background: linear-gradient(135deg, #22c55e, #14532d); }
+        .uno-card-yellow { background: linear-gradient(135deg, #eab308, #713f12); }
+        .uno-card-wild { background: linear-gradient(135deg, #1f2937, #000000); }
+        
+        .uno-card .corner {
+            font-size: 10px;
+            font-weight: bold;
+            position: absolute;
+            color: white;
+            text-shadow: 1px 1px 0 #000;
+        }
+        .uno-card .corner.tl { top: 4px; left: 4px; }
+        .uno-card .corner.br { bottom: 4px; right: 4px; transform: rotate(180deg); }
+        .uno-card .center {
+            font-size: 24px;
+            font-weight: 900;
+            color: white;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+            font-family: 'Space Grotesk', sans-serif;
+            text-align: center;
+            line-height: 1;
+        }
+        .uno-card.deck-card {
+            background: linear-gradient(135deg, #111, #333);
+            border-color: #f472b6;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-100 flex flex-col justify-between">
+
+    <!-- Interactive Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div id="ui-layer" class="flex flex-col h-full w-full max-w-5xl mx-auto relative overflow-hidden">
+        
+        <!-- TOP GLOBAL HEADER BAR -->
+        <header class="w-full px-4 py-3 flex justify-between items-center z-50 shrink-0">
+            <!-- Logo / Brand -->
+            <div class="flex items-center gap-2 cursor-pointer" onclick="showHomeScreen()">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyber-cyan to-cyber-violet flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+                    <i class="fas fa-gamepad text-dark-base text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyber-cyan via-white to-cyber-pink">ARCADE HUB</h1>
+                    <p class="text-[10px] font-mono text-cyber-cyan/80 tracking-widest uppercase -mt-1">Gen Z Arena v2.5</p>
+                </div>
+            </div>
+
+            <!-- Global Controls: Sound Toggle & Stats Button -->
+            <div class="flex items-center gap-3">
+                <!-- Sound & BGM Toggle -->
+                <button id="btn-sound-toggle" onclick="toggleAudio()" class="glass-panel px-3 py-2 rounded-xl flex items-center gap-2 hover:border-cyber-cyan transition text-xs font-mono">
+                    <div id="sound-visualizer" class="flex items-center gap-0.5 sound-muted">
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                        <div class="sound-bar"></div>
+                    </div>
+                    <span id="sound-status" class="text-gray-400">AUDIO OFF</span>
+                </button>
+
+                <!-- Stats / Leaderboard Trigger -->
+                <button onclick="openStatsModal()" class="glass-panel w-9 h-9 rounded-xl flex items-center justify-center text-cyber-pink hover:border-cyber-pink transition active:scale-95">
+                    <i class="fas fa-trophy"></i>
+                </button>
+
+                <!-- Help / Shortcut Info -->
+                <button onclick="openHelpModal()" class="glass-panel w-9 h-9 rounded-xl flex items-center justify-center text-cyber-cyan hover:border-cyber-cyan transition active:scale-95 hidden sm:flex">
+                    <i class="fas fa-keyboard"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- TOAST NOTIFICATION CONTAINER -->
+        <div id="toast-container" class="absolute top-16 left-0 right-0 flex flex-col items-center gap-2 z-[9999] pointer-events-none px-4"></div>
+
+        <!-- SCREEN 1: LOGIN / PROFILES -->
+        <main id="screen-login" class="flex-grow flex flex-col items-center justify-center p-4 z-40 overflow-y-auto">
+            <div class="glass-panel rounded-3xl w-full max-w-md p-6 sm:p-8 flex flex-col gap-6 animate-bounce-short shadow-2xl relative">
+                <!-- Decorative Glow Pill -->
+                <div class="absolute -top-12 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-cyber-violet/30 border border-cyber-violet/50 backdrop-blur-md text-cyber-cyan font-mono text-xs uppercase tracking-widest flex items-center gap-2 shadow-[0_0_15px_rgba(112,0,255,0.4)]">
+                    <span class="w-2 h-2 rounded-full bg-cyber-green animate-ping"></span> MULTIPLAYER & AI BOT ARENA
+                </div>
+
+                <div class="text-center mt-2">
+                    <h2 class="font-heading text-3xl sm:text-4xl font-extrabold text-white">READY PLAYER ONE</h2>
+                    <p class="text-gray-400 text-xs sm:text-sm mt-1">Pilih avatar & buat codename kamu untuk mulai bersaing!</p>
+                </div>
+
+                <!-- Avatar Preview with XP Badge -->
+                <div class="flex flex-col items-center gap-2">
+                    <div class="relative">
+                        <div id="avatar-preview" class="text-6xl bg-dark-card p-4 rounded-3xl border-2 border-cyber-cyan shadow-[0_0_25px_rgba(0,240,255,0.3)] transition-transform duration-300 hover:scale-105">
+                            🐺
+                        </div>
+                        <span id="login-level-badge" class="absolute -bottom-2 -right-2 bg-gradient-to-r from-cyber-pink to-cyber-violet text-white font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-white/20 shadow-md">
+                            LVL 1
+                        </span>
+                    </div>
+                    <span id="player-title-display" class="font-mono text-xs text-cyber-cyan uppercase tracking-wider font-semibold">Arcade Rookie</span>
+                </div>
+
+                <!-- Codename Input -->
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-2 uppercase tracking-wider">Player Codename</label>
+                    <div class="relative">
+                        <input type="text" id="input-username" placeholder="Masukkan Nama Player..." maxlength="14" class="glass-input w-full rounded-2xl px-4 py-3.5 text-lg font-heading font-bold text-center placeholder-gray-600 tracking-wide">
+                        <i class="fas fa-user-astronaut absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                </div>
+
+                <!-- Select Avatar Grid -->
+                <div>
+                    <label class="block text-xs font-mono text-gray-400 mb-2 uppercase tracking-wider">Pilih Character Avatar</label>
+                    <div class="grid grid-cols-6 gap-2 bg-dark-card/60 p-3 rounded-2xl border border-white/5">
+                        <button class="avatar-opt text-2xl p-2 rounded-xl selected" onclick="selectAvatar('🐺', this)">🐺</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('🦊', this)">🦊</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('🐉', this)">🐉</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('👾', this)">👾</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('🤖', this)">🤖</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('👽', this)">👽</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('👻', this)">👻</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('💀', this)">💀</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('🐱', this)">🐱</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('⚡', this)">⚡</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('👑', this)">👑</button>
+                        <button class="avatar-opt text-2xl p-2 rounded-xl" onclick="selectAvatar('🎮', this)">🎮</button>
+                    </div>
+                </div>
+
+                <!-- Enter Button -->
+                <button id="btn-login" class="btn-cyber-primary w-full py-4 rounded-2xl font-heading font-extrabold text-lg text-white tracking-wider uppercase flex items-center justify-center gap-3">
+                    ENTER ARENA <i class="fas fa-bolt text-cyber-yellow"></i>
+                </button>
+            </div>
+        </main>
+
+        <!-- SCREEN 2: HOME LOBBY & MODE SELECT -->
+        <main id="screen-home" class="flex-grow flex flex-col items-center justify-center p-4 z-40 hidden overflow-y-auto">
+            <div class="w-full max-w-md flex flex-col gap-5">
+                
+                <!-- Player Banner Card -->
+                <div class="glass-panel p-4 rounded-3xl flex items-center justify-between shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <div id="home-avatar" class="text-4xl bg-dark-card p-2.5 rounded-2xl border border-cyber-cyan/40 shadow-[0_0_15px_rgba(0,240,255,0.2)]">🐺</div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 id="home-username" class="font-heading font-extrabold text-xl text-white">Player</h3>
+                                <span id="home-lvl-badge" class="bg-cyber-violet/30 border border-cyber-violet text-cyber-cyan font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">LVL 1</span>
+                            </div>
+                            <p id="home-title" class="text-xs text-cyber-cyan font-mono font-medium">Arcade Rookie</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="logout()" class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center text-gray-400 hover:text-cyber-pink transition active:scale-90" title="Keluar">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+
+                <!-- MODE SELECT TABS: SOLO VS AI OR MULTIPLAYER -->
+                <div class="grid grid-cols-2 gap-3 p-1.5 glass-panel rounded-2xl">
+                    <button id="tab-btn-solo" onclick="switchLobbyTab('solo')" class="py-3 rounded-xl font-heading font-bold text-sm tracking-wide transition-all bg-cyber-primary text-white shadow-lg">
+                        <i class="fas fa-robot mr-1.5"></i> VS BOT AI (SOLO)
+                    </button>
+                    <button id="tab-btn-multi" onclick="switchLobbyTab('multi')" class="py-3 rounded-xl font-heading font-bold text-sm tracking-wide transition-all text-gray-400 hover:text-white">
+                        <i class="fas fa-users mr-1.5"></i> MULTIPLAYER
+                    </button>
+                </div>
+
+                <!-- TAB CONTENT A: SOLO VS BOT AI -->
+                <div id="tab-content-solo" class="flex flex-col gap-3">
+                    <div class="glass-panel p-5 rounded-3xl flex flex-col gap-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-heading font-bold text-lg text-white">Pilih Bot Opponent</h4>
+                                <p class="text-xs text-gray-400">Mainkan semua game secara instan tanpa perlu lawan online</p>
+                            </div>
+                            <span class="text-2xl">🤖</span>
+                        </div>
+
+                        <!-- Bot Difficulty Selector -->
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="selectBotDifficulty('easy')" id="bot-diff-easy" class="bot-diff-btn glass-card p-2.5 rounded-xl text-center border-cyber-green text-cyber-green font-mono text-xs font-bold transition">
+                                EASY
+                            </button>
+                            <button onclick="selectBotDifficulty('medium')" id="bot-diff-medium" class="bot-diff-btn glass-card p-2.5 rounded-xl text-center border-cyber-yellow text-cyber-yellow font-mono text-xs font-bold opacity-60 transition">
+                                MEDIUM
+                            </button>
+                            <button onclick="selectBotDifficulty('hard')" id="bot-diff-hard" class="bot-diff-btn glass-card p-2.5 rounded-xl text-center border-cyber-pink text-cyber-pink font-mono text-xs font-bold opacity-60 transition">
+                                HARD
+                            </button>
+                        </div>
+
+                        <button onclick="startSoloBotMatch()" class="btn-cyber-primary w-full py-4 rounded-2xl font-heading font-extrabold text-base uppercase tracking-wider flex items-center justify-center gap-2">
+                            START BOT ARENA <i class="fas fa-play text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB CONTENT B: MULTIPLAYER ROOMS -->
+                <div id="tab-content-multi" class="flex flex-col gap-4 hidden">
+                    <!-- Create Private Match -->
+                    <button onclick="createRoom()" class="btn-cyber-pink w-full py-5 rounded-3xl font-heading font-extrabold text-lg text-white uppercase tracking-wider flex flex-col items-center justify-center gap-1 group relative overflow-hidden">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-plus-circle text-2xl"></i>
+                            <span>HOST NEW ROOM</span>
+                        </div>
+                        <span class="text-xs font-mono font-normal text-pink-100/80">Buat room private & undang teman dengan Kode 4 Digit</span>
+                    </button>
+                    
+                    <div class="flex items-center gap-3">
+                        <div class="flex-grow h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+                        <span class="text-gray-400 font-mono text-[10px] uppercase tracking-widest">ATAU JOIN KODE ROOM</span>
+                        <div class="flex-grow h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+                    </div>
+
+                    <!-- Join Room Form -->
+                    <div class="glass-panel p-5 rounded-3xl flex flex-col gap-3">
+                        <div class="relative">
+                            <input type="text" id="input-room-code" placeholder="KODE 4-DIGIT..." maxlength="4" class="glass-input w-full rounded-2xl px-4 py-3.5 text-center text-2xl font-mono font-bold tracking-[0.4em] uppercase text-cyber-cyan placeholder-gray-600">
+                        </div>
+                        <button onclick="joinRoom()" class="btn-cyber-primary w-full py-3.5 rounded-2xl font-heading font-extrabold text-base uppercase tracking-wider flex items-center justify-center gap-2">
+                            JOIN MATCH NOW <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+        <!-- SCREEN 3: GAME ROOM & ARENA -->
+        <main id="screen-room" class="flex-grow flex flex-col z-40 hidden overflow-hidden relative">
+            
+            <!-- Room Top Header -->
+            <div class="glass-panel px-4 py-3 rounded-b-3xl flex justify-between items-center shrink-0 border-t-0 shadow-lg relative z-20">
+                <button onclick="leaveRoom()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-gray-300 hover:text-white active:scale-90 transition">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                
+                <div class="flex flex-col items-center cursor-pointer group" onclick="copyRoomCode()">
+                    <span class="text-[9px] font-mono text-gray-400 uppercase tracking-widest group-hover:text-cyber-cyan transition">ROOM CODE (Klik Copy)</span>
+                    <div class="bg-dark-base border border-cyber-cyan/40 text-cyber-cyan font-mono font-extrabold px-4 py-1 rounded-xl text-lg tracking-[0.25em] shadow-[0_0_12px_rgba(0,240,255,0.2)] group-hover:shadow-[0_0_20px_rgba(0,240,255,0.5)] transition flex items-center gap-2" id="room-code-display">
+                        ---- <i class="fas fa-copy text-xs opacity-60"></i>
+                    </div>
+                </div>
+                
+                <button onclick="toggleChat()" class="w-10 h-10 rounded-xl glass-card flex items-center justify-center text-cyber-pink relative active:scale-90 transition">
+                    <i class="fas fa-comments"></i>
+                    <span id="chat-badge" class="absolute -top-1 -right-1 bg-cyber-pink text-white text-[9px] font-mono font-bold w-4 h-4 rounded-full flex items-center justify-center hidden animate-ping">!</span>
+                </button>
+            </div>
+
+            <!-- Ready Button Moved Below Room Code -->
+            <div id="ready-container" class="px-4 w-full max-w-lg mx-auto shrink-0 z-10 hidden mt-2">
+                <button id="btn-ready" onclick="toggleReady()" class="glass-panel border-cyber-cyan text-cyber-cyan w-full py-3 rounded-2xl font-heading font-extrabold tracking-widest uppercase transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <i class="fas fa-check-circle"></i> MARK AS READY
+                </button>
+            </div>
+
+            <!-- Room Host End Match Actions (Moved Up for Mobile) -->
+            <div id="host-actions" class="px-4 mt-2 w-full max-w-lg mx-auto shrink-0 hidden flex justify-center gap-2 z-20">
+                <button onclick="playAgain()" class="glass-panel text-cyber-cyan border-cyber-cyan flex-1 py-3 rounded-2xl font-heading font-bold text-[10px] sm:text-xs tracking-widest uppercase hover:bg-cyber-cyan/10 transition active:scale-95 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                    <i class="fas fa-redo mr-1"></i> PLAY AGAIN
+                </button>
+                <button onclick="backToLobby()" class="glass-panel text-gray-300 border-gray-600 flex-1 py-3 rounded-2xl font-heading font-bold text-[10px] sm:text-xs tracking-widest uppercase hover:text-cyber-pink hover:border-cyber-pink transition active:scale-95">
+                    <i class="fas fa-stop mr-1"></i> RETURN
+                </button>
+            </div>
+
+            <!-- Player Match Header Info -->
+            <div class="flex justify-between items-center px-4 py-3 shrink-0 max-w-lg mx-auto w-full relative z-10">
+                <!-- Player 1 -->
+                <div id="p1-card-box" class="flex flex-col items-center gap-1 w-5/12 relative">
+                    <div class="relative">
+                        <div id="p1-avatar" class="text-4xl bg-dark-card p-3 rounded-2xl border-2 border-cyber-cyan shadow-[0_0_20px_rgba(0,240,255,0.3)] transition-all">👤</div>
+                        <div id="p1-ready-badge" class="absolute -bottom-1 -right-1 bg-cyber-green text-dark-base text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded-md shadow hidden">READY</div>
+                    </div>
+                    <span id="p1-name" class="font-heading font-bold text-xs sm:text-sm text-center truncate w-full text-white">Player 1</span>
+                    <span class="text-[10px] text-cyber-cyan font-mono bg-cyber-cyan/10 px-2 py-0.5 rounded-full border border-cyber-cyan/30">SKOR: <span id="p1-score" class="font-bold">0</span></span>
+                </div>
+                
+                <!-- VS Indicator -->
+                <div class="w-2/12 flex flex-col items-center justify-center">
+                    <span class="text-xl sm:text-2xl font-heading font-black italic bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500">VS</span>
+                </div>
+                
+                <!-- Player 2 / Bot -->
+                <div id="p2-card-box" class="flex flex-col items-center gap-1 w-5/12 relative">
+                    <div class="relative">
+                        <div id="p2-avatar" class="text-4xl bg-dark-card p-3 rounded-2xl border-2 border-gray-600 opacity-60 transition-all">👤</div>
+                        <div id="p2-ready-badge" class="absolute -bottom-1 -right-1 bg-cyber-green text-dark-base text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded-md shadow hidden">READY</div>
+                    </div>
+                    <span id="p2-name" class="font-heading font-bold text-xs sm:text-sm text-center truncate w-full text-gray-400">Waiting...</span>
+                    <span id="p2-score-container" class="text-[10px] text-cyber-pink font-mono bg-cyber-pink/10 px-2 py-0.5 rounded-full border border-cyber-pink/30 hidden">SKOR: <span id="p2-score" class="font-bold">0</span></span>
+                </div>
+            </div>
+
+            <!-- Quick Emotes Floating Bar -->
+            <div class="flex justify-center gap-2 px-4 py-1 shrink-0 z-20">
+                <div class="glass-panel px-3 py-1.5 rounded-full flex gap-3 text-lg items-center">
+                    <span class="text-[10px] font-mono text-gray-400 mr-1 hidden sm:inline">EMOTES:</span>
+                    <button onclick="sendEmote('🔥')" class="hover:scale-125 active:scale-95 transition">🔥</button>
+                    <button onclick="sendEmote('💀')" class="hover:scale-125 active:scale-95 transition">💀</button>
+                    <button onclick="sendEmote('🤡')" class="hover:scale-125 active:scale-95 transition">🤡</button>
+                    <button onclick="sendEmote('GG')" class="hover:scale-125 active:scale-95 transition text-xs font-mono font-bold text-cyber-cyan">GG</button>
+                    <button onclick="sendEmote('👑')" class="hover:scale-125 active:scale-95 transition">👑</button>
+                    <button onclick="sendEmote('🚀')" class="hover:scale-125 active:scale-95 transition">🚀</button>
+                </div>
+            </div>
+
+            <!-- MAIN ARENA CONTENT AREA -->
+            <div class="flex-grow flex flex-col items-center justify-center p-3 relative w-full max-w-md mx-auto overflow-y-auto">
+                
+                <!-- LOBBY GAME SELECTOR -->
+                <div id="game-selector" class="w-full flex flex-col gap-3 pb-24">
+                    <div class="text-center mb-1">
+                        <span class="font-mono text-cyber-cyan text-xs tracking-widest uppercase">Arena Protocol</span>
+                        <p class="text-gray-400 text-xs">Tekan READY untuk membuka pilihan game!</p>
+                    </div>
+
+                    <div id="host-game-list" class="flex flex-col gap-2.5 opacity-50 pointer-events-none transition-all duration-300">
+                        <!-- 1. Rock Paper Scissors -->
+                        <button onclick="startGame('rps')" class="glass-card p-3.5 rounded-2xl flex items-center gap-3 hover:border-cyber-cyan transition text-left group">
+                            <div class="text-2xl bg-dark-base p-2.5 rounded-xl border border-white/10 group-hover:border-cyber-cyan">✌️</div>
+                            <div>
+                                <h4 class="font-heading font-bold text-base text-white">Rock Paper Scissors Extreme</h4>
+                                <p class="text-xs text-gray-400 font-mono">Duel Klasik Senjata Refleks</p>
+                            </div>
+                        </button>
+                        
+                        <!-- 2. Quantum Dice Rush -->
+                        <button onclick="startGame('dice')" class="glass-card p-3.5 rounded-2xl flex items-center gap-3 hover:border-cyber-violet transition text-left group">
+                            <div class="text-2xl bg-dark-base p-2.5 rounded-xl border border-white/10 group-hover:border-cyber-violet">🎲</div>
+                            <div>
+                                <h4 class="font-heading font-bold text-base text-white">Quantum Dice Rush</h4>
+                                <p class="text-xs text-gray-400 font-mono">Adu Keberuntungan Lempar Dadu</p>
+                            </div>
+                        </button>
+                        
+                        <!-- 3. Neon Tic-Tac-Toe -->
+                        <button onclick="startGame('tictactoe')" class="glass-card p-3.5 rounded-2xl flex items-center gap-3 hover:border-cyber-pink transition text-left group">
+                            <div class="text-2xl bg-dark-base p-2.5 rounded-xl border border-white/10 group-hover:border-cyber-pink">✖️⭕</div>
+                            <div>
+                                <h4 class="font-heading font-bold text-base text-white">Neon Tic-Tac-Toe Grid</h4>
+                                <p class="text-xs text-gray-400 font-mono">Strategi Grid 3x3 Taktis</p>
+                            </div>
+                        </button>
+
+                        <!-- 4. Speed Reaction Clash -->
+                        <button onclick="startGame('speed')" class="glass-card p-3.5 rounded-2xl flex items-center gap-3 hover:border-cyber-yellow transition text-left group">
+                            <div class="text-2xl bg-dark-base p-2.5 rounded-xl border border-white/10 group-hover:border-cyber-yellow">⚡</div>
+                            <div>
+                                <h4 class="font-heading font-bold text-base text-white">Speed Reaction Clash</h4>
+                                <p class="text-xs text-gray-400 font-mono">Adu Kecepatan Refleks (ms)</p>
+                            </div>
+                        </button>
+
+                        <!-- 5. Mind Flip Memory Match -->
+                        <button onclick="startGame('memory')" class="glass-card p-3.5 rounded-2xl flex items-center gap-3 hover:border-cyber-green transition text-left group">
+                            <div class="text-2xl bg-dark-base p-2.5 rounded-xl border border-white/10 group-hover:border-cyber-green">🎴</div>
+                            <div>
+                                <h4 class="font-heading font-bold text-base text-white">Mind Flip Memory Match</h4>
+                                <p class="text-xs text-gray-400 font-mono">Ingatan Pasangan Kartu</p>
+                            </div>
+                        </button>
+
+                        <!-- 6. Cyber UNO -->
+                        <button onclick="startGame('uno')" class="glass-card p-3.5 rounded-2xl flex items-center gap-3 hover:border-cyber-pink transition text-left group">
+                            <div class="text-2xl bg-dark-base p-2.5 rounded-xl border border-white/10 group-hover:border-cyber-pink">🎴</div>
+                            <div>
+                                <h4 class="font-heading font-bold text-base text-white">Cyber UNO Duel</h4>
+                                <p class="text-xs text-gray-400 font-mono">Pertarungan Kartu Warna-warni</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GAME 1: ROCK PAPER SCISSORS -->
+                <div id="game-rps" class="w-full hidden flex-col items-center">
+                    <div class="glass-panel px-4 py-1.5 rounded-full border-cyber-cyan mb-6">
+                        <h3 class="text-xs font-mono tracking-widest text-cyber-cyan uppercase">Rock Paper Scissors Extreme</h3>
+                    </div>
+                    
+                    <div class="w-full flex justify-between items-center mb-8 px-2">
+                        <div id="rps-p1-choice" class="text-5xl bg-dark-base p-2 rounded-2xl border-2 border-white/20 h-24 w-24 flex items-center justify-center shadow-lg transition-all">❓</div>
+                        <div id="rps-result" class="text-xl font-heading font-black italic text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 scale-0 transition-transform duration-300 text-center w-24 leading-tight">VS</div>
+                        <div id="rps-p2-choice" class="text-5xl bg-dark-base p-2 rounded-2xl border-2 border-white/20 h-24 w-24 flex items-center justify-center shadow-lg transition-all">❓</div>
+                    </div>
+
+                    <p id="rps-status" class="mb-5 font-mono text-xs text-gray-400 uppercase tracking-widest text-center h-5">PILIH SENJATA (Shortcut 1, 2, 3)</p>
+
+                    <div class="flex gap-4 w-full justify-center">
+                        <button onclick="playRPS('rock')" class="rps-btn text-4xl glass-panel p-4 rounded-2xl active:scale-90 transition border-white/10 hover:border-cyber-cyan">✊</button>
+                        <button onclick="playRPS('paper')" class="rps-btn text-4xl glass-panel p-4 rounded-2xl active:scale-90 transition border-white/10 hover:border-cyber-cyan">🖐️</button>
+                        <button onclick="playRPS('scissors')" class="rps-btn text-4xl glass-panel p-4 rounded-2xl active:scale-90 transition border-white/10 hover:border-cyber-cyan">✌️</button>
+                    </div>
+                </div>
+
+                <!-- GAME 2: QUANTUM DICE RUSH -->
+                <div id="game-dice" class="w-full hidden flex-col items-center">
+                    <div class="glass-panel px-4 py-1.5 rounded-full border-cyber-violet mb-6">
+                        <h3 class="text-xs font-mono tracking-widest text-cyber-violet uppercase">Quantum Dice Rush</h3>
+                    </div>
+                    
+                    <div class="w-full flex justify-around items-center mb-8">
+                        <div id="dice-p1" class="text-6xl font-mono font-bold bg-dark-base rounded-2xl h-24 w-24 flex items-center justify-center border-2 border-white/20 shadow-lg">?</div>
+                        <div id="dice-result" class="text-xl font-heading font-black italic text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 scale-0 transition-transform duration-300 text-center w-20 leading-tight">VS</div>
+                        <div id="dice-p2" class="text-6xl font-mono font-bold bg-dark-base rounded-2xl h-24 w-24 flex items-center justify-center border-2 border-white/20 shadow-lg">?</div>
+                    </div>
+
+                    <p id="dice-status" class="mb-5 font-mono text-xs text-gray-400 uppercase tracking-widest text-center h-5">TEKAN ROLL DADU (Shortcut SPACE)</p>
+
+                    <button id="btn-roll-dice" onclick="rollDice()" class="btn-cyber-primary w-full max-w-[240px] py-4 rounded-2xl font-heading font-extrabold text-lg uppercase tracking-wider">
+                        ROLL DADU <i class="fas fa-dice ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- GAME 3: NEON TIC TAC TOE -->
+                <div id="game-ttt" class="w-full hidden flex-col items-center">
+                    <div class="glass-panel px-4 py-1 rounded-full border-cyber-pink mb-3">
+                        <h3 class="text-xs font-mono tracking-widest text-cyber-pink uppercase">Neon Tic-Tac-Toe</h3>
+                    </div>
+                    
+                    <p id="ttt-status" class="mb-3 font-mono text-xs uppercase tracking-widest text-center px-4 py-1 rounded-xl bg-white/5 border border-white/10 h-7 flex items-center justify-center">GILIRAN KAMU</p>
+
+                    <div class="glass-panel p-2.5 rounded-3xl border-white/10 w-full aspect-square max-w-[270px]">
+                        <div class="grid grid-cols-3 grid-rows-3 gap-1.5 w-full h-full bg-white/5 rounded-2xl overflow-hidden" id="ttt-board">
+                            <!-- Board generated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GAME 4: SPEED REACTION CLASH -->
+                <div id="game-speed" class="w-full hidden flex-col items-center">
+                    <div class="glass-panel px-4 py-1 rounded-full border-cyber-yellow mb-4">
+                        <h3 class="text-xs font-mono tracking-widest text-cyber-yellow uppercase">Speed Reaction Clash</h3>
+                    </div>
+
+                    <div id="speed-box" onclick="tapSpeedTarget()" class="w-full h-56 rounded-3xl glass-panel border-2 border-cyber-yellow/40 flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-200">
+                        <i id="speed-icon" class="fas fa-bolt text-4xl text-cyber-yellow mb-2 animate-bounce"></i>
+                        <h4 id="speed-prompt" class="font-heading font-extrabold text-2xl text-white">GET READY...</h4>
+                        <p id="speed-sub" class="text-xs font-mono text-gray-400 mt-1">Jangan tap sebelum sinyal HIZAU!</p>
+                    </div>
+
+                    <div class="flex justify-between w-full mt-4 px-2 font-mono text-xs text-gray-400">
+                        <span>P1: <b id="speed-p1-ms" class="text-cyber-cyan">-- ms</b></span>
+                        <span>P2: <b id="speed-p2-ms" class="text-cyber-pink">-- ms</b></span>
+                    </div>
+                </div>
+
+                <!-- GAME 5: MIND FLIP MEMORY MATCH -->
+                <div id="game-memory" class="w-full hidden flex-col items-center">
+                    <div class="glass-panel px-4 py-1 rounded-full border-cyber-green mb-3">
+                        <h3 class="text-xs font-mono tracking-widest text-cyber-green uppercase">Mind Flip Memory Match</h3>
+                    </div>
+
+                    <p id="memory-status" class="mb-3 font-mono text-xs uppercase tracking-widest text-center px-3 py-1 rounded-xl bg-white/5 border border-white/10">Cari Pasangan Kartu!</p>
+
+                    <div class="grid grid-cols-4 gap-2 w-full max-w-[290px]" id="memory-board">
+                        <!-- Cards generated via JS -->
+                    </div>
+                </div>
+
+                <!-- GAME 6: CYBER UNO -->
+                <div id="game-uno" class="w-full hidden flex-col items-center relative" style="height: calc(100vh - 280px); min-height: 380px;">
+                    <div class="glass-panel px-4 py-1 rounded-full border-cyber-pink mb-2 shrink-0">
+                        <h3 class="text-xs font-mono tracking-widest text-cyber-pink uppercase">Cyber UNO Duel</h3>
+                    </div>
+                    
+                    <!-- Opponent Status -->
+                    <div class="w-full flex justify-between items-center px-2 mb-2 shrink-0">
+                        <div class="text-xs font-mono text-gray-400">P2 Cards: <span id="uno-p2-count" class="text-white font-bold">7</span></div>
+                        <p id="uno-status" class="font-mono text-[10px] uppercase tracking-widest text-center px-2 py-0.5 rounded-md bg-white/5 border border-white/10">Giliranmu</p>
+                    </div>
+
+                    <!-- Center Board -->
+                    <div class="flex justify-center items-center gap-6 mb-2 shrink-0">
+                        <!-- Draw Pile -->
+                        <button onclick="drawUnoCard()" class="uno-card deck-card flex justify-center items-center text-cyber-pink shadow-lg hover:scale-105 transition-transform" id="uno-draw-btn">
+                            <span class="font-heading font-black italic text-xl">UNO</span>
+                        </button>
+                        
+                        <!-- Discard Pile -->
+                        <div id="uno-discard" class="uno-card shadow-2xl transition-all">
+                            <!-- Card rendering -->
+                        </div>
+                    </div>
+                    
+                    <!-- Color Indicator -->
+                    <div id="uno-color-indicator" class="w-6 h-6 rounded-full shadow-lg mb-2 hidden border-2 border-white shrink-0"></div>
+
+                    <!-- My Hand -->
+                    <div class="w-full flex-grow flex flex-col justify-end overflow-hidden pb-1">
+                        <div id="uno-hand" class="flex flex-wrap justify-center gap-1.5 overflow-y-auto max-h-[140px] p-1 pb-2 scroll-smooth">
+                            <!-- Cards rendering -->
+                        </div>
+                    </div>
+                    
+                    <!-- Color Picker Modal -->
+                    <div id="uno-color-picker" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4 rounded-3xl">
+                        <h4 class="font-heading text-white mb-4 text-sm uppercase tracking-widest">Pilih Warna Wild</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="setUnoColor('red')" class="w-16 h-16 rounded-xl bg-red-500 hover:scale-110 transition shadow-[0_0_15px_rgba(239,68,68,0.5)]"></button>
+                            <button onclick="setUnoColor('blue')" class="w-16 h-16 rounded-xl bg-blue-500 hover:scale-110 transition shadow-[0_0_15px_rgba(59,130,246,0.5)]"></button>
+                            <button onclick="setUnoColor('green')" class="w-16 h-16 rounded-xl bg-green-500 hover:scale-110 transition shadow-[0_0_15px_rgba(34,197,94,0.5)]"></button>
+                            <button onclick="setUnoColor('yellow')" class="w-16 h-16 rounded-xl bg-yellow-500 hover:scale-110 transition shadow-[0_0_15px_rgba(234,179,8,0.5)]"></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </main>
+
+        <!-- CHAT & COMMS DRAWER -->
+        <div id="chat-drawer" class="absolute bottom-0 left-0 w-full h-[60%] glass-panel rounded-t-3xl border-t border-white/20 shadow-2xl flex flex-col transition-transform duration-300 translate-y-full z-50 bg-dark-base/95 backdrop-blur-xl">
+            <div class="flex justify-between items-center p-4 border-b border-white/10 shrink-0">
+                <h3 class="font-mono text-cyber-cyan text-xs tracking-widest uppercase flex items-center gap-2">
+                    <i class="fas fa-terminal"></i> COMMS_LINK ARENA CHAT
+                </h3>
+                <button onclick="toggleChat()" class="text-gray-400 hover:text-white p-1.5"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            
+            <!-- Chat Input Moved to Top for Android keyboard compatibility -->
+            <div class="p-3 border-b border-white/10 bg-dark-panel/60 flex gap-2 shrink-0">
+                <input type="text" id="input-chat" placeholder="Ketik pesan..." class="glass-input flex-grow rounded-xl px-4 py-2.5 font-mono text-xs placeholder-gray-600">
+                <button onclick="sendChat()" class="btn-cyber-primary w-11 h-10 flex items-center justify-center rounded-xl shrink-0"><i class="fas fa-paper-plane text-sm"></i></button>
+            </div>
+
+            <div id="chat-messages" class="flex-grow overflow-y-auto p-4 flex flex-col gap-2.5 scroll-smooth pb-12"></div>
+        </div>
+        <div id="chat-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 hidden" onclick="toggleChat()"></div>
+
+        <!-- MODAL 1: STATS & LEADERBOARD -->
+        <div id="modal-stats" class="absolute inset-0 bg-black/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-sm rounded-3xl p-6 flex flex-col gap-4 animate-bounce-short border-cyber-pink/40">
+                <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                    <h3 class="font-heading font-extrabold text-xl text-white flex items-center gap-2">
+                        <i class="fas fa-trophy text-cyber-yellow"></i> PLAYER STATS
+                    </h3>
+                    <button onclick="closeStatsModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="glass-card p-3 rounded-2xl border-cyber-green/30">
+                        <span class="text-2xl font-mono font-extrabold text-cyber-green" id="stat-wins">0</span>
+                        <p class="text-[10px] font-mono text-gray-400 uppercase mt-1">TOTAL MENANG</p>
+                    </div>
+                    <div class="glass-card p-3 rounded-2xl border-cyber-pink/30">
+                        <span class="text-2xl font-mono font-extrabold text-cyber-pink" id="stat-losses">0</span>
+                        <p class="text-[10px] font-mono text-gray-400 uppercase mt-1">TOTAL KALAH</p>
+                    </div>
+                    <div class="glass-card p-3 rounded-2xl border-cyber-yellow/30">
+                        <span class="text-2xl font-mono font-extrabold text-cyber-yellow" id="stat-streak">0</span>
+                        <p class="text-[10px] font-mono text-gray-400 uppercase mt-1">WIN STREAK</p>
+                    </div>
+                    <div class="glass-card p-3 rounded-2xl border-cyber-cyan/30">
+                        <span class="text-2xl font-mono font-extrabold text-cyber-cyan" id="stat-winrate">0%</span>
+                        <p class="text-[10px] font-mono text-gray-400 uppercase mt-1">WIN RATE</p>
+                    </div>
+                </div>
+
+                <div class="glass-card p-3.5 rounded-2xl flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-mono text-gray-400">TOTAL XP:</span>
+                        <h4 id="stat-xp-val" class="font-mono font-bold text-cyber-cyan text-lg">0 XP</h4>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs font-mono text-gray-400">CURRENT TITLE:</span>
+                        <h4 id="stat-title-val" class="font-mono font-bold text-cyber-pink text-xs uppercase">Arcade Rookie</h4>
+                    </div>
+                </div>
+
+                <button onclick="closeStatsModal()" class="btn-cyber-primary w-full py-3 rounded-xl font-heading font-bold text-sm">CLOSE</button>
+            </div>
+        </div>
+
+        <!-- MODAL 2: KEYBOARD SHORTCUTS HELP -->
+        <div id="modal-help" class="absolute inset-0 bg-black/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
+            <div class="glass-panel w-full max-w-sm rounded-3xl p-6 flex flex-col gap-4 animate-bounce-short border-cyber-cyan/40">
+                <div class="flex justify-between items-center border-b border-white/10 pb-3">
+                    <h3 class="font-heading font-extrabold text-lg text-white flex items-center gap-2">
+                        <i class="fas fa-keyboard text-cyber-cyan"></i> KEYBOARD SHORTCUTS
+                    </h3>
+                    <button onclick="closeHelpModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times text-lg"></i></button>
+                </div>
+
+                <div class="flex flex-col gap-2.5 font-mono text-xs">
+                    <div class="flex justify-between glass-card p-2 rounded-xl">
+                        <span class="text-gray-300">RPS Weapon (Rock/Paper/Scissors)</span>
+                        <span class="text-cyber-cyan font-bold">Tombol 1, 2, 3</span>
+                    </div>
+                    <div class="flex justify-between glass-card p-2 rounded-xl">
+                        <span class="text-gray-300">Roll Dice / Speed Tap</span>
+                        <span class="text-cyber-cyan font-bold">SPACEBAR</span>
+                    </div>
+                    <div class="flex justify-between glass-card p-2 rounded-xl">
+                        <span class="text-gray-300">Tic-Tac-Toe Grid Cell</span>
+                        <span class="text-cyber-cyan font-bold">Numpad 1 - 9</span>
+                    </div>
+                    <div class="flex justify-between glass-card p-2 rounded-xl">
+                        <span class="text-gray-300">Quick Emotes Expression</span>
+                        <span class="text-cyber-pink font-bold">Tombol Q, W, E, R</span>
+                    </div>
+                </div>
+
+                <button onclick="closeHelpModal()" class="btn-cyber-primary w-full py-3 rounded-xl font-heading font-bold text-sm">GOT IT!</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN APP ENGINE SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- 1. PARTICLE BACKGROUND CANVAS ---
+        const initParticles = () => {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+
+            const resize = () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+                reset() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.vx = (Math.random() - 0.5) * 0.4;
+                    this.vy = (Math.random() - 0.5) * 0.4;
+                    this.radius = Math.random() * 2 + 0.5;
+                    this.colors = ['#00F0FF', '#7000FF', '#FF2E93', '#00F5D4'];
+                    this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                    this.alpha = Math.random() * 0.4 + 0.1;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+                        this.reset();
+                    }
+                }
+                draw() {
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < 45; i++) particles.push(new Particle());
+
+            const animate = () => {
+                ctx.clearRect(0, 0, width, height);
+                
+                // Draw connecting lines between nearby particles
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 100) {
+                            ctx.globalAlpha = (1 - dist / 100) * 0.15;
+                            ctx.strokeStyle = particles[i].color;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                particles.forEach(p => { p.update(); p.draw(); });
+                requestAnimationFrame(animate);
+            };
+            animate();
+        };
+        initParticles();
+
+        // --- 2. AUDIO & SFX ENGINE (Tone.js) ---
+        const AudioEngine = {
+            initialized: false,
+            muted: true,
+            synth: null,
+            metalSynth: null,
+            bgmLoop: null,
+            init: async () => {
+                if (AudioEngine.initialized) return;
+                try {
+                    await Tone.start();
+                    AudioEngine.synth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "sine" },
+                        envelope: { attack: 0.005, decay: 0.1, sustain: 0.1, release: 0.4 }
+                    }).toDestination();
+                    AudioEngine.synth.volume.value = -12;
+
+                    AudioEngine.metalSynth = new Tone.MetalSynth({
+                        frequency: 250, envelope: { attack: 0.001, decay: 0.08, release: 0.01 },
+                        harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5
+                    }).toDestination();
+                    AudioEngine.metalSynth.volume.value = -18;
+
+                    AudioEngine.initialized = true;
+                } catch (e) {
+                    console.log("Audio init fallback", e);
+                }
+            },
+            playClick: () => { if(AudioEngine.initialized && !AudioEngine.muted) AudioEngine.synth.triggerAttackRelease("C6", "32n"); },
+            playSelect: () => { if(AudioEngine.initialized && !AudioEngine.muted) AudioEngine.synth.triggerAttackRelease("E6", "32n"); },
+            playEmote: () => { if(AudioEngine.initialized && !AudioEngine.muted) AudioEngine.synth.triggerAttackRelease("G6", "16n"); },
+            playWin: () => {
+                if(!AudioEngine.initialized || AudioEngine.muted) return;
+                const now = Tone.now();
+                AudioEngine.synth.triggerAttackRelease(["C5", "E5", "G5"], "8n", now);
+                AudioEngine.synth.triggerAttackRelease(["C6", "E6", "G6", "C7"], "4n", now + 0.15);
+                triggerConfetti();
+            },
+            playLose: () => {
+                if(!AudioEngine.initialized || AudioEngine.muted) return;
+                const now = Tone.now();
+                AudioEngine.synth.triggerAttackRelease("E4", "8n", now);
+                AudioEngine.synth.triggerAttackRelease("Eb4", "8n", now + 0.15);
+                AudioEngine.synth.triggerAttackRelease("D4", "4n", now + 0.3);
+            },
+            playTick: () => { if(AudioEngine.initialized && !AudioEngine.muted) AudioEngine.metalSynth.triggerAttackRelease("32n"); }
+        };
+
+        const triggerConfetti = () => {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#00F0FF', '#7000FF', '#FF2E93', '#00F5D4', '#FFB800']
+                });
+            }
+        };
+
+        window.toggleAudio = async () => {
+            await AudioEngine.init();
+            AudioEngine.muted = !AudioEngine.muted;
+            
+            const visualizer = document.getElementById('sound-visualizer');
+            const statusTxt = document.getElementById('sound-status');
+            
+            if (AudioEngine.muted) {
+                visualizer.classList.add('sound-muted');
+                statusTxt.innerText = "AUDIO OFF";
+                statusTxt.classList.replace('text-cyber-cyan', 'text-gray-400');
+            } else {
+                visualizer.classList.remove('sound-muted');
+                statusTxt.innerText = "AUDIO ON";
+                statusTxt.classList.replace('text-gray-400', 'text-cyber-cyan');
+                AudioEngine.playSelect();
+            }
+        };
+
+        // UI click sound handler
+        document.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                AudioEngine.playClick();
+            }
+        });
+
+        // --- 3. FIREBASE SETUP & HYBRID LOCAL NETWORK ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'arcade-hub-pro-v2';
+        let firebaseConfig = {
+            apiKey: "AIzaSyCOy-KuX61XSwPLGNRk5l7Fok0F-__Nw7U",
+            authDomain: "game-v-7a28e.firebaseapp.com",
+            databaseURL: "https://game-v-7a28e-default-rtdb.firebaseio.com",
+            projectId: "game-v-7a28e",
+            storageBucket: "game-v-7a28e.firebasestorage.app",
+            messagingSenderId: "922061484807",
+            appId: "1:922061484807:web:2f0a350d347f101aeacba2",
+            measurementId: "G-CDJ255BSMQ"
+        };
+
+        let app = null, auth = null, db = null;
+        try {
+            if (firebaseConfig) {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+            }
+        } catch (e) {
+            console.log("Firebase setup skipped (offline mode).");
+        }
+
+        // --- GLOBAL STATE ---
+        let currentUser = {
+            uid: null,
+            name: '',
+            avatar: '🐺',
+            xp: 0,
+            level: 1,
+            title: 'Arcade Rookie',
+            stats: { wins: 0, losses: 0, streak: 0 }
+        };
+        let currentRoomId = null;
+        let roomData = null;
+        let isHost = false;
+        let isBotMode = false;
+        let botDifficulty = 'easy'; // easy, medium, hard
+        let lastChatTime = 0;
+        let unsubscribeRoom = null;
+        let isChatOpen = false;
+
+        // Local Storage Handler
+        const loadLocalStats = () => {
+            const saved = localStorage.getItem('arcade_hub_player');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    currentUser.xp = data.xp || 0;
+                    currentUser.stats = data.stats || { wins: 0, losses: 0, streak: 0 };
+                    calculateLevel();
+                } catch(e){}
+            }
+        };
+        const saveLocalStats = () => {
+            localStorage.setItem('arcade_hub_player', JSON.stringify({
+                xp: currentUser.xp,
+                stats: currentUser.stats
+            }));
+        };
+
+        const calculateLevel = () => {
+            currentUser.level = Math.floor(currentUser.xp / 100) + 1;
+            const titles = ['Arcade Rookie', 'Cyber Phantom', 'Dice Warlock', 'Tactical Mind', 'Speed Demon', 'Arcade Legend'];
+            currentUser.title = titles[Math.min(currentUser.level - 1, titles.length - 1)];
+            
+            document.getElementById('login-level-badge').innerText = `LVL ${currentUser.level}`;
+            document.getElementById('home-lvl-badge').innerText = `LVL ${currentUser.level}`;
+            document.getElementById('player-title-display').innerText = currentUser.title;
+            document.getElementById('home-title').innerText = currentUser.title;
+        };
+
+        const addXP = (amount) => {
+            currentUser.xp += amount;
+            calculateLevel();
+            saveLocalStats();
+            showToast(`+${amount} XP Gained!`, "success");
+        };
+
+        // --- UTILS ---
+        window.showToast = (message, type = 'info') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let colors = type === 'error' ? 'bg-cyber-pink/20 border-cyber-pink text-cyber-pink' : 
+                         (type === 'success' ? 'bg-cyber-green/20 border-cyber-green text-cyber-green' : 'bg-cyber-cyan/20 border-cyber-cyan text-cyber-cyan');
+            
+            let icon = type === 'error' ? '⚠️' : (type === 'success' ? '⚡' : 'ℹ️');
+            
+            toast.className = `glass-panel border ${colors} px-5 py-2.5 rounded-2xl shadow-xl font-mono text-xs uppercase tracking-wider flex items-center gap-3 transform transition-all duration-300 -translate-y-4 opacity-0`;
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('-translate-y-4', 'opacity-0');
+            });
+            
+            setTimeout(() => {
+                toast.classList.add('-translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        };
+
+        const generateRoomCode = () => {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            return Array.from({length: 4}, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+        };
+
+        const showScreen = (screenId) => {
+            ['screen-login', 'screen-home', 'screen-room'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        };
+
+        window.showHomeScreen = () => {
+            if (currentUser.uid) showScreen('screen-home');
+        };
+
+        // --- 4. AUTH & PROFILE LOGIC ---
+        window.selectAvatar = (emoji, btnEl) => {
+            AudioEngine.playSelect();
+            currentUser.avatar = emoji;
+            document.getElementById('avatar-preview').innerText = emoji;
+            document.querySelectorAll('.avatar-opt').forEach(el => el.classList.remove('selected'));
+            btnEl.classList.add('selected');
+        };
+
+        document.getElementById('btn-login').addEventListener('click', async () => {
+            await AudioEngine.init();
+            AudioEngine.playClick();
+
+            const nameInput = document.getElementById('input-username').value.trim();
+            if (!nameInput) { showToast("Masukkan codename kamu dulu!", "error"); return; }
+
+            currentUser.name = nameInput;
+            loadLocalStats();
+
+            const btn = document.getElementById('btn-login');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CONNECTING...';
+            btn.disabled = true;
+
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                currentUser.uid = auth.currentUser.uid;
+                
+                document.getElementById('home-avatar').innerText = currentUser.avatar;
+                document.getElementById('home-username').innerText = currentUser.name;
+                showScreen('screen-home');
+                showToast(`Welcome Back, Agent ${currentUser.name}!`, "success");
+            } catch (error) {
+                console.log("Auth offline fallback:", error);
+                currentUser.uid = 'player-' + Math.random().toString(36).substring(2, 7);
+                document.getElementById('home-avatar').innerText = currentUser.avatar;
+                document.getElementById('home-username').innerText = currentUser.name;
+                showScreen('screen-home');
+                showToast("System Access Granted (Offline Mode)", "success");
+            } finally {
+                btn.innerHTML = 'ENTER ARENA <i class="fas fa-bolt text-cyber-yellow"></i>';
+                btn.disabled = false;
+            }
+        });
+
+        window.logout = () => {
+            if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
+            currentRoomId = null;
+            if (auth) {
+                try { auth.signOut(); } catch(e) {}
+            }
+            showScreen('screen-login');
+        };
+
+        // --- 5. LOBBY TABS & BOT DIFFICULTY ---
+        window.switchLobbyTab = (tab) => {
+            AudioEngine.playClick();
+            const btnSolo = document.getElementById('tab-btn-solo');
+            const btnMulti = document.getElementById('tab-btn-multi');
+            const contentSolo = document.getElementById('tab-content-solo');
+            const contentMulti = document.getElementById('tab-content-multi');
+
+            if (tab === 'solo') {
+                btnSolo.className = "py-3 rounded-xl font-heading font-bold text-sm tracking-wide transition-all bg-cyber-primary text-white shadow-lg";
+                btnMulti.className = "py-3 rounded-xl font-heading font-bold text-sm tracking-wide transition-all text-gray-400 hover:text-white";
+                contentSolo.classList.remove('hidden');
+                contentMulti.classList.add('hidden');
+            } else {
+                btnMulti.className = "py-3 rounded-xl font-heading font-bold text-sm tracking-wide transition-all bg-cyber-pink text-white shadow-lg";
+                btnSolo.className = "py-3 rounded-xl font-heading font-bold text-sm tracking-wide transition-all text-gray-400 hover:text-white";
+                contentMulti.classList.remove('hidden');
+                contentSolo.classList.add('hidden');
+            }
+        };
+
+        window.selectBotDifficulty = (diff) => {
+            AudioEngine.playClick();
+            botDifficulty = diff;
+            document.querySelectorAll('.bot-diff-btn').forEach(btn => btn.classList.add('opacity-60'));
+            const activeBtn = document.getElementById(`bot-diff-${diff}`);
+            activeBtn.classList.remove('opacity-60');
+        };
+
+        // --- 6. ROOM MANAGEMENT (MULTIPLAYER & BOT) ---
+        window.startSoloBotMatch = async () => {
+            isBotMode = true;
+            isHost = true;
+            const code = 'BOT1';
+            currentRoomId = code;
+
+            const botAvatars = { 'easy': '🤖', 'medium': '👾', 'hard': '⚡' };
+            const botNames = { 'easy': 'Easy Bot v1', 'medium': 'Cyber AI Pro', 'hard': 'Impossible AI' };
+
+            roomData = {
+                roomId: code,
+                status: 'active',
+                currentGame: 'lobby',
+                hostUid: currentUser.uid,
+                p1: { uid: currentUser.uid, name: currentUser.name, avatar: currentUser.avatar, score: 0, isReady: true },
+                p2: { uid: 'bot-id', name: botNames[botDifficulty], avatar: botAvatars[botDifficulty], score: 0, isReady: true },
+                gameState: {},
+                chat: [{ type: 'system', msg: `Bot Arena initialized vs ${botNames[botDifficulty]}.`, time: Date.now() }]
+            };
+
+            enterRoomUI(code);
+            updateRoomUI(roomData);
+            showToast("Bot Arena Initialized!", "success");
+        };
+
+        window.createRoom = async () => {
+            if (!currentUser.uid) return;
+            isBotMode = false;
+            const code = generateRoomCode();
+            currentRoomId = code;
+            isHost = true;
+
+            const newRoomData = {
+                roomId: code,
+                status: 'waiting',
+                currentGame: 'lobby',
+                hostUid: currentUser.uid,
+                p1: { uid: currentUser.uid, name: currentUser.name, avatar: currentUser.avatar, score: 0, isReady: false },
+                p2: null,
+                gameState: {},
+                chat: [{ type: 'system', msg: `Session ${code} instantiated by ${currentUser.name}.`, time: Date.now() }]
+            };
+
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', code);
+                await setDoc(roomRef, newRoomData);
+                enterRoomUI(code);
+                listenToRoom(code);
+                showToast(`Session ${code} Created`, "success");
+            } catch (e) {
+                console.error("Firebase create room error:", e);
+                if (e.message && e.message.includes("permission")) {
+                    showToast("Error Firebase: Akses ditolak! Cek Firestore Rules.", "error");
+                } else {
+                    showToast("Fallback to offline mode", "warning");
+                    roomData = newRoomData;
+                    enterRoomUI(code);
+                    updateRoomUI(roomData);
+                }
+            }
+        };
+
+        window.joinRoom = async () => {
+            if (!currentUser.uid) return;
+            isBotMode = false;
+            const codeInput = document.getElementById('input-room-code').value.trim().toUpperCase();
+            if (!codeInput || codeInput.length !== 4) { showToast("Kode harus 4 Karakter!", "error"); return; }
+
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', codeInput);
+                const roomSnap = await getDoc(roomRef);
+                
+                if (!roomSnap.exists()) { showToast("Session Tidak Ditemukan!", "error"); return; }
+                const data = roomSnap.data();
+                
+                if (data.p2 !== null && data.p2.uid !== currentUser.uid && data.p1.uid !== currentUser.uid) {
+                    showToast("Session Sudah Penuh!", "error"); return;
+                }
+
+                isHost = false;
+                currentRoomId = codeInput;
+
+                if (data.p2 === null) {
+                    const sysMsg = { type: 'system', msg: `${currentUser.name} bergabung ke room.`, time: Date.now() };
+                    let currentChat = data.chat || [];
+                    currentChat.push(sysMsg);
+
+                    await updateDoc(roomRef, {
+                        p2: { uid: currentUser.uid, name: currentUser.name, avatar: currentUser.avatar, score: 0, isReady: false },
+                        chat: currentChat
+                    });
+                }
+                
+                enterRoomUI(codeInput);
+                listenToRoom(codeInput);
+            } catch (e) {
+                console.error("Firebase join room error:", e);
+                if (e.message && e.message.includes("permission")) {
+                    showToast("Error Firebase: Akses ditolak! Cek Firestore Rules.", "error");
+                } else {
+                    showToast("Gagal Terhubung ke Room: " + e.message, "error");
+                }
+            }
+        };
+
+        window.leaveRoom = async () => {
+            lastChatTime = 0;
+            if (unsubscribeRoom) { unsubscribeRoom(); unsubscribeRoom = null; }
+            if (currentRoomId && !isBotMode && db) {
+                try {
+                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+                    const snap = await getDoc(roomRef);
+                    if (snap.exists()) {
+                        let data = snap.data();
+                        let currentChat = data.chat || [];
+                        currentChat.push({ type: 'system', msg: `${currentUser.name} keluar room.`, time: Date.now() });
+
+                        if (isHost) {
+                            await updateDoc(roomRef, { status: 'closed', chat: currentChat });
+                        } else {
+                            await updateDoc(roomRef, { p2: null, 'p1.isReady': false, currentGame: 'lobby', chat: currentChat });
+                        }
+                    }
+                } catch (e) {}
+            }
+            currentRoomId = null;
+            isBotMode = false;
+            showScreen('screen-home');
+        };
+
+        window.copyRoomCode = () => {
+            if (!currentRoomId) return;
+            navigator.clipboard.writeText(currentRoomId).then(() => {
+                showToast("Kode Room Tersalin ke Clipboard!", "success");
+            }).catch(() => { showToast("Gagal menyalin", "error"); });
+        };
+
+        const enterRoomUI = (code) => {
+            document.getElementById('room-code-display').innerHTML = `${code} <i class="fas fa-copy text-xs opacity-60"></i>`;
+            showScreen('screen-room');
+            
+            document.getElementById('game-selector').classList.remove('hidden');
+            document.getElementById('ready-container').classList.remove('hidden');
+            document.getElementById('game-rps').classList.add('hidden');
+            document.getElementById('game-dice').classList.add('hidden');
+            document.getElementById('game-ttt').classList.add('hidden');
+            document.getElementById('game-speed').classList.add('hidden');
+            document.getElementById('game-memory').classList.add('hidden');
+            document.getElementById('host-actions').classList.add('hidden');
+            
+            initTTTBoard();
+        };
+
+        // --- 7. REALTIME SYNC ENGINE ---
+        const listenToRoom = (code) => {
+            if (unsubscribeRoom) unsubscribeRoom();
+            
+            const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', code);
+            unsubscribeRoom = onSnapshot(roomRef, (snap) => {
+                if (!snap.exists()) {
+                    showToast("Session Diakhiri", "error");
+                    leaveRoom();
+                    return;
+                }
+                
+                roomData = snap.data();
+                if (roomData.status === 'closed' && !isHost) {
+                    showToast("Host Mengakhiri Room", "info");
+                    leaveRoom();
+                    return;
+                }
+                updateRoomUI(roomData);
+            });
+        };
+
+        const updateRoomUI = (data) => {
+            const isP1 = currentUser.uid === data.p1.uid;
+            const me = isP1 ? data.p1 : data.p2;
+
+            // P1 Card
+            document.getElementById('p1-avatar').innerText = data.p1.avatar;
+            document.getElementById('p1-name').innerText = data.p1.name;
+            document.getElementById('p1-score').innerText = data.p1.score;
+            document.getElementById('p1-ready-badge').classList.toggle('hidden', !data.p1.isReady);
+            
+            // P2 Card
+            const p2Av = document.getElementById('p2-avatar');
+            const p2Nm = document.getElementById('p2-name');
+            const p2ScCont = document.getElementById('p2-score-container');
+            const p2Sc = document.getElementById('p2-score');
+            const p2Rdy = document.getElementById('p2-ready-badge');
+            
+            if (data.p2) {
+                p2Av.innerText = data.p2.avatar;
+                p2Av.classList.remove('opacity-60', 'border-gray-600');
+                p2Av.classList.add('border-cyber-pink', 'shadow-[0_0_20px_rgba(255,46,147,0.3)]');
+                p2Nm.innerText = data.p2.name;
+                p2Nm.classList.replace('text-gray-400', 'text-white');
+                p2Sc.innerText = data.p2.score;
+                p2ScCont.classList.remove('hidden');
+                p2Rdy.classList.toggle('hidden', !data.p2.isReady);
+            } else {
+                p2Av.innerText = '👤';
+                p2Av.classList.add('opacity-60', 'border-gray-600');
+                p2Av.classList.remove('border-cyber-pink', 'shadow-[0_0_20px_rgba(255,46,147,0.3)]');
+                p2Nm.innerText = 'Waiting...';
+                p2Nm.classList.replace('text-white', 'text-gray-400');
+                p2ScCont.classList.add('hidden');
+                p2Rdy.classList.add('hidden');
+            }
+
+            renderChat(data.chat || []);
+
+            // Hide games
+            ['game-selector', 'ready-container', 'game-rps', 'game-dice', 'game-ttt', 'game-speed', 'game-memory', 'game-uno', 'host-actions'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+
+            if (data.currentGame === 'lobby') {
+                document.getElementById('game-selector').classList.remove('hidden');
+                document.getElementById('ready-container').classList.remove('hidden');
+                
+                const btnReady = document.getElementById('btn-ready');
+                if (me && me.isReady) {
+                    btnReady.innerHTML = '<i class="fas fa-check-double text-cyber-green"></i> YOU ARE READY';
+                    btnReady.classList.replace('border-cyber-cyan', 'border-cyber-green');
+                    btnReady.classList.replace('text-cyber-cyan', 'text-cyber-green');
+                } else {
+                    btnReady.innerHTML = '<i class="fas fa-check-circle"></i> MARK AS READY';
+                    btnReady.classList.replace('border-cyber-green', 'border-cyber-cyan');
+                    btnReady.classList.replace('text-cyber-green', 'text-cyber-cyan');
+                }
+
+                const bothReady = data.p1.isReady && (data.p2 && data.p2.isReady);
+                const hostList = document.getElementById('host-game-list');
+                
+                if (isHost) {
+                    if (bothReady) {
+                        hostList.classList.remove('opacity-50', 'pointer-events-none');
+                    } else {
+                        hostList.classList.add('opacity-50', 'pointer-events-none');
+                    }
+                } else {
+                    hostList.classList.add('opacity-50', 'pointer-events-none');
+                }
+
+            } else {
+                if (isHost) document.getElementById('host-actions').classList.remove('hidden');
+                
+                if (data.currentGame === 'rps') {
+                    document.getElementById('game-rps').classList.remove('hidden');
+                    updateRPSUI(data.gameState, isP1);
+                    if (isHost && data.gameState.phase === 'choosing' && data.gameState.p1Choice && data.gameState.p2Choice) {
+                        checkRPSResult();
+                    }
+                } else if (data.currentGame === 'dice') {
+                    document.getElementById('game-dice').classList.remove('hidden');
+                    updateDiceUI(data.gameState, isP1);
+                } else if (data.currentGame === 'tictactoe') {
+                    document.getElementById('game-ttt').classList.remove('hidden');
+                    updateTTTUI(data.gameState, isP1);
+                } else if (data.currentGame === 'speed') {
+                    document.getElementById('game-speed').classList.remove('hidden');
+                    updateSpeedUI(data.gameState, isP1);
+                    if (isHost && data.gameState.state === 'ready' && (data.gameState.p1Ms || data.gameState.p2Ms)) {
+                        checkSpeedResult();
+                    }
+                } else if (data.currentGame === 'memory') {
+                    document.getElementById('game-memory').classList.remove('hidden');
+                    updateMemoryUI(data.gameState, isP1);
+                } else if (data.currentGame === 'uno') {
+                    document.getElementById('game-uno').classList.remove('hidden');
+                    updateUnoUI(data.gameState, isP1);
+                }
+            }
+        };
+
+        const syncRoomState = async (updateFields) => {
+            if (roomData) {
+                for (const key in updateFields) {
+                    const keys = key.split('.');
+                    let current = roomData;
+                    for (let i = 0; i < keys.length - 1; i++) {
+                        if (current[keys[i]] === undefined) current[keys[i]] = {};
+                        current = current[keys[i]];
+                    }
+                    current[keys[keys.length - 1]] = updateFields[key];
+                }
+                updateRoomUI(roomData);
+            }
+            
+            if (isBotMode) return;
+
+            if (currentRoomId && db) {
+                try {
+                    const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+                    updateDoc(roomRef, updateFields).catch(e => console.error(e));
+                } catch(e){}
+            }
+        };
+
+        window.toggleReady = async () => {
+            AudioEngine.playClick();
+            if (!roomData) return;
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            const currentStatus = isP1 ? roomData.p1.isReady : roomData.p2.isReady;
+            
+            const field = isP1 ? 'p1.isReady' : 'p2.isReady';
+            await syncRoomState({ [field]: !currentStatus });
+        };
+
+        window.startGame = async (gameId) => {
+            AudioEngine.playSelect();
+            if (!isHost) return;
+            
+            let initialGameState = {};
+            if (gameId === 'rps') initialGameState = { p1Choice: null, p2Choice: null, phase: 'choosing', resultText: '' };
+            else if (gameId === 'dice') initialGameState = { p1Roll: null, p2Roll: null, phase: 'rolling', resultText: '' };
+            else if (gameId === 'tictactoe') initialGameState = { board: Array(9).fill(null), turn: 'p1', winner: null, winningLine: [] };
+            else if (gameId === 'speed') {
+                initialGameState = { p1Ms: null, p2Ms: null, startTime: 0, state: 'waiting', resultText: '' };
+                setTimeout(() => triggerSpeedSignal(), 2000 + Math.random() * 2500);
+            }
+            else if (gameId === 'memory') {
+                const icons = ['🚀', '💎', '🍕', '👾', '⚡', '🔮'];
+                const deck = [...icons, ...icons].sort(() => Math.random() - 0.5);
+                initialGameState = { deck: deck, flipped: [], matched: [], p1Score: 0, p2Score: 0, turn: 'p1', winner: null };
+            }
+            else if (gameId === 'uno') {
+                const colors = ['red', 'blue', 'green', 'yellow'];
+                const deck = [];
+                colors.forEach(c => {
+                    deck.push({ color: c, value: '0', type: 'number', id: c+'0' });
+                    for(let i=1; i<=9; i++) {
+                        deck.push({ color: c, value: i.toString(), type: 'number', id: c+i+'a' });
+                        deck.push({ color: c, value: i.toString(), type: 'number', id: c+i+'b' });
+                    }
+                    for(let i=0; i<2; i++) {
+                        deck.push({ color: c, value: 'Skip', type: 'action', id: c+'S'+i });
+                        deck.push({ color: c, value: 'Reverse', type: 'action', id: c+'R'+i });
+                        deck.push({ color: c, value: '+2', type: 'action', id: c+'D2'+i });
+                    }
+                });
+                for(let i=0; i<4; i++) {
+                    deck.push({ color: 'wild', value: 'Wild', type: 'wild', id: 'W'+i });
+                    deck.push({ color: 'wild', value: '+4', type: 'wild', id: 'WD4'+i });
+                }
+                deck.sort(() => Math.random() - 0.5);
+                
+                // UNO Initial Draw
+                const hand1 = deck.splice(0, 7);
+                const hand2 = deck.splice(0, 7);
+                const discardPile = deck.splice(0, 1);
+                
+                // Ensure starting card is not a wild card for simplicity, or just set currentColor
+                let startColor = discardPile[0].color;
+                if(startColor === 'wild') startColor = ['red','blue','green','yellow'][Math.floor(Math.random()*4)];
+
+                initialGameState = { deck: deck, discardPile: discardPile, p1Hand: hand1, p2Hand: hand2, turn: 'p1', winner: null, currentColor: startColor, scoreAdded: false };
+            }
+
+            const gameNames = { 'rps': 'Rock Paper Scissors', 'dice': 'Quantum Dice', 'tictactoe': 'Tic-Tac-Toe', 'speed': 'Speed Reaction', 'memory': 'Memory Match', 'uno': 'Cyber UNO' };
+            let currentChat = roomData.chat || [];
+            currentChat.push({ type: 'system', msg: `Game [${gameNames[gameId]}] Dimulai!`, time: Date.now() });
+
+            await syncRoomState({
+                currentGame: gameId,
+                gameState: initialGameState,
+                chat: currentChat
+            });
+        };
+
+        window.playAgain = async () => {
+            AudioEngine.playClick();
+            if (!isHost || !roomData) return;
+            startGame(roomData.currentGame);
+        };
+
+        window.backToLobby = async () => {
+            AudioEngine.playClick();
+            if (!isHost) return;
+            await syncRoomState({
+                currentGame: 'lobby',
+                gameState: {},
+                'p1.isReady': false,
+                'p2.isReady': false
+            });
+        };
+
+        // --- 8. GAME 1: ROCK PAPER SCISSORS LOGIC ---
+        const rpsEmojis = { 'rock': '✊', 'paper': '🖐️', 'scissors': '✌️' };
+
+        window.playRPS = async (choice) => {
+            AudioEngine.playSelect();
+            if (!roomData) return;
+            const state = roomData.gameState;
+            if (state.phase !== 'choosing') return;
+
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            if ((isP1 && state.p1Choice) || (!isP1 && state.p2Choice)) return;
+
+            const field = isP1 ? 'gameState.p1Choice' : 'gameState.p2Choice';
+            if (isBotMode) roomData.gameState[isP1 ? 'p1Choice' : 'p2Choice'] = choice;
+            
+            await syncRoomState({ [field]: choice });
+
+            // Bot response if solo
+            if (isBotMode && !roomData.gameState.p2Choice) {
+                setTimeout(async () => {
+                    const botChoices = ['rock', 'paper', 'scissors'];
+                    const botChoice = botChoices[Math.floor(Math.random() * botChoices.length)];
+                    roomData.gameState.p2Choice = botChoice;
+                    checkRPSResult();
+                }, 600);
+            } else {
+                checkRPSResult();
+            }
+        };
+
+        const checkRPSResult = async () => {
+            if (!isHost) return;
+            const state = roomData.gameState;
+
+            if (state.p1Choice && state.p2Choice && state.phase === 'choosing') {
+                let winner = null;
+                if (state.p1Choice === state.p2Choice) winner = 'draw';
+                else if (
+                    (state.p1Choice === 'rock' && state.p2Choice === 'scissors') ||
+                    (state.p1Choice === 'paper' && state.p2Choice === 'rock') ||
+                    (state.p1Choice === 'scissors' && state.p2Choice === 'paper')
+                ) { winner = 'p1'; } else { winner = 'p2'; }
+
+                let resultText = winner === 'draw' ? 'SERI!' : (winner === 'p1' ? 'P1 MENANG' : 'P2 MENANG');
+                
+                let p1Score = roomData.p1.score;
+                let p2Score = roomData.p2.score;
+                if (winner === 'p1') { p1Score++; if(currentUser.uid === roomData.p1.uid) addXP(30); }
+                if (winner === 'p2') { p2Score++; if(currentUser.uid === roomData.p2.uid) addXP(30); }
+
+                await syncRoomState({
+                    'gameState.phase': 'showing',
+                    'gameState.resultText': resultText,
+                    'p1.score': p1Score,
+                    'p2.score': p2Score
+                });
+
+                setTimeout(async () => {
+                    if (roomData.currentGame === 'rps') {
+                        await syncRoomState({
+                            gameState: { p1Choice: null, p2Choice: null, phase: 'choosing', resultText: '' }
+                        });
+                    }
+                }, 3000);
+            }
+        };
+
+        const updateRPSUI = (state, isP1) => {
+            const p1Box = document.getElementById('rps-p1-choice');
+            const p2Box = document.getElementById('rps-p2-choice');
+            const resultBox = document.getElementById('rps-result');
+            const statusTxt = document.getElementById('rps-status');
+
+            if (state.phase === 'choosing') {
+                p1Box.innerText = state.p1Choice ? (isP1 ? rpsEmojis[state.p1Choice] : '🔒') : '❓';
+                p2Box.innerText = state.p2Choice ? (!isP1 ? rpsEmojis[state.p2Choice] : '🔒') : '❓';
+                resultBox.style.transform = 'scale(0)';
+                
+                const myChoice = isP1 ? state.p1Choice : state.p2Choice;
+                statusTxt.innerText = myChoice ? "Menunggu Lawan Memilih..." : "PILIH SENJATA (Shortcut 1, 2, 3)";
+            } else if (state.phase === 'showing') {
+                p1Box.innerText = rpsEmojis[state.p1Choice];
+                p2Box.innerText = rpsEmojis[state.p2Choice];
+                
+                resultBox.innerText = state.resultText;
+                resultBox.style.transform = 'scale(1)';
+                statusTxt.innerText = "Hasil Ronde...";
+
+                if (state.resultText === 'SERI!') {}
+                else if ((state.resultText === 'P1 MENANG' && isP1) || (state.resultText === 'P2 MENANG' && !isP1)) {
+                    AudioEngine.playWin();
+                } else {
+                    AudioEngine.playLose();
+                }
+            }
+        };
+
+        // --- 9. GAME 2: QUANTUM DICE RUSH LOGIC ---
+        window.rollDice = async () => {
+            if (!roomData) return;
+            const state = roomData.gameState;
+            if (state.phase !== 'rolling') return;
+
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            if ((isP1 && state.p1Roll) || (!isP1 && state.p2Roll)) return;
+
+            AudioEngine.playTick();
+            const btn = document.getElementById('btn-roll-dice');
+            btn.disabled = true;
+
+            const myBox = isP1 ? document.getElementById('dice-p1') : document.getElementById('dice-p2');
+            let rolls = 0;
+            const rollInterval = setInterval(() => {
+                myBox.innerText = Math.floor(Math.random() * 6) + 1;
+                AudioEngine.playTick();
+                rolls++;
+                if(rolls > 8) {
+                    clearInterval(rollInterval);
+                    finalizeRoll();
+                }
+            }, 50);
+
+            const finalizeRoll = async () => {
+                const finalRoll = Math.floor(Math.random() * 6) + 1;
+                const field = isP1 ? 'gameState.p1Roll' : 'gameState.p2Roll';
+                if(isBotMode) roomData.gameState[isP1 ? 'p1Roll' : 'p2Roll'] = finalRoll;
+                await syncRoomState({ [field]: finalRoll });
+
+                if (isBotMode && !roomData.gameState.p2Roll) {
+                    setTimeout(() => {
+                        roomData.gameState.p2Roll = Math.floor(Math.random() * 6) + 1;
+                        checkDiceResult();
+                    }, 500);
+                } else {
+                    checkDiceResult();
+                }
+            };
+        };
+
+        const checkDiceResult = async () => {
+            if (!isHost) return;
+            const state = roomData.gameState;
+
+            if (state.p1Roll && state.p2Roll && state.phase === 'rolling') {
+                let winner = null;
+                if (state.p1Roll === state.p2Roll) winner = 'draw';
+                else if (state.p1Roll > state.p2Roll) winner = 'p1';
+                else winner = 'p2';
+
+                let resultText = winner === 'draw' ? 'SERI!' : (winner === 'p1' ? 'P1 MENANG' : 'P2 MENANG');
+                
+                let p1Score = roomData.p1.score;
+                let p2Score = roomData.p2.score;
+                if (winner === 'p1') { p1Score++; if(currentUser.uid === roomData.p1.uid) addXP(30); }
+                if (winner === 'p2') { p2Score++; if(currentUser.uid === roomData.p2.uid) addXP(30); }
+
+                await syncRoomState({
+                    'gameState.phase': 'showing',
+                    'gameState.resultText': resultText,
+                    'p1.score': p1Score,
+                    'p2.score': p2Score
+                });
+
+                setTimeout(async () => {
+                    if (roomData.currentGame === 'dice') {
+                        await syncRoomState({
+                            gameState: { p1Roll: null, p2Roll: null, phase: 'rolling', resultText: '' }
+                        });
+                    }
+                }, 3000);
+            }
+        };
+
+        const updateDiceUI = (state, isP1) => {
+            const p1Box = document.getElementById('dice-p1');
+            const p2Box = document.getElementById('dice-p2');
+            const resultBox = document.getElementById('dice-result');
+            const btn = document.getElementById('btn-roll-dice');
+
+            if (state.phase === 'rolling') {
+                if (isP1 && !state.p1Roll) p1Box.innerText = '?';
+                if (!isP1 && !state.p2Roll) p2Box.innerText = '?';
+                
+                if (isP1 && state.p2Roll) p2Box.innerHTML = '<i class="fas fa-check text-cyber-green"></i>';
+                if (!isP1 && state.p1Roll) p1Box.innerHTML = '<i class="fas fa-check text-cyber-green"></i>';
+                
+                resultBox.style.transform = 'scale(0)';
+                const myRoll = isP1 ? state.p1Roll : state.p2Roll;
+                btn.disabled = !!myRoll;
+            } else if (state.phase === 'showing') {
+                p1Box.innerText = state.p1Roll;
+                p2Box.innerText = state.p2Roll;
+                resultBox.innerText = state.resultText;
+                resultBox.style.transform = 'scale(1)';
+                btn.disabled = true;
+
+                if ((state.resultText === 'P1 MENANG' && isP1) || (state.resultText === 'P2 MENANG' && !isP1)) {
+                    AudioEngine.playWin();
+                } else if (state.resultText !== 'SERI!') {
+                    AudioEngine.playLose();
+                }
+            }
+        };
+
+        // --- 10. GAME 3: TIC TAC TOE LOGIC ---
+        const initTTTBoard = () => {
+            const board = document.getElementById('ttt-board');
+            board.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'ttt-cell flex items-center justify-center text-4xl cursor-pointer font-black rounded-xl glass-card transition-all';
+                cell.id = `ttt-cell-${i}`;
+                cell.onclick = () => playTTT(i);
+                board.appendChild(cell);
+            }
+        };
+
+        window.playTTT = async (index) => {
+            if (!roomData) return;
+            const state = roomData.gameState;
+            if (state.winner) return;
+
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            const myTurn = (isP1 && state.turn === 'p1') || (!isP1 && state.turn === 'p2');
+            if (!myTurn || state.board[index] !== null) return;
+
+            AudioEngine.playClick();
+            const newBoard = [...state.board];
+            newBoard[index] = state.turn;
+            
+            const winLines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            let winner = null;
+            let winningLine = [];
+            for (let line of winLines) {
+                const [a, b, c] = line;
+                if (newBoard[a] && newBoard[a] === newBoard[b] && newBoard[a] === newBoard[c]) {
+                    winner = newBoard[a];
+                    winningLine = line;
+                    break;
+                }
+            }
+            let isDraw = !winner && !newBoard.includes(null);
+            const nextTurn = state.turn === 'p1' ? 'p2' : 'p1';
+            
+            let p1Score = roomData.p1.score;
+            let p2Score = roomData.p2.score;
+            if (winner === 'p1') { p1Score++; if(currentUser.uid === roomData.p1.uid) addXP(50); }
+            if (winner === 'p2') { p2Score++; if(currentUser.uid === roomData.p2.uid) addXP(50); }
+
+            await syncRoomState({
+                'gameState.board': newBoard,
+                'gameState.turn': nextTurn,
+                'gameState.winner': isDraw ? 'draw' : winner,
+                'gameState.winningLine': winningLine,
+                'p1.score': p1Score,
+                'p2.score': p2Score
+            });
+
+            // Bot response in solo mode
+            if (isBotMode && !winner && !isDraw && nextTurn === 'p2') {
+                setTimeout(() => {
+                    const emptyCells = newBoard.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+                    if (emptyCells.length > 0) {
+                        const botChoice = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                        playTTT(botChoice);
+                    }
+                }, 600);
+            }
+        };
+
+        const updateTTTUI = (state, isP1) => {
+            if (!state || !state.board) return;
+            for (let i = 0; i < 9; i++) {
+                const cell = document.getElementById(`ttt-cell-${i}`);
+                cell.classList.remove('ttt-win-cell');
+                
+                if (state.board[i] === 'p1') {
+                    cell.innerText = '✖️';
+                    cell.className = 'ttt-cell flex items-center justify-center text-4xl font-black rounded-xl glass-card text-cyber-cyan shadow-[0_0_10px_rgba(0,240,255,0.4)]';
+                } else if (state.board[i] === 'p2') {
+                    cell.innerText = '⭕';
+                    cell.className = 'ttt-cell flex items-center justify-center text-4xl font-black rounded-xl glass-card text-cyber-pink shadow-[0_0_10px_rgba(255,46,147,0.4)]';
+                } else {
+                    cell.innerText = '';
+                    cell.className = 'ttt-cell flex items-center justify-center text-4xl font-black rounded-xl glass-card hover:border-cyber-cyan';
+                }
+                
+                if (state.winningLine && state.winningLine.includes(i)) {
+                    cell.classList.add('ttt-win-cell');
+                }
+            }
+
+            const statusTxt = document.getElementById('ttt-status');
+            if (state.winner) {
+                if (state.winner === 'draw') {
+                    statusTxt.innerText = "SERI DETECTED";
+                } else {
+                    const isMe = (state.winner === 'p1' && isP1) || (state.winner === 'p2' && !isP1);
+                    statusTxt.innerText = isMe ? "VICTORY! KAMU MENANG" : "DEFEAT! KAMU KALAH";
+                }
+            } else {
+                const myTurn = (state.turn === 'p1' && isP1) || (state.turn === 'p2' && !isP1);
+                statusTxt.innerText = myTurn ? "GILIRAN KAMU!" : "GILIRAN LAWAN...";
+            }
+        };
+
+        // --- 11. GAME 4: SPEED REACTION CLASH LOGIC ---
+        const triggerSpeedSignal = async () => {
+            if (!isHost) return;
+            await syncRoomState({
+                'gameState.state': 'ready',
+                'gameState.startTime': Date.now()
+            });
+        };
+
+        window.tapSpeedTarget = async () => {
+            if (!roomData) return;
+            const state = roomData.gameState;
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            
+            if (state.state === 'waiting') {
+                showToast("Terlalu Cepat! False Start!", "error");
+                return;
+            }
+            if (state.state === 'ready') {
+                const field = isP1 ? 'gameState.p1Ms' : 'gameState.p2Ms';
+                if ((isP1 && state.p1Ms) || (!isP1 && state.p2Ms)) return; // Prevent double tap
+
+                const reactionTime = window.localSpeedStartTime ? (Date.now() - window.localSpeedStartTime) : (Date.now() - state.startTime);
+                AudioEngine.playSelect();
+
+                if(isBotMode) roomData.gameState[isP1 ? 'p1Ms' : 'p2Ms'] = reactionTime;
+                await syncRoomState({ [field]: reactionTime });
+
+                if (isBotMode && !roomData.gameState.p2Ms) {
+                    setTimeout(() => {
+                        roomData.gameState.p2Ms = Math.floor(220 + Math.random() * 150);
+                        checkSpeedResult();
+                    }, 100);
+                } else {
+                    checkSpeedResult();
+                }
+            }
+        };
+
+        const checkSpeedResult = async () => {
+            if (!isHost) return;
+            const state = roomData.gameState;
+            if (state.p1Ms || state.p2Ms) {
+                let winner;
+                if (state.p1Ms && !state.p2Ms) winner = 'p1';
+                else if (!state.p1Ms && state.p2Ms) winner = 'p2';
+                else winner = state.p1Ms <= state.p2Ms ? 'p1' : 'p2';
+                let resultText = winner === 'p1' ? 'P1 TERCEPAT!' : 'P2 TERCEPAT!';
+
+                let p1Score = roomData.p1.score;
+                let p2Score = roomData.p2.score;
+                if (winner === 'p1') { p1Score++; if(currentUser.uid === roomData.p1.uid) addXP(40); }
+                if (winner === 'p2') { p2Score++; if(currentUser.uid === roomData.p2.uid) addXP(40); }
+
+                await syncRoomState({
+                    'gameState.state': 'finished',
+                    'gameState.resultText': resultText,
+                    'p1.score': p1Score,
+                    'p2.score': p2Score
+                });
+            }
+        };
+
+        const updateSpeedUI = (state, isP1) => {
+            const speedBox = document.getElementById('speed-box');
+            const speedPrompt = document.getElementById('speed-prompt');
+            const p1Ms = document.getElementById('speed-p1-ms');
+            const p2Ms = document.getElementById('speed-p2-ms');
+
+            p1Ms.innerText = state.p1Ms ? `${state.p1Ms} ms` : '-- ms';
+            p2Ms.innerText = state.p2Ms ? `${state.p2Ms} ms` : '-- ms';
+
+            if (state.state === 'waiting') {
+                speedBox.className = "w-full h-56 rounded-3xl glass-panel border-2 border-cyber-pink/40 flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all bg-cyber-pink/10";
+                speedPrompt.innerText = "SIAP-SIAP...";
+                window.localSpeedStartTime = null;
+            } else if (state.state === 'ready') {
+                if (!window.localSpeedStartTime) window.localSpeedStartTime = Date.now();
+                speedBox.className = "w-full h-56 rounded-3xl glass-panel border-2 border-cyber-green flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all bg-cyber-green/20 animate-pulse";
+                speedPrompt.innerText = "TAP SEKARANG!! ⚡";
+            } else if (state.state === 'finished') {
+                speedBox.className = "w-full h-56 rounded-3xl glass-panel border-2 border-cyber-cyan flex flex-col items-center justify-center p-6 text-center transition-all bg-dark-card";
+                speedPrompt.innerText = state.resultText;
+            }
+        };
+
+        // --- 12. GAME 5: MIND FLIP MEMORY MATCH LOGIC ---
+        window.flipMemoryCard = async (index) => {
+            if (!roomData) return;
+            const state = roomData.gameState;
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            const myTurn = (isP1 && state.turn === 'p1') || (!isP1 && state.turn === 'p2');
+            
+            if (!myTurn || state.flipped.includes(index) || state.matched.includes(index) || state.flipped.length >= 2) return;
+
+            AudioEngine.playClick();
+            const newFlipped = [...state.flipped, index];
+            await syncRoomState({ 'gameState.flipped': newFlipped });
+
+            if (newFlipped.length === 2) {
+                const [idx1, idx2] = newFlipped;
+                if (state.deck[idx1] === state.deck[idx2]) {
+                    // Match!
+                    AudioEngine.playSelect();
+                    const newMatched = [...state.matched, idx1, idx2];
+                    let p1Score = state.p1Score + (state.turn === 'p1' ? 1 : 0);
+                    let p2Score = state.p2Score + (state.turn === 'p2' ? 1 : 0);
+                    let winner = newMatched.length === state.deck.length ? (p1Score > p2Score ? 'p1' : (p2Score > p1Score ? 'p2' : 'draw')) : null;
+
+                    let globalP1 = roomData.p1.score;
+                    let globalP2 = roomData.p2.score;
+                    if (winner === 'p1') { globalP1++; if(currentUser.uid === roomData.p1.uid) addXP(50); }
+                    if (winner === 'p2') { globalP2++; if(currentUser.uid === roomData.p2.uid) addXP(50); }
+
+                    setTimeout(async () => {
+                        await syncRoomState({
+                            'gameState.matched': newMatched,
+                            'gameState.flipped': [],
+                            'gameState.p1Score': p1Score,
+                            'gameState.p2Score': p2Score,
+                            'gameState.winner': winner,
+                            ...(winner ? { 'p1.score': globalP1, 'p2.score': globalP2 } : {})
+                        });
+                    }, 500);
+                } else {
+                    // Mismatch, pass turn
+                    const nextTurn = state.turn === 'p1' ? 'p2' : 'p1';
+                    setTimeout(async () => {
+                        await syncRoomState({
+                            'gameState.flipped': [],
+                            'gameState.turn': nextTurn
+                        });
+
+                        if (isBotMode && nextTurn === 'p2') {
+                            setTimeout(() => botMemoryTurn(), 700);
+                        }
+                    }, 1000);
+                }
+            }
+        };
+
+        const botMemoryTurn = () => {
+            const state = roomData.gameState;
+            const available = state.deck.map((_, i) => i).filter(i => !state.matched.includes(i));
+            if (available.length >= 2) {
+                const first = available[Math.floor(Math.random() * available.length)];
+                flipMemoryCard(first);
+                setTimeout(() => {
+                    const remaining = available.filter(i => i !== first);
+                    const second = remaining[Math.floor(Math.random() * remaining.length)];
+                    flipMemoryCard(second);
+                }, 600);
+            }
+        };
+
+        const updateMemoryUI = (state, isP1) => {
+            const board = document.getElementById('memory-board');
+            board.innerHTML = '';
+            
+            state.deck.forEach((icon, i) => {
+                const card = document.createElement('div');
+                const isFlipped = state.flipped.includes(i) || state.matched.includes(i);
+                
+                card.className = `flip-card h-16 rounded-2xl glass-card flex items-center justify-center text-2xl font-bold cursor-pointer transition-all ${isFlipped ? 'flipped border-cyber-cyan bg-cyber-cyan/10' : 'hover:border-cyber-cyan'}`;
+                card.innerHTML = `<div class="flip-card-inner w-full h-full relative">
+                    <div class="flip-card-front w-full h-full absolute flex items-center justify-center text-3xl">❓</div>
+                    <div class="flip-card-back w-full h-full absolute flex items-center justify-center text-3xl">${icon}</div>
+                </div>`;
+                card.onclick = () => flipMemoryCard(i);
+                board.appendChild(card);
+            });
+
+            const statusTxt = document.getElementById('memory-status');
+            const myTurn = (state.turn === 'p1' && isP1) || (state.turn === 'p2' && !isP1);
+            statusTxt.innerText = state.winner ? `WINNER: ${state.winner.toUpperCase()}` : (myTurn ? "GILIRAN KAMU MEMBALIK KARTU" : "GILIRAN LAWAN...");
+        };
+
+        // --- 12.5 GAME 6: UNO LOGIC ---
+        const updateUnoUI = (state, isP1) => {
+            const p2Count = document.getElementById('uno-p2-count');
+            const statusTxt = document.getElementById('uno-status');
+            const handContainer = document.getElementById('uno-hand');
+            const discard = document.getElementById('uno-discard');
+            const colorIndicator = document.getElementById('uno-color-indicator');
+            
+            p2Count.innerText = isP1 ? state.p2Hand.length : state.p1Hand.length;
+            
+            const myTurn = (state.turn === 'p1' && isP1) || (state.turn === 'p2' && !isP1);
+            statusTxt.innerText = state.winner ? `WINNER: ${state.winner.toUpperCase()}` : (myTurn ? "GILIRAN KAMU" : "GILIRAN LAWAN...");
+            
+            // Render discard pile
+            const topCard = state.discardPile[state.discardPile.length - 1];
+            discard.className = `uno-card shadow-2xl transition-all uno-card-${topCard.color}`;
+            let displayVal = topCard.value;
+            if(displayVal === '+2' || displayVal === '+4' || displayVal === 'Skip' || displayVal === 'Reverse') {
+                if(displayVal === '+4' || displayVal === '+2') displayVal = displayVal;
+                else if(displayVal === 'Skip') displayVal = '⊘';
+                else if(displayVal === 'Reverse') displayVal = '⇌';
+            }
+            discard.innerHTML = `
+                <div class="corner tl">${displayVal}</div>
+                <div class="center">${displayVal}</div>
+                <div class="corner br">${displayVal}</div>
+            `;
+            
+            if(state.currentColor && topCard.color === 'wild') {
+                colorIndicator.classList.remove('hidden');
+                colorIndicator.className = `w-6 h-6 rounded-full shadow-lg mb-2 border-2 border-white shrink-0 bg-${state.currentColor}-500`;
+            } else {
+                colorIndicator.classList.add('hidden');
+            }
+
+            // Render hand
+            handContainer.innerHTML = '';
+            const myHand = isP1 ? state.p1Hand : state.p2Hand;
+            myHand.forEach(card => {
+                const cDiv = document.createElement('div');
+                cDiv.className = `uno-card uno-card-${card.color} shadow-md hover:-translate-y-2 hover:shadow-xl transition-all`;
+                
+                let val = card.value;
+                if(val === 'Skip') val = '⊘';
+                if(val === 'Reverse') val = '⇌';
+
+                cDiv.innerHTML = `
+                    <div class="corner tl">${val}</div>
+                    <div class="center text-lg">${val}</div>
+                    <div class="corner br">${val}</div>
+                `;
+                cDiv.onclick = () => {
+                    if(myTurn && !state.winner) playUnoCard(card.id);
+                };
+                handContainer.appendChild(cDiv);
+            });
+        };
+
+        window.playUnoCard = async (cardId) => {
+            AudioEngine.playClick();
+            if (!roomData) return;
+            let state = JSON.parse(JSON.stringify(roomData.gameState));
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            const myHandField = isP1 ? 'p1Hand' : 'p2Hand';
+            const oppHandField = isP1 ? 'p2Hand' : 'p1Hand';
+            let myHand = state[myHandField];
+            
+            const cardIndex = myHand.findIndex(c => c.id === cardId);
+            if(cardIndex === -1) return;
+            const card = myHand[cardIndex];
+            const topCard = state.discardPile[state.discardPile.length - 1];
+
+            // Validation
+            const isValid = card.color === 'wild' || card.color === state.currentColor || card.value === topCard.value;
+            if(!isValid) {
+                showToast("Kartu tidak valid!", "error");
+                return;
+            }
+
+            // Play card
+            myHand.splice(cardIndex, 1);
+            state.discardPile.push(card);
+            state.currentColor = card.color;
+            
+            if(myHand.length === 1) {
+                AudioEngine.playWin(); // UNO SHOUT
+                showToast("UNO!!", "success");
+            }
+            if(myHand.length === 0) {
+                state.winner = isP1 ? 'p1' : 'p2';
+            }
+
+            // Handle Action cards
+            let nextTurn = state.turn === 'p1' ? 'p2' : 'p1';
+            let cardsToDraw = 0;
+            if(card.value === 'Skip' || card.value === 'Reverse') {
+                nextTurn = state.turn; // 1v1 reverse is skip
+            } else if(card.value === '+2') {
+                cardsToDraw = 2;
+                nextTurn = state.turn;
+            } else if(card.value === '+4') {
+                cardsToDraw = 4;
+                nextTurn = state.turn;
+            }
+
+            if(cardsToDraw > 0) {
+                const drawn = state.deck.splice(0, cardsToDraw);
+                state[oppHandField].push(...drawn);
+                if(state.deck.length < 5) {
+                    const oldDiscard = state.discardPile.splice(0, state.discardPile.length - 1);
+                    state.deck.push(...oldDiscard.sort(() => Math.random() - 0.5));
+                }
+            }
+
+            if(card.color === 'wild') {
+                document.getElementById('uno-color-picker').classList.remove('hidden');
+                document.getElementById('uno-color-picker').classList.add('flex');
+                // Store intermediate state waiting for color
+                window._pendingUnoState = state;
+                window._pendingNextTurn = nextTurn;
+                return;
+            }
+
+            state.turn = nextTurn;
+            finishUnoMove(state);
+        };
+
+        window.setUnoColor = (color) => {
+            AudioEngine.playSelect();
+            document.getElementById('uno-color-picker').classList.add('hidden');
+            document.getElementById('uno-color-picker').classList.remove('flex');
+            let state = window._pendingUnoState;
+            state.currentColor = color;
+            state.turn = window._pendingNextTurn;
+            finishUnoMove(state);
+        };
+
+        window.drawUnoCard = async () => {
+            AudioEngine.playClick();
+            if (!roomData) return;
+            let state = JSON.parse(JSON.stringify(roomData.gameState));
+            const isP1 = currentUser.uid === roomData.p1.uid;
+            if((isP1 && state.turn !== 'p1') || (!isP1 && state.turn !== 'p2')) return;
+            if(state.winner) return;
+
+            const myHandField = isP1 ? 'p1Hand' : 'p2Hand';
+            const drawn = state.deck.splice(0, 1);
+            state[myHandField].push(...drawn);
+            
+            if(state.deck.length < 5) {
+                const oldDiscard = state.discardPile.splice(0, state.discardPile.length - 1);
+                state.deck.push(...oldDiscard.sort(() => Math.random() - 0.5));
+            }
+
+            state.turn = state.turn === 'p1' ? 'p2' : 'p1';
+            finishUnoMove(state);
+        };
+
+        const finishUnoMove = async (state) => {
+            let p1Score = roomData.p1.score;
+            let p2Score = roomData.p2.score;
+            
+            if (state.winner && !state.scoreAdded) {
+                state.scoreAdded = true;
+                if (state.winner === 'p1') { p1Score++; if(currentUser.uid === roomData.p1.uid) addXP(50); }
+                if (state.winner === 'p2') { p2Score++; if(currentUser.uid === roomData.p2.uid) addXP(50); }
+            }
+
+            if (isBotMode) {
+                roomData.gameState = state;
+                roomData.p1.score = p1Score;
+                roomData.p2.score = p2Score;
+                updateRoomUI(roomData);
+                if (state.turn === 'p2' && !state.winner) {
+                    setTimeout(() => botUnoTurn(), 1200);
+                }
+                return;
+            }
+            await syncRoomState({ 
+                gameState: state,
+                'p1.score': p1Score,
+                'p2.score': p2Score
+            });
+        };
+
+        const botUnoTurn = () => {
+            let state = JSON.parse(JSON.stringify(roomData.gameState));
+            if(state.winner) return;
+
+            let myHand = state.p2Hand;
+            const topCard = state.discardPile[state.discardPile.length - 1];
+            
+            // Find valid cards
+            const validCards = myHand.filter(c => c.color === 'wild' || c.color === state.currentColor || c.value === topCard.value);
+            
+            if(validCards.length > 0) {
+                // Play first valid card (could make it smarter based on difficulty)
+                const cardToPlay = validCards[0];
+                const cardIndex = myHand.findIndex(c => c.id === cardToPlay.id);
+                
+                myHand.splice(cardIndex, 1);
+                state.discardPile.push(cardToPlay);
+                state.currentColor = cardToPlay.color;
+                
+                if(myHand.length === 1) AudioEngine.playWin();
+                if(myHand.length === 0) state.winner = 'p2';
+
+                let nextTurn = 'p1';
+                let cardsToDraw = 0;
+                if(cardToPlay.value === 'Skip' || cardToPlay.value === 'Reverse') nextTurn = 'p2';
+                else if(cardToPlay.value === '+2') { cardsToDraw = 2; nextTurn = 'p2'; }
+                else if(cardToPlay.value === '+4') { cardsToDraw = 4; nextTurn = 'p2'; }
+
+                if(cardsToDraw > 0) {
+                    const drawn = state.deck.splice(0, cardsToDraw);
+                    state.p1Hand.push(...drawn);
+                }
+
+                if(cardToPlay.color === 'wild') {
+                    // Bot picks color it has most of
+                    const colors = ['red', 'blue', 'green', 'yellow'];
+                    let colorCounts = {red:0, blue:0, green:0, yellow:0};
+                    myHand.forEach(c => { if(c.color !== 'wild') colorCounts[c.color]++; });
+                    let bestColor = 'red';
+                    let maxCount = -1;
+                    colors.forEach(c => { if(colorCounts[c] > maxCount) { maxCount = colorCounts[c]; bestColor = c; } });
+                    state.currentColor = bestColor;
+                }
+
+                state.turn = nextTurn;
+                AudioEngine.playClick();
+                finishUnoMove(state);
+            } else {
+                // Draw card
+                const drawn = state.deck.splice(0, 1);
+                state.p2Hand.push(...drawn);
+                state.turn = 'p1';
+                finishUnoMove(state);
+            }
+        };
+
+        // --- 13. EMOTES & CHAT COMMS ---
+        window.sendEmote = (emoji) => {
+            AudioEngine.playEmote();
+            if (!currentRoomId) return;
+
+            const isP1 = currentUser.uid === roomData?.p1?.uid;
+            const targetBox = isP1 ? document.getElementById('p1-card-box') : document.getElementById('p2-card-box');
+
+            const emoteEl = document.createElement('div');
+            emoteEl.className = 'floating-emote';
+            emoteEl.innerText = emoji;
+            targetBox.appendChild(emoteEl);
+
+            setTimeout(() => emoteEl.remove(), 1800);
+        };
+
+        window.toggleChat = () => {
+            AudioEngine.playClick();
+            const drawer = document.getElementById('chat-drawer');
+            const backdrop = document.getElementById('chat-backdrop');
+            const badge = document.getElementById('chat-badge');
+            
+            isChatOpen = !isChatOpen;
+            if (isChatOpen) {
+                drawer.classList.remove('translate-y-full');
+                backdrop.classList.remove('hidden');
+                badge.classList.add('hidden');
+                scrollToBottomChat();
+            } else {
+                drawer.classList.add('translate-y-full');
+                backdrop.classList.add('hidden');
+            }
+        };
+
+        window.sendChat = async () => {
+            const input = document.getElementById('input-chat');
+            const msg = input.value.trim();
+            if (!msg || !currentRoomId) return;
+            
+            input.value = '';
+            AudioEngine.playTick();
+            
+            const chatObj = { uid: currentUser.uid, name: currentUser.name, msg: msg, time: Date.now() };
+
+            if (isBotMode) {
+                roomData.chat = roomData.chat || [];
+                roomData.chat.push(chatObj);
+                renderChat(roomData.chat);
+                
+                // Bot chat response
+                setTimeout(() => {
+                    const botReplies = ["GGWP bro! 🔥", "Nice move!", "Let's play again!", "Haha mantap! 😎"];
+                    const reply = botReplies[Math.floor(Math.random() * botReplies.length)];
+                    roomData.chat.push({ uid: 'bot-id', name: roomData.p2.name, msg: reply, time: Date.now() });
+                    renderChat(roomData.chat);
+                }, 1000);
+                return;
+            }
+
+            try {
+                const roomRef = doc(db, 'artifacts', appId, 'public', 'data', 'rooms', currentRoomId);
+                const snap = await getDoc(roomRef);
+                let currentChat = snap.data().chat || [];
+                currentChat.push(chatObj);
+                if (currentChat.length > 30) currentChat = currentChat.slice(currentChat.length - 30);
+                await updateDoc(roomRef, { chat: currentChat });
+            } catch (e) {}
+        };
+
+        document.getElementById('input-chat').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChat();
+        });
+
+        const renderChat = (chats) => {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+
+            if (chats.length > 0) {
+                const lastMsg = chats[chats.length - 1];
+                if (lastChatTime !== 0 && lastMsg.time > lastChatTime && lastMsg.uid !== currentUser.uid && lastMsg.type !== 'system') {
+                    showToast(`💬 ${lastMsg.name}: ${lastMsg.msg.substring(0,25)}`, 'info');
+                    if (typeof isChatOpen !== 'undefined' && !isChatOpen) {
+                        const badge = document.getElementById('chat-badge');
+                        if (badge) badge.classList.remove('hidden');
+                    }
+                    if (typeof AudioEngine !== 'undefined') AudioEngine.playSelect();
+                }
+                lastChatTime = lastMsg.time;
+            }
+
+            chats.forEach(c => {
+                const div = document.createElement('div');
+                if (c.type === 'system') {
+                    div.className = 'w-full text-center my-1';
+                    div.innerHTML = `<span class="bg-white/5 border border-white/10 text-gray-400 font-mono text-[9px] uppercase px-3 py-1 rounded-full">${escapeHTML(c.msg)}</span>`;
+                } else {
+                    const isMe = c.uid === currentUser.uid;
+                    div.className = `max-w-[80%] p-3 rounded-2xl text-xs ${isMe ? 'bg-cyber-cyan/20 border border-cyber-cyan/30 text-white self-end rounded-br-none' : 'bg-dark-card border border-white/10 text-gray-200 self-start rounded-bl-none'}`;
+                    const nameSpan = isMe ? '' : `<div class="font-mono text-[9px] text-cyber-cyan mb-1 font-bold uppercase">${c.name}</div>`;
+                    div.innerHTML = `${nameSpan}<div>${escapeHTML(c.msg)}</div>`;
+                }
+                container.appendChild(div);
+            });
+            scrollToBottomChat();
+        };
+
+        const scrollToBottomChat = () => {
+            setTimeout(() => {
+                const container = document.getElementById('chat-messages');
+                container.scrollTop = container.scrollHeight;
+            }, 50);
+        };
+
+        const escapeHTML = (str) => {
+            const div = document.createElement('div');
+            div.innerText = str;
+            return div.innerHTML;
+        };
+
+        // --- 14. STATS & HELP MODALS ---
+        window.openStatsModal = () => {
+            AudioEngine.playClick();
+            document.getElementById('stat-wins').innerText = currentUser.stats.wins;
+            document.getElementById('stat-losses').innerText = currentUser.stats.losses;
+            document.getElementById('stat-streak').innerText = currentUser.stats.streak;
+            const total = currentUser.stats.wins + currentUser.stats.losses;
+            const winrate = total > 0 ? Math.round((currentUser.stats.wins / total) * 100) : 0;
+            document.getElementById('stat-winrate').innerText = `${winrate}%`;
+            document.getElementById('stat-xp-val').innerText = `${currentUser.xp} XP`;
+            document.getElementById('stat-title-val').innerText = currentUser.title;
+
+            document.getElementById('modal-stats').classList.remove('hidden');
+        };
+        window.closeStatsModal = () => {
+            AudioEngine.playClick();
+            document.getElementById('modal-stats').classList.add('hidden');
+        };
+
+        window.openHelpModal = () => {
+            AudioEngine.playClick();
+            document.getElementById('modal-help').classList.remove('hidden');
+        };
+        window.closeHelpModal = () => {
+            AudioEngine.playClick();
+            document.getElementById('modal-help').classList.add('hidden');
+        };
+
+        // --- 15. KEYBOARD SHORTCUTS CONTROLLER ---
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+
+            // RPS
+            if (e.key === '1') playRPS('rock');
+            if (e.key === '2') playRPS('paper');
+            if (e.key === '3') playRPS('scissors');
+
+            // Dice / Speed
+            if (e.code === 'Space') {
+                if (roomData?.currentGame === 'dice') rollDice();
+                if (roomData?.currentGame === 'speed') tapSpeedTarget();
+            }
+
+            // Emotes
+            if (e.key === 'q' || e.key === 'Q') sendEmote('🔥');
+            if (e.key === 'w' || e.key === 'W') sendEmote('💀');
+            if (e.key === 'e' || e.key === 'E') sendEmote('🤡');
+            if (e.key === 'r' || e.key === 'R') sendEmote('GG');
+
+            // Modal ESC
+            if (e.key === 'Escape') {
+                closeStatsModal();
+                closeHelpModal();
+                if (isChatOpen) toggleChat();
+            }
+        });
+    </script>
+</body>
+</html>

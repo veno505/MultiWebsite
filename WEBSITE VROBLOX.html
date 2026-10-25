@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INFORMATIKA LIFE: CAMPUS SIMULATOR</title>
+<meta name="description" content="Simulasi kehidupan mahasiswa Informatika: kuliah, coding, organisasi, kompetisi, dan karier. RPG Life Simulator edukatif.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05060f; --bg2:#0b0d1f; --panel:rgba(16,20,48,.72); --line:rgba(80,140,255,.28);
+  --blue:#2ea6ff; --cyan:#22e4ff; --purple:#a15cff; --pink:#ff4fd8; --green:#2dff9a; --red:#ff4d6d; --yellow:#ffd84a;
+  --text:#e6ecff; --muted:#8c97c4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',sans-serif;color:var(--text);background:radial-gradient(1200px 700px at 15% -10%,#1a2468 0%,transparent 60%),radial-gradient(900px 600px at 100% 10%,#3a1470 0%,transparent 55%),var(--bg);overflow-x:hidden;transition:filter 1s}
+body::before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(46,166,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(46,166,255,.05) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;mask-image:radial-gradient(circle at 50% 30%,#000 20%,transparent 80%)}
+h1,h2,h3,.orb{font-family:'Orbitron',sans-serif;letter-spacing:.04em}
+button{font-family:inherit;cursor:pointer;color:inherit}
+.app{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
+.glass{background:var(--panel);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(10px);box-shadow:0 0 24px rgba(46,166,255,.08),inset 0 0 30px rgba(120,80,255,.05)}
+header.top{display:flex;align-items:center;gap:14px;padding:12px 16px;flex-wrap:wrap}
+.logo{font-size:clamp(14px,2.4vw,22px);font-weight:900;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 30px rgba(46,166,255,.4)}
+.logo small{display:block;font-size:.55em;color:var(--muted);-webkit-text-fill-color:var(--muted);font-family:'Inter';letter-spacing:.2em}
+.hud{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.chip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(10,14,40,.7);font-size:13px;font-weight:600;white-space:nowrap}
+.chip b{color:var(--cyan)}
+.bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;padding:10px 16px}
+.bar{font-size:12px;color:var(--muted)}
+.bar .t{height:9px;border-radius:9px;background:#111634;border:1px solid var(--line);overflow:hidden;margin-top:4px}
+.bar .t i{display:block;height:100%;width:0;border-radius:9px;transition:width .4s;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.bar.en .t i{background:linear-gradient(90deg,#ffb020,var(--green))}
+.bar.ap .t i{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.bar.sm .t i{background:linear-gradient(90deg,var(--purple),var(--blue))}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;padding:8px;scrollbar-width:thin}
+nav.tabs button{flex:0 0 auto;padding:9px 14px;border-radius:11px;border:1px solid transparent;background:transparent;font-weight:600;font-size:13px;color:var(--muted);transition:.2s}
+nav.tabs button:hover{color:var(--text);background:rgba(46,166,255,.1)}
+nav.tabs button.on{color:#fff;border-color:var(--blue);background:linear-gradient(135deg,rgba(46,166,255,.25),rgba(161,92,255,.25));box-shadow:0 0 14px rgba(46,166,255,.35)}
+main.view{padding:16px;min-height:420px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.card{padding:14px;border-radius:14px;border:1px solid var(--line);background:rgba(8,11,34,.65);transition:.2s}
+.card:hover{border-color:var(--cyan);box-shadow:0 0 16px rgba(34,228,255,.18)}
+.card h3{font-size:14px;margin-bottom:6px;color:var(--cyan)}
+.card p,.muted{font-size:12.5px;color:var(--muted);line-height:1.5}
+.btn{padding:8px 13px;border-radius:10px;border:1px solid var(--blue);background:linear-gradient(135deg,rgba(46,166,255,.28),rgba(161,92,255,.28));font-weight:600;font-size:12.5px;transition:.15s}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 0 14px rgba(46,166,255,.5)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.pri{background:linear-gradient(135deg,var(--blue),var(--purple));border-color:transparent;color:#fff}
+.btn.dng{border-color:var(--red);background:rgba(255,77,109,.18)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;background:rgba(161,92,255,.2);border:1px solid rgba(161,92,255,.5);color:#d9c2ff}
+.tag.g{background:rgba(45,255,154,.14);border-color:rgba(45,255,154,.5);color:var(--green)}
+.tag.y{background:rgba(255,216,74,.14);border-color:rgba(255,216,74,.5);color:var(--yellow)}
+.tag.r{background:rgba(255,77,109,.14);border-color:rgba(255,77,109,.5);color:var(--red)}
+.sec{font-family:'Orbitron';font-size:13px;color:var(--purple);margin:14px 0 8px;letter-spacing:.12em}
+.sec:first-child{margin-top:0}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.loc{padding:12px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(160deg,rgba(18,26,70,.8),rgba(30,12,60,.7));text-align:left;transition:.2s;position:relative;overflow:hidden}
+.loc:hover{transform:translateY(-3px);border-color:var(--cyan)}
+.loc.here{border-color:var(--green);box-shadow:0 0 18px rgba(45,255,154,.35)}
+.loc .ic{font-size:26px}
+.loc b{display:block;font-size:13px;margin-top:4px}
+.loc span{font-size:11px;color:var(--muted)}
+.zone{font-size:10px;letter-spacing:.15em;color:var(--purple);margin-top:6px}
+.npc{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:rgba(161,92,255,.1);border:1px dashed rgba(161,92,255,.5);margin-bottom:10px}
+.npc .av{font-size:30px}
+.mini{height:6px;border-radius:6px;background:#111634;overflow:hidden;margin:6px 0}
+.mini i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--cyan);font-family:'Orbitron';font-size:11px;letter-spacing:.1em}
+.log{max-height:150px;overflow:auto;font-size:12.5px;padding:10px 16px;font-family:'JetBrains Mono',monospace;color:#9fb4ff}
+.log div{padding:2px 0;border-bottom:1px dotted rgba(80,140,255,.15)}
+.modal{position:fixed;inset:0;background:rgba(2,3,12,.8);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:50;padding:14px}
+.modal.on{display:flex}
+.mbox{width:min(640px,100%);max-height:92vh;overflow:auto;padding:20px;animation:pop .25s}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+pre.code{background:#04050f;border:1px solid var(--line);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12.5px;overflow:auto;color:#b8ccff;white-space:pre-wrap}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(10,14,40,.8);font-size:13px;transition:.15s}
+.opt:hover:not(:disabled){border-color:var(--cyan);background:rgba(34,228,255,.08)}
+.opt.ok{border-color:var(--green);background:rgba(45,255,154,.15)}
+.opt.bad{border-color:var(--red);background:rgba(255,77,109,.15)}
+.nums{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.num{width:54px;height:54px;border-radius:12px;font-family:'Orbitron';font-size:18px;border:1px solid var(--blue);background:rgba(46,166,255,.14)}
+.num.done{opacity:.25;pointer-events:none}
+.vul{display:block;width:100%;text-align:left;font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px;margin:4px 0;border-radius:8px;border:1px solid var(--line);background:#04050f}
+.vul.sel{border-color:var(--yellow);background:rgba(255,216,74,.12)}
+.vul.ok{border-color:var(--green)} .vul.bad{border-color:var(--red)}
+select,input[type=text]{background:#0a0d26;border:1px solid var(--line);border-radius:9px;padding:8px;color:var(--text);font-family:inherit;font-size:13px;width:100%}
+.chat{height:260px;overflow:auto;padding:10px;border:1px solid var(--line);border-radius:12px;background:rgba(4,5,15,.7);font-size:13px}
+.chat p{margin:3px 0}.chat b{color:var(--cyan)}.chat .me b{color:var(--green)}
+#toasts{position:fixed;right:14px;top:14px;z-index:99;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 14px;border-radius:12px;background:rgba(12,16,44,.95);border:1px solid var(--cyan);box-shadow:0 0 16px rgba(34,228,255,.4);font-size:13px;animation:pop .25s;max-width:300px}
+.toast.bad{border-color:var(--red)}
+.preview{border-radius:12px;padding:18px;margin-top:10px;text-align:center;border:1px solid var(--line)}
+.event{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,rgba(255,79,216,.2),rgba(161,92,255,.2));border:1px solid var(--pink);margin-bottom:12px;font-size:13px}
+.big{font-size:44px;text-align:center}
+@media(max-width:640px){.hud{margin-left:0}.app{padding:8px}main.view{padding:10px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top glass">
+    <div class="logo">INFORMATIKA LIFE<small>CAMPUS SIMULATOR</small></div>
+    <div class="hud" id="hud"></div>
+  </header>
+  <section class="bars glass" id="bars"></section>
+  <nav class="tabs glass" id="tabs"></nav>
+  <main class="view glass" id="view"></main>
+  <section class="glass"><div class="log" id="log"></div></section>
+</div>
+<div class="modal" id="modal"><div class="mbox glass" id="mbox"></div></div>
+<div id="toasts"></div>
+
+<script>
+"use strict";
+/* ================== DATA ================== */
+var SKILLS = {prog:"Programming",db:"Database",ai:"Artificial Intelligence",sec:"Cyber Security",ux:"UI/UX Design",ps:"Problem Solving"};
+var SOCIAL = {kom:"Komunikasi",team:"Kerja Sama",lead:"Leadership",net:"Networking"};
+var COURSES = [
+ {id:"c1",sem:1,name:"Dasar Pemrograman",dosen:"Bu Sari",sk:"prog",materi:["Variabel & tipe data","Percabangan","Perulangan","Fungsi"]},
+ {id:"c2",sem:1,name:"Algoritma dan Struktur Data",dosen:"Pak Budi",sk:"ps",materi:["Array & list","Stack & queue","Sorting","Searching"]},
+ {id:"c3",sem:1,name:"Matematika Komputer",dosen:"Bu Rina",sk:"ps",materi:["Logika","Himpunan","Matriks","Graf"]},
+ {id:"c4",sem:1,name:"Pengantar Teknologi Informasi",dosen:"Pak Anton",sk:"ux",materi:["Sejarah komputer","Arsitektur sistem","Internet","Etika digital"]},
+ {id:"c5",sem:2,name:"Pemrograman Web",dosen:"Bu Maya",sk:"prog",materi:["HTML","CSS","JavaScript","Backend dasar"]},
+ {id:"c6",sem:2,name:"Basis Data",dosen:"Pak Dedi",sk:"db",materi:["ERD","SQL dasar","Normalisasi","JOIN"]},
+ {id:"c7",sem:2,name:"Sistem Operasi",dosen:"Pak Hendra",sk:"sec",materi:["Proses","Memori","Penjadwalan","File system"]},
+ {id:"c8",sem:3,name:"Pemrograman Mobile",dosen:"Bu Lia",sk:"ux",materi:["Layout","Navigasi","State","API"]},
+ {id:"c9",sem:3,name:"Jaringan Komputer",dosen:"Pak Joko",sk:"sec",materi:["OSI","TCP/IP","Routing","Subnetting"]},
+ {id:"c10",sem:3,name:"Rekayasa Perangkat Lunak",dosen:"Bu Tari",sk:"ps",materi:["SDLC","UML","Agile","Testing"]},
+ {id:"c11",sem:4,name:"Artificial Intelligence",dosen:"Dr. Wijaya",sk:"ai",materi:["Search","Knowledge","Neural net","NLP"]},
+ {id:"c12",sem:4,name:"Data Science",dosen:"Bu Citra",sk:"db",materi:["Cleaning","Statistik","Visualisasi","Modeling"]},
+ {id:"c13",sem:4,name:"Keamanan Siber",dosen:"Pak Rudi",sk:"sec",materi:["Kriptografi","Web security","Pentest","Forensik"]},
+ {id:"c14",sem:5,name:"Machine Learning",dosen:"Dr. Wijaya",sk:"ai",materi:["Regresi","Klasifikasi","Clustering","Deep learning"]},
+ {id:"c15",sem:5,name:"Metodologi Penelitian",dosen:"Bu Nina",sk:"ps",materi:["Rumusan masalah","Studi pustaka","Metode","Penulisan"]},
+ {id:"c16",sem:6,name:"Cloud Computing",dosen:"Pak Fajar",sk:"prog",materi:["IaaS/PaaS","Container","Serverless","DevOps"]},
+ {id:"c17",sem:6,name:"Etika Profesi",dosen:"Bu Ratna",sk:"ux",materi:["Hak cipta","Privasi","Kode etik","Kolaborasi"]},
+ {id:"c18",sem:7,name:"Internet of Things",dosen:"Pak Yusuf",sk:"sec",materi:["Sensor","Mikrokontroler","MQTT","Dashboard IoT"]},
+ {id:"c19",sem:7,name:"Kewirausahaan Digital",dosen:"Bu Dewi",sk:"ux",materi:["Ide bisnis","MVP","Pitching","Monetisasi"]},
+ {id:"c20",sem:8,name:"Tugas Akhir",dosen:"Dr. Wijaya",sk:"prog",materi:["Proposal","Implementasi","Sidang","Revisi"]}
+];
+var LOCS = {
+ fak:{n:"Gedung Fakultas",ic:"🏛️",z:"FAKULTAS",d:"Kelas, lab AI, lab Cyber, lab Data, ruang server, ruang dosen."},
+ lib:{n:"Perpustakaan Digital",ic:"📚",z:"KAMPUS",d:"Referensi, buku teknologi, tugas."},
+ kan:{n:"Kantin Kampus",ic:"🍜",z:"KAMPUS",d:"Makan & ngobrol."},
+ stu:{n:"Student Center",ic:"🏢",z:"KAMPUS",d:"Organisasi, meeting kelompok."},
+ aud:{n:"Auditorium",ic:"🎤",z:"KAMPUS",d:"Seminar, workshop, presentasi."},
+ tam:{n:"Taman Kampus",ic:"🌳",z:"KAMPUS",d:"Santai & bertemu teman."},
+ code:{n:"Coding Space",ic:"💻",z:"INFORMATIKA",d:"Coding bareng."},
+ hack:{n:"Hackathon Arena",ic:"🏆",z:"INFORMATIKA",d:"Kompetisi bikin aplikasi."},
+ inc:{n:"Startup Incubator",ic:"🚀",z:"INFORMATIKA",d:"Bangun startup, internship, HR."},
+ gam:{n:"Gaming Laboratory",ic:"🎮",z:"INFORMATIKA",d:"Bikin game."},
+ air:{n:"AI Research Center",ic:"🤖",z:"INFORMATIKA",d:"Eksperimen AI."},
+ dorm:{n:"Asrama Mahasiswa",ic:"🛏️",z:"ASRAMA",d:"Tidur, belajar, dekor kamar, undang teman."}
+};
+var NPCS = {
+ fak:{av:"👨‍🏫",n:"Dosen Pembimbing",t:"DOSEN",l:["Rajin hadir dan kerjakan tugas, nilai akan mengikuti.","UTS minggu 8 dan UAS minggu 16. Jangan menunda belajar!","Portfolio yang baik lebih berharga daripada IPK saja."]},
+ lib:{av:"🧑‍🎓",n:"Rani (Mahasiswa Rajin)",t:"RAJIN",l:["Ayo belajar bareng, aku bantu jelasin materi!","Catatan rangkuman bisa menghemat waktu ujian."]},
+ kan:{av:"😎",n:"Dito (Mahasiswa Santai)",t:"SANTAI",l:["Santai dulu bro, makan bareng yuk!","Energi habis? Isi dulu perut."]},
+ stu:{av:"🧑‍💼",n:"Ketua HMIF",t:"ORGANISASI",l:["HMIF butuh anggota aktif untuk event kampus.","Organisasi menambah networking dan reputasi."]},
+ aud:{av:"🎙️",n:"Panitia Seminar",t:"EVENT",l:["Seminar teknologi minggu ini terbuka untuk umum.","Workshop menambah skill dan relasi."]},
+ tam:{av:"🧘",n:"Mahasiswa Santai",t:"SANTAI",l:["Taman enak buat healing."]},
+ code:{av:"🧑‍💻",n:"Kevin (Mahasiswa Kompetitif)",t:"RIVAL",l:["IPK-ku lebih tinggi darimu. Berani tanding coding?","Aku sudah level 40 di Programming!"]},
+ hack:{av:"🥇",n:"Juri Hackathon",t:"EVENT",l:["Hackathon butuh ide, kode, dan presentasi."]},
+ inc:{av:"👩‍💼",n:"HR PT Teknologi Nusantara",t:"HR",l:["Kami membuka internship untuk semester 5 ke atas.","Portfolio dan skill adalah kunci interview."]},
+ gam:{av:"🕹️",n:"Game Dev Mentor",t:"MENTOR",l:["Game butuh kreativitas dan programming."]},
+ air:{av:"🤖",n:"Robot Peneliti R-7",t:"ROBOT",l:["Dataset bersih, model bagus. Mulai eksperimen?"]},
+ dorm:{av:"🧑‍🤝‍🧑",n:"Teman Sekamar",t:"TEMAN",l:["Tidur cukup bikin otak lebih fokus.","Upgrade kamar bikin tidur lebih nyenyak."]}
+};
+var ORGS = {
+ hmif:{n:"Himpunan Mahasiswa Informatika",cost:0,gain:{lead:2,kom:1,net:1},desc:"Rapat, event kampus, workshop."},
+ ai:{n:"AI Club",cost:50000,gain:{ai:2,ps:1},desc:"Diskusi dan proyek AI."},
+ cyb:{n:"Cyber Security Club",cost:50000,gain:{sec:2,ps:1},desc:"CTF & latihan keamanan."},
+ gdc:{n:"Game Developer Club",cost:50000,gain:{prog:1,ux:2},desc:"Game jam dan desain."},
+ web:{n:"Web Developer Club",cost:50000,gain:{prog:2,ux:1},desc:"Bangun website bersama."}
+};
+var SHOP = [
+ {id:"lap1",n:"Laptop Gaming Mid",p:6000000,d:"+20% hasil belajar & coding",fx:"study",v:.2},
+ {id:"lap2",n:"Laptop Workstation",p:15000000,d:"+40% hasil belajar & coding",fx:"study",v:.4,req:"lap1"},
+ {id:"book1",n:"Buku Clean Code",p:250000,d:"+3 Programming",skill:["prog",3]},
+ {id:"book2",n:"Buku Database Design",p:250000,d:"+3 Database",skill:["db",3]},
+ {id:"book3",n:"Buku Hands-On ML",p:300000,d:"+3 AI",skill:["ai",3]},
+ {id:"book4",n:"Buku Ethical Hacking",p:300000,d:"+3 Security",skill:["sec",3]},
+ {id:"room1",n:"Kasur Ergonomis",p:1500000,d:"Tidur +15 energi",fx:"sleep",v:15},
+ {id:"room2",n:"Setup Meja Gaming + LED",p:3000000,d:"Belajar di kamar +25%",fx:"dormstudy",v:.25},
+ {id:"room3",n:"Poster & Dekorasi Neon",p:800000,d:"+5 reputasi, mood naik",fx:"rep",v:5},
+ {id:"acc1",n:"Headset Noise Cancel",p:900000,d:"+10% hasil belajar",fx:"study",v:.1},
+ {id:"acc2",n:"Mechanical Keyboard RGB",p:700000,d:"+5 reputasi",fx:"rep",v:5},
+ {id:"acc3",n:"Smartwatch",p:1200000,d:"Energi mingguan +10",fx:"weekEn",v:10}
+];
+var JOBS = {
+ se:{n:"Software Engineer",ic:"👨‍💻",sal:9000000,f:function(s){return s.skills.prog;},need:"Programming",ch:["Deadline sprint mepet","Bug produksi tengah malam"]},
+ ai:{n:"AI Engineer",ic:"🧠",sal:11000000,f:function(s){return s.skills.ai;},need:"Artificial Intelligence",ch:["Model overfitting","Data tidak lengkap"]},
+ ds:{n:"Data Scientist",ic:"📊",sal:10000000,f:function(s){return (s.skills.db+s.skills.ai+s.skills.ps)/3;},need:"Data Analysis",ch:["Stakeholder minta insight cepat","Data kotor"]},
+ sec:{n:"Cyber Security Specialist",ic:"🛡️",sal:10500000,f:function(s){return s.skills.sec;},need:"Security",ch:["Insiden ransomware","Audit mendadak"]},
+ gd:{n:"Game Developer",ic:"🎮",sal:8500000,f:function(s){return (s.skills.prog+s.skills.ux)/2;},need:"Programming + Creativity",ch:["Crunch time rilis","Review pemain negatif"]},
+ sf:{n:"Startup Founder",ic:"🚀",sal:6000000,f:function(s){return (s.soc.lead+s.soc.net)/2;},need:"Leadership + Networking",ch:["Cash flow menipis","Investor ragu"]}
+};
+var LVLS = ["Junior","Mid","Senior","Lead","Principal"];
+var FREELANCE_NAMES = ["Landing page UMKM","Bot Telegram","Dashboard toko online","Aplikasi absensi","Fix bug website klien"];
+var BOTS = ["Kevin","Rani","Dito","Alya","Bima","Salsa","Rafi","Nadia","Fajar","Putri"];
+var BOTMSG = ["Ada yang mau bentuk kelompok proyek?","Tugas Python susah banget wkwk","Siapa ikut hackathon minggu ini?","Kantin lagi rame nih","Baru dapet freelance, lumayan!","IPK semester ini lumayan bagus","Ada yang bisa bantu debug?","Gabung AI Club yuk!","Server lab lagi down, hati-hati","GG untuk kompetisi coding kemarin"];
+
+/* ================== STATE ================== */
+var KEY = "informatika_life_save_v1";
+var S = null, TAB = "dash", LOC = "dorm";
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function rp(n){return "Rp"+Math.round(n).toLocaleString("id-ID");}
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function $(id){return document.getElementById(id);}
+function newState(name){
+  var s={name:name,nim:"2026"+rnd(10000,99999),sem:1,week:1,ap:10,money:1500000,energy:100,rep:5,
+   skills:{prog:3,db:1,ai:1,sec:1,ux:2,ps:3},soc:{kom:3,team:3,lead:1,net:1},
+   courses:{},hist:[],quests:{},orgs:[],items:[],badges:[],log:[],loc:"dorm",
+   career:null,clvl:0,cxp:0,months:0,graduated:false,group:null,evDone:{},stats:{classes:0,tasks:0,games:0,freelance:0,comps:0,helped:0,sleeps:0}};
+  initCourses(s);return s;
+}
+function initCourses(s){COURSES.forEach(function(c){if(c.sem===s.sem&&!s.courses[c.id])s.courses[c.id]={m:0,att:0,tk:0,aw:-1,uts:null,uas:null};});}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function load(){try{var r=localStorage.getItem(KEY);if(r){S=JSON.parse(r);return true;}}catch(e){}return false;}
+function cc(){return COURSES.filter(function(c){return c.sem===S.sem;});}
+function studyMul(){var m=1;S.items.forEach(function(id){var it=SHOP.find(function(x){return x.id===id;});if(it&&it.fx==="study")m+=it.v;});return m;}
+function itemSum(fx){var m=0;S.items.forEach(function(id){var it=SHOP.find(function(x){return x.id===id;});if(it&&it.fx===fx)m+=it.v;});return m;}
+function gpa(){var h=S.hist;if(!h.length)return 0;var t=0;h.forEach(function(x){t+=gp(x.score);});return t/h.length;}
+function gp(sc){return sc>=85?4:sc>=78?3.5:sc>=70?3:sc>=62?2.5:sc>=55?2:sc>=45?1:0;}
+function grade(sc){return sc>=85?"A":sc>=78?"AB":sc>=70?"B":sc>=62?"BC":sc>=55?"C":sc>=45?"D":"E";}
+function log(t){S.log.unshift(t);S.log=S.log.slice(0,40);var l=$("log");if(l)renderLog();}
+function toast(t,bad){var d=document.createElement("div");d.className="toast"+(bad?" bad":"");d.textContent=t;$("toasts").appendChild(d);setTimeout(function(){d.remove();},3200);}
+
+/* ================== CORE ACTIONS ================== */
+function canAct(ap,en){
+  if(S.graduated&&!S.career){toast("Pilih karier dulu!",true);return false;}
+  if(S.ap<ap){toast("Waktu minggu ini tidak cukup.",true);return false;}
+  if(S.energy<en){toast("Energi tidak cukup. Makan atau tidur dulu!",true);return false;}
+  return true;
+}
+function spend(ap,en){S.ap-=ap;S.energy=clamp(S.energy-en,0,100);}
+function afterAct(){
+  checkQuests();checkBadges();
+  if(S.ap<=0)nextWeek();
+  save();render();
+}
+function addSkill(k,v){
+  var g=Math.max(1,Math.round(v*studyMul()));
+  if(SKILLS[k]!==undefined)S.skills[k]=clamp(S.skills[k]+g,1,100);
+  else if(SOCIAL[k]!==undefined)S.soc[k]=clamp(S.soc[k]+g,1,100);
+  return g;
+}
+function addSoc(k,v){if(SOCIAL[k]!==undefined)S.soc[k]=clamp(S.soc[k]+v,1,100);}
+function gain(o){
+  var t=[];
+  for(var k in o){
+    var v=o[k];
+    if(k==="money"){S.money+=v;t.push((v>=0?"+":"")+rp(v));}
+    else if(k==="energy"){S.energy=clamp(S.energy+v,0,100);t.push((v>=0?"+":"")+v+" energi");}
+    else if(k==="rep"){S.rep+=v;t.push((v>=0?"+":"")+v+" reputasi");}
+    else if(SKILLS[k]!==undefined){var g=addSkill(k,v);t.push("+"+g+" "+SKILLS[k]);}
+    else if(SOCIAL[k]!==undefined){addSoc(k,v);t.push("+"+v+" "+SOCIAL[k]);}
+  }
+  return t.join(", ");
+}
+function nextWeek(){
+  S.week++;S.ap=10;
+  S.energy=clamp(S.energy+20+itemSum("weekEn"),0,100);
+  var allow=S.sem<=4?250000:150000;S.money+=allow;
+  var cost=120000;S.money-=cost;
+  S.orgs.forEach(function(){/* weekly org perk handled in actions */});
+  if(S.money<0){S.money=0;S.energy=clamp(S.energy-15,0,100);log("💸 Uang habis! Kamu kelaparan, energi turun.");}
+  cc().forEach(function(c){S.courses[c.id].aw=-1;});
+  log("📅 Minggu "+S.week+" Semester "+S.sem+". Uang saku "+rp(allow)+", biaya hidup "+rp(cost)+".");
+  if(S.week===9){doExam("uts");}
+  if(S.week>16){doExam("uas");endSemester();}
+}
+function examScore(c){
+  var d=S.courses[c.id];
+  var sc=d.m*0.75+S.skills[c.sk]*0.25+rnd(-6,6)+(S.rep>50?2:0);
+  return clamp(Math.round(sc),0,100);
+}
+function doExam(type){
+  var out=[];
+  cc().forEach(function(c){var d=S.courses[c.id];d[type]=examScore(c);out.push(c.name+": "+d[type]);});
+  log((type==="uts"?"📝 UTS selesai. ":"📝 UAS selesai. ")+out.join(" | "));
+  toast((type==="uts"?"UTS":"UAS")+" selesai! Cek tab Kuliah.");
+}
+function finalScore(c){
+  var d=S.courses[c.id];
+  var att=d.att/16*100,tk=d.tk/3*100;
+  return Math.round(clamp(att*0.1+tk*0.2+(d.uts||0)*0.25+(d.uas||0)*0.45,0,100));
+}
+function endSemester(){
+  var rows=[];
+  cc().forEach(function(c){var sc=finalScore(c);S.hist.push({sem:S.sem,id:c.id,name:c.name,score:sc});rows.push("<tr><td>"+esc(c.name)+"</td><td>"+sc+"</td><td><b>"+grade(sc)+"</b></td></tr>");});
+  var g=gpa();
+  var endedSem=S.sem;
+  if(S.sem>=8){
+    S.graduated=true;
+    showModal("<div class='big'>🎓</div><h2 class='orb' style='text-align:center'>WISUDA!</h2><p class='muted' style='text-align:center;margin:8px 0'>Selamat "+esc(S.name)+", kamu lulus dengan IPK <b style='color:var(--cyan)'>"+g.toFixed(2)+"</b>.<br>Pilih karier di tab Karier.</p><table><tr><th>MK</th><th>Nilai</th><th>Huruf</th></tr>"+rows.join("")+"</table><div class='row'><button class='btn pri' onclick='closeModal();setTab(\"career\")'>Pilih Karier</button></div>");
+    S.rep+=30;S.money+=2000000;
+  } else {
+    S.sem++;S.week=1;S.ap=10;initCourses(S);
+    S.money+=500000;
+    showModal("<h2 class='orb'>Hasil Semester "+endedSem+"</h2><table><tr><th>MK</th><th>Nilai</th><th>Huruf</th></tr>"+rows.join("")+"</table><p class='muted' style='margin-top:10px'>IPK kumulatif: <b style='color:var(--cyan)'>"+g.toFixed(2)+"</b>. Bonus libur +Rp500.000. Selamat datang di Semester "+S.sem+"!</p><div class='row'><button class='btn pri' onclick='closeModal()'>Lanjut</button></div>");
+    S.group=null;
+  }
+  log("🎓 Semester "+endedSem+" selesai. IPK "+g.toFixed(2)+".");
+}
+
+/* ===== course actions ===== */
+function attend(id){
+  var c=COURSES.find(function(x){return x.id===id;});var d=S.courses[id];
+  if(LOC!=="fak"){toast("Pergi ke Gedung Fakultas untuk menghadiri kelas.",true);return;}
+  if(d.aw===S.week){toast("Kamu sudah hadir di kelas ini minggu ini.",true);return;}
+  if(!canAct(1,10))return;
+  spend(1,10);d.aw=S.week;d.att=Math.min(16,d.att+1);S.stats.classes++;
+  var gm=Math.round((5+S.skills[c.sk]/20)*studyMul());d.m=clamp(d.m+gm,0,100);
+  var mat=c.materi[Math.min(3,Math.floor((S.week-1)/4))];
+  var t=gain((function(){var o={};o[c.sk]=1;return o;})());
+  log("🏫 Kelas "+c.name+" ("+c.dosen+"): materi \""+mat+"\". Penguasaan +"+gm+". "+t);
+  afterAct();
+}
+function doTask(id){
+  var c=COURSES.find(function(x){return x.id===id;});var d=S.courses[id];
+  if(d.tk>=3){toast("Semua tugas sudah selesai.",true);return;}
+  if(!canAct(2,15))return;
+  spend(2,15);
+  var need=Math.min(95,30+d.tk*20);
+  var ok=(d.m+S.skills[c.sk])/2+rnd(0,25)>=need*0.7;
+  if(ok){d.tk++;d.m=clamp(d.m+4,0,100);S.stats.tasks++;var g=gain((function(){var o={};o[c.sk]=2;return o;})());log("📝 Tugas "+c.name+" #"+d.tk+" selesai. "+g);toast("Tugas selesai!");}
+  else{d.m=clamp(d.m+2,0,100);log("❌ Tugas "+c.name+" belum memuaskan. Pelajari materi dulu.");toast("Tugas belum selesai. Tingkatkan penguasaan!",true);}
+  afterAct();
+}
+function studyCourse(id){
+  var c=COURSES.find(function(x){return x.id===id;});var d=S.courses[id];
+  if(!canAct(1,12))return;
+  spend(1,12);var b=1;if(LOC==="lib")b+=.3;if(LOC==="dorm")b+=itemSum("dormstudy");
+  var g=Math.round(7*studyMul()*b);d.m=clamp(d.m+g,0,100);addSkill(c.sk,1);
+  log("📖 Belajar "+c.name+" (+"+g+" penguasaan).");afterAct();
+}
+
+/* ================== LOCATION ACTIONS ================== */
+function money(n){return n<=S.money;}
+function A(label,desc,ap,en,cost,fn,cond){return {label:label,desc:desc,ap:ap,en:en,cost:cost||0,fn:fn,cond:cond};}
+function locActions(){
+  var L=LOC,a=[];
+  if(L==="fak"){
+    a.push(A("Praktikum Lab Komputer","Latihan coding di lab. +Programming",1,10,0,function(){return gain({prog:3,ps:1});}));
+    a.push(A("Lab AI","Eksperimen model sederhana. +AI",1,12,0,function(){return gain({ai:3,ps:1});}));
+    a.push(A("Lab Cyber Security","Latihan keamanan. +Security",1,12,0,function(){return gain({sec:3});}));
+    a.push(A("Lab Data Science","Analisis dataset. +Database",1,12,0,function(){return gain({db:3,ps:1});}));
+    a.push(A("Ruang Server","Pantau server LED. +Database +Security",1,8,0,function(){return gain({db:1,sec:1});}));
+    a.push(A("Konsultasi Dosen","Bimbingan akademik. +Reputasi",1,5,0,function(){var c=cc()[rnd(0,cc().length-1)];var d=S.courses[c.id];d.m=clamp(d.m+8,0,100);return "Penguasaan "+c.name+" +8. "+gain({rep:2});}));
+    a.push(A("Ruang Proyek Mahasiswa","Kerjakan proyek pribadi. +Programming +Kerja Sama",2,15,0,function(){return gain({prog:3,team:1});}));
+  }
+  if(L==="lib"){
+    a.push(A("Baca Buku Teknologi","Bacaan acak. +skill",1,8,0,function(){var k=Object.keys(SKILLS)[rnd(0,5)];var o={};o[k]=3;return gain(o);}));
+    a.push(A("Cari Referensi","Referensi tugas. Penguasaan semua MK +3",1,6,0,function(){cc().forEach(function(c){var d=S.courses[c.id];d.m=clamp(d.m+3,0,100);});return "+3 penguasaan semua mata kuliah";}));
+    a.push(A("Print & Kerjakan Tugas","Biaya Rp10.000. Penguasaan +4 satu MK",1,6,10000,function(){var c=cc()[rnd(0,cc().length-1)];S.courses[c.id].m=clamp(S.courses[c.id].m+4,0,100);return c.name+" +4";}));
+  }
+  if(L==="kan"){
+    a.push(A("Makan Nasi Goreng","+25 energi",1,0,25000,function(){return gain({energy:25});}));
+    a.push(A("Makan Bergizi + Es Teh","+35 energi, +1 Komunikasi",1,0,45000,function(){return gain({energy:35,kom:1});}));
+    a.push(A("Ngobrol dengan Mahasiswa","Interaksi sosial. +Komunikasi +Networking",1,3,0,function(){return gain({kom:2,net:2});}));
+    a.push(A("Traktir Teman","Rp80.000. +Reputasi +Networking",1,3,80000,function(){return gain({rep:3,net:2});}));
+  }
+  if(L==="stu"){
+    var hm=S.orgs.indexOf("hmif")>=0;
+    for(var k in ORGS){(function(k){var o=ORGS[k];var j=S.orgs.indexOf(k)>=0;
+      if(!j)a.push(A("Gabung "+o.n,o.desc+" Biaya "+rp(o.cost),1,5,o.cost,function(){S.orgs.push(k);return "Resmi bergabung! "+gain({rep:3,net:2});}));
+      else a.push(A("Kegiatan "+o.n,"Aktivitas rutin: rapat/event/workshop.",1,12,0,function(){var g=gain(o.gain);return g+", "+gain({rep:2});}));
+    })(k);}
+    a.push(A(S.group?"Kerjakan Proyek Kelompok ("+S.group.p+"%)":"Bentuk Kelompok Proyek","Meeting & kerja tim. Selesai = bonus besar.",1,12,0,function(){
+      if(!S.group){S.group={p:0,m:["Rani","Kevin","Dito"].slice(0,rnd(2,3))};return "Kelompok terbentuk bersama "+S.group.m.join(", ")+". "+gain({team:2,lead:1});}
+      S.group.p=clamp(S.group.p+rnd(15,25),0,100);var g=gain({team:2,prog:1,lead:1});
+      if(S.group.p>=100){S.group=null;S.stats.groups=(S.stats.groups||0)+1;return "🎉 Proyek kelompok selesai! "+gain({money:500000,rep:8})+". "+g;}
+      return "Progress proyek "+S.group.p+"%. "+g;
+    }));
+  }
+  if(L==="aud"){
+    a.push(A("Seminar Teknologi","Duduk dan belajar. +Networking +skill acak",1,8,0,function(){var k=Object.keys(SKILLS)[rnd(0,5)];var o={net:2};o[k]=2;return gain(o);}));
+    a.push(A("Workshop Intensif","Rp150.000. +3 Programming +3 UI/UX",2,12,150000,function(){return gain({prog:3,ux:3,net:1});}));
+    a.push(A("Presentasi Proyek","Presentasikan hasilmu. +Komunikasi +Reputasi",2,15,0,function(){S.stats.pres=(S.stats.pres||0)+1;return gain({kom:4,rep:4});}));
+  }
+  if(L==="tam"){
+    a.push(A("Bersantai & Healing","+30 energi",1,0,0,function(){return gain({energy:30});}));
+    a.push(A("Bertemu Mahasiswa Lain","+Networking +Komunikasi",1,3,0,function(){return gain({net:2,kom:2});}));
+    a.push(A("Jalan Pagi","+15 energi +Kerja Sama",1,0,0,function(){return gain({energy:15,team:1});}));
+  }
+  if(L==="code"){
+    a.push(A("Coding Bareng","Pair programming. +Programming +Kerja Sama",1,12,0,function(){return gain({prog:3,team:1,ps:1});}));
+    a.push(A("Bantu Teman Coding","Membantu teman. +Reputasi",1,10,0,function(){S.stats.helped++;return gain({rep:3,kom:1,prog:1});}));
+    a.push(A("Freelance Programmer","Dapat bayaran per proyek.",2,18,0,function(){var f=Math.round((200000+S.skills.prog*20000)*(1+Math.random()*.4)/1000)*1000;S.stats.freelance++;return FREELANCE_NAMES[rnd(0,4)]+" selesai. "+gain({money:f,prog:1});},function(){return S.skills.prog>=8;}));
+  }
+  if(L==="hack"){
+    a.push(A("Latihan Hackathon","Persiapan lomba. +Problem Solving",1,12,0,function(){return gain({ps:3,prog:2,team:1});}));
+    var ev=currentEvent();
+    a.push(A(ev?"Ikuti "+ev.n:"Belum ada kompetisi minggu ini","Kompetisi resmi: hadiah uang & reputasi.",2,25,0,function(){return joinCompetition(ev);},function(){return !!ev;}));
+  }
+  if(L==="inc"){
+    a.push(A("Membuat Website untuk Klien","Mini-game Website Builder bermuatan uang.",2,15,0,function(){setTimeout(function(){miniWeb(true);},0);return "";}));
+    a.push(A("Riset Ide Startup","+Leadership +Networking",1,10,0,function(){return gain({lead:3,net:2});}));
+    a.push(A("Magang Part-time","Hanya semester 5 ke atas. Gaji + pengalaman.",3,22,0,function(){S.stats.intern=(S.stats.intern||0)+1;return "Kamu magang. "+gain({money:1200000+S.skills.prog*10000,prog:3,net:2,rep:3});},function(){return S.sem>=5;}));
+    a.push(A("Interview Kerja dengan HR","Latihan interview. +Komunikasi +Leadership",1,8,0,function(){S.stats.interview=(S.stats.interview||0)+1;return gain({kom:3,lead:2,rep:2});},function(){return S.sem>=4;}));
+  }
+  if(L==="gam"){
+    a.push(A("Membuat Game Prototipe","+Programming +UI/UX",2,15,0,function(){S.stats.games=(S.stats.games||0)+1;return gain({prog:3,ux:3});}));
+    a.push(A("Playtest Game Teman","+UI/UX +Networking",1,6,0,function(){return gain({ux:2,net:1});}));
+    a.push(A("Jual Game di Marketplace","Dapat uang jika sudah punya prototipe.",1,8,0,function(){return "Game terjual! "+gain({money:150000+S.skills.ux*8000,rep:2});},function(){return (S.stats.games||0)>=1;}));
+  }
+  if(L==="air"){
+    a.push(A("Eksperimen Model AI","+AI +Problem Solving",1,14,0,function(){return gain({ai:4,ps:1});}));
+    a.push(A("Training Neural Network","Butuh energi. +AI besar",2,20,0,function(){return gain({ai:7,db:1});}));
+  }
+  if(L==="dorm"){
+    a.push(A("Tidur","Pulihkan energi. Kasur ergonomis menambah pemulihan.",2,0,0,function(){S.stats.sleeps++;return gain({energy:55+itemSum("sleep")});}));
+    a.push(A("Tidur Siang Singkat","+25 energi",1,0,0,function(){return gain({energy:25});}));
+    a.push(A("Belajar di Kamar","Skill acak, komputer pribadi",1,8,0,function(){var k=Object.keys(SKILLS)[rnd(0,5)];var o={};o[k]=Math.round(3*(1+itemSum("dormstudy")));return gain(o);}));
+    a.push(A("Undang Teman","Rp40.000 snack. +Networking +Kerja Sama +energi",1,0,40000,function(){return gain({net:2,team:2,energy:10});}));
+    a.push(A("Dekorasi Kamar","Lihat toko untuk upgrade fasilitas.",0,0,0,function(){setTimeout(function(){setTab("shop");},0);return "";}));
+  }
+  return a;
+}
+function runLocAction(i){
+  var act=locActions()[i];if(!act)return;
+  if(act.cond&&!act.cond()){toast("Syarat belum terpenuhi.",true);return;}
+  if(act.cost>S.money){toast("Uang tidak cukup.",true);return;}
+  if(!canAct(act.ap,act.en))return;
+  S.money-=act.cost;spend(act.ap,act.en);
+  var r=act.fn();
+  if(r)log("▶ "+act.label+": "+r);
+  afterAct();
+}
+function talkNpc(){
+  var n=NPCS[LOC];var line=n.l[rnd(0,n.l.length-1)];
+  var extra="";
+  if(n.t==="RAJIN"){extra="<div class='row'><button class='btn' onclick='npcHelp()'>Belajar Bareng (1 waktu)</button></div>";}
+  if(n.t==="RIVAL"){extra="<div class='row'><button class='btn dng' onclick='rival()'>Tantang Duel Coding</button></div>";}
+  if(n.t==="SANTAI"){extra="<div class='row'><button class='btn' onclick='npcChill()'>Nongkrong (1 waktu, -Rp30.000)</button></div>";}
+  if(n.t==="HR"){extra="<div class='row'><button class='btn' onclick='hrOpp()'>Tanya Peluang Karier</button></div>";}
+  showModal("<div class='npc'><div class='av'>"+n.av+"</div><div><b>"+n.n+"</b><div class='tag'>"+n.t+"</div></div></div><p>\""+esc(line)+"\"</p>"+extra+"<div class='row'><button class='btn' onclick='closeModal()'>Tutup</button></div>");
+}
+function npcHelp(){closeModal();if(!canAct(1,6))return;spend(1,6);var c=cc()[rnd(0,cc().length-1)];var d=S.courses[c.id];d.m=clamp(d.m+10,0,100);log("🧑‍🎓 Belajar bareng Rani: "+c.name+" +10. "+gain({kom:1,net:1}));afterAct();}
+function npcChill(){closeModal();if(S.money<30000){toast("Uang kurang.",true);return;}if(!canAct(1,0))return;S.money-=30000;spend(1,0);log("😎 Nongkrong: "+gain({energy:20,kom:2,net:1}));afterAct();}
+function rival(){
+  closeModal();
+  var qs=pick(QB.alg,3);
+  runQuiz("Duel Coding vs Kevin",qs,function(ok,tot){
+    if(!canAct(1,12))return;spend(1,12);
+    if(ok>=2){log("🏅 Menang duel! "+gain({rep:6,ps:3,money:100000}));}else{log("😓 Kalah duel. "+gain({ps:1,rep:-1}));}
+    afterAct();
+  });
+}
+function hrOpp(){
+  var m=Object.keys(JOBS).map(function(k){var j=JOBS[k];return "<tr><td>"+j.ic+" "+j.n+"</td><td>"+rp(j.sal)+"</td><td>"+j.need+"</td></tr>";}).join("");
+  showModal("<h3 class='orb'>Peluang Karier</h3><table><tr><th>Posisi</th><th>Gaji awal</th><th>Skill</th></tr>"+m+"</table><p class='muted' style='margin-top:8px'>Internship tersedia di Startup Incubator mulai semester 5.</p><div class='row'><button class='btn' onclick='closeModal()'>Tutup</button></div>");
+}
+
+/* ================== EVENTS / COMPETITIONS ================== */
+function currentEvent(){
+  if(S.graduated)return null;
+  var w=S.week,k;
+  if(S.sem>=2&&w===6)k={id:"hack",n:"Hackathon Nasional",skill:["prog","ps"],pr:3000000};
+  else if(S.sem>=3&&w===11)k={id:"aic",n:"Kompetisi AI",skill:["ai","ps"],pr:3500000};
+  else if(S.sem>=3&&w===14)k={id:"cyb",n:"Cyber Security Competition",skill:["sec","ps"],pr:3500000};
+  else return null;
+  var key=k.id+"_"+S.sem;if(S.evDone[key])return null;k.key=key;return k;
+}
+function joinCompetition(ev){
+  if(!ev)return "";
+  S.evDone[ev.key]=true;S.stats.comps++;
+  var sc=(S.skills[ev.skill[0]]+S.skills[ev.skill[1]])/2+S.soc.team/4+rnd(0,35);
+  var place=sc>=75?1:sc>=55?2:sc>=40?3:0;
+  var txt="";
+  if(place){var pm=Math.round(ev.pr/place);txt="Juara "+place+"! "+gain({money:pm,rep:place===1?25:place===2?15:8,net:3});if(place===1)S.stats.wins=(S.stats.wins||0)+1;}
+  else txt="Belum menang, tetapi pengalaman bertambah. "+gain({rep:2,ps:2});
+  setTimeout(function(){showModal("<div class='big'>🏆</div><h3 class='orb' style='text-align:center'>"+ev.n+"</h3><p style='text-align:center;margin:8px 0'>"+esc(txt)+"</p><div class='row'><button class='btn pri' onclick='closeModal()'>OK</button></div>");},0);
+  return txt;
+}
+
+/* ================== MINIGAMES ================== */
+function pick(arr,n){var a=arr.slice(),o=[];while(o.length<n&&a.length)o.push(a.splice(rnd(0,a.length-1),1)[0]);return o;}
+var QB={
+ dbg:[
+  {q:"Kode ini seharusnya menjumlahkan 1..n. Apa bug-nya?",code:"function sum(n){\n  let t=0;\n  for(let i=1;i<n;i++){ t+=i; }\n  return t;\n}",o:["Seharusnya i<=n","Seharusnya let t=1","return di dalam loop","Tidak ada bug"],a:0},
+  {q:"Kode ini menyebabkan error saat dijalankan. Mengapa?",code:"let nama = 'Budi';\nconsole.log(Nama);",o:["JavaScript case-sensitive: Nama != nama","Kurang titik koma","String harus pakai tanda kutip dua","console.log salah"],a:0},
+  {q:"Kondisi ini selalu benar. Perbaikannya?",code:"let x = 5;\nif (x = 10) {\n  console.log('sepuluh');\n}",o:["Pakai x === 10","Pakai x =< 10","Hapus if","Pakai x := 10"],a:0},
+  {q:"Program ini loop tak terbatas. Penyebabnya?",code:"let i = 0;\nwhile (i < 5) {\n  console.log(i);\n}",o:["Lupa i++","Seharusnya for","Kurang var","console.log salah"],a:0},
+  {q:"Python: apa bug-nya?",code:"def halo(nama):\nprint('Halo '+nama)",o:["Kurang indentasi pada body fungsi","Kurang kurung kurawal","def harus function","Kurang titik koma"],a:0},
+  {q:"Array [1,2,3]. Output arr[3]?",code:"const arr=[1,2,3];\nconsole.log(arr[3]);",o:["undefined (indeks mulai 0)","3","1","Error sintaks"],a:0}
+ ],
+ alg:[
+  {q:"Kompleksitas waktu binary search pada array terurut?",o:["O(log n)","O(n)","O(n log n)","O(1)"],a:0},
+  {q:"Algoritma sorting yang membandingkan pasangan bersebelahan berulang?",o:["Bubble sort","Binary search","Quick select","Hashing"],a:0},
+  {q:"Struktur data LIFO adalah?",o:["Stack","Queue","Tree","Graph"],a:0},
+  {q:"Pada flowchart, belah ketupat melambangkan?",o:["Keputusan","Proses","Mulai/selesai","Input/output"],a:0},
+  {q:"Logika: jika A dan B benar, A AND B bernilai?",o:["Benar","Salah","Tidak tentu","Null"],a:0},
+  {q:"Pencarian satu per satu dari awal disebut?",o:["Linear search","Binary search","Hash search","Jump search"],a:0}
+ ],
+ db:[
+  {q:"Perintah membuat tabel baru?",o:["CREATE TABLE","MAKE TABLE","NEW TABLE","ADD TABLE"],a:0},
+  {q:"Query ambil semua mahasiswa dengan IPK > 3.5?",code:"SELECT * FROM mahasiswa ...",o:["WHERE ipk > 3.5","IF ipk > 3.5","HAVING ipk","FILTER ipk>3.5"],a:0},
+  {q:"Menghubungkan dua tabel berdasarkan kunci yang sama?",o:["JOIN","MERGE TABLE","LINK","CONNECT"],a:0},
+  {q:"Kunci unik pengenal baris disebut?",o:["Primary key","Foreign key","Index key","Secret key"],a:0},
+  {q:"Menambah data baru ke tabel?",o:["INSERT INTO","ADD ROW","PUT INTO","APPEND"],a:0},
+  {q:"Menghitung jumlah baris?",code:"SELECT ____(*) FROM mahasiswa;",o:["COUNT","SUM","TOTAL","LEN"],a:0}
+ ],
+ sec:[
+  {q:"Serangan memasukkan perintah SQL lewat input form disebut?",o:["SQL Injection","Phishing","DDoS","Spoofing"],a:0},
+  {q:"Cara terbaik mencegah SQL Injection?",o:["Prepared statement","Menyembunyikan form","Memperbesar font","Menghapus database"],a:0},
+  {q:"Password sebaiknya disimpan dengan?",o:["Hash + salt","Teks biasa","Base64","Kolom tersembunyi"],a:0},
+  {q:"Serangan membanjiri server dengan trafik?",o:["DDoS","XSS","CSRF","MITM"],a:0}
+ ]
+};
+function finishGame(name,ok,tot,rw,ap,en){
+  // rw: reward object scaled by accuracy
+  var r=tot?ok/tot:0;
+  var o={};for(var k in rw){o[k]=Math.max(0,Math.round(rw[k]*r));}
+  var t=gain(o);S.stats.games++;S.stats.mg=(S.stats.mg||0)+1;
+  if(ok===tot)S.stats.perfect=(S.stats.perfect||0)+1;
+  log("🎮 "+name+": "+ok+"/"+tot+" benar. "+t);
+  afterAct();
+}
+function startMini(kind){
+  var info={dbg:[1,12],alg:[1,12],web:[2,15],db:[1,12],sec:[1,12]}[kind];
+  if(!canAct(info[0],info[1]))return;
+  spend(info[0],info[1]);
+  if(kind==="dbg")runQuiz("Debugging Challenge",pick(QB.dbg,3),function(o,t){finishGame("Debugging",o,t,{prog:5,ps:3,money:90000},0,0);},true);
+  if(kind==="alg")miniSort();
+  if(kind==="web")miniWeb(false);
+  if(kind==="db")runQuiz("Database Challenge",pick(QB.db,3),function(o,t){finishGame("Database",o,t,{db:6,ps:2,money:90000},0,0);},true);
+  if(kind==="sec")miniSec();
+}
+function runQuiz(title,qs,done,noSpend){
+  var i=0,ok=0;
+  function show(){
+    var q=qs[i];
+    var order=q.o.map(function(t,idx){return {t:t,c:idx===q.a};});
+    order.sort(function(){return Math.random()-.5;});
+    var h="<h3 class='orb'>"+esc(title)+" ("+(i+1)+"/"+qs.length+")</h3><p style='margin:10px 0'>"+esc(q.q)+"</p>";
+    if(q.code)h+="<pre class='code'>"+esc(q.code)+"</pre>";
+    h+=order.map(function(o,idx){return "<button class='opt' data-i='"+idx+"'>"+esc(o.t)+"</button>";}).join("");
+    showModal(h);
+    var btns=document.querySelectorAll("#mbox .opt");
+    btns.forEach(function(b){b.onclick=function(){
+      var o=order[+b.dataset.i];
+      btns.forEach(function(x){x.disabled=true;if(order[+x.dataset.i].c)x.classList.add("ok");});
+      if(o.c)ok++;else b.classList.add("bad");
+      setTimeout(function(){i++;if(i<qs.length)show();else{closeModal();done(ok,qs.length);}},900);
+    };});
+  }
+  show();
+}
+function miniSort(){
+  var arr=[];while(arr.length<6){var v=rnd(1,60);if(arr.indexOf(v)<0)arr.push(v);}
+  var sorted=arr.slice().sort(function(a,b){return a-b;});var step=0,err=0;
+  function draw(){
+    showModal("<h3 class='orb'>Algorithm Puzzle: Sorting</h3><p class='muted'>Klik angka dari yang terkecil ke terbesar.</p><div class='nums'>"+arr.map(function(v,i){return "<button class='num' data-i='"+i+"'>"+v+"</button>";}).join("")+"</div><p id='sinfo' class='muted'>Kesalahan: 0</p>");
+    document.querySelectorAll("#mbox .num").forEach(function(b){b.onclick=function(){
+      var v=arr[+b.dataset.i];
+      if(v===sorted[step]){b.classList.add("done");step++;if(step>=sorted.length){closeModal();runQuiz("Algorithm Puzzle: Logika",pick(QB.alg,2),function(o,t){var tot=t+1;var okAll=o+(err<=1?1:0);finishGame("Algorithm Puzzle",okAll,tot,{ps:6,prog:3,money:80000},0,0);});}}
+      else{err++;$("sinfo").textContent="Kesalahan: "+err;}
+    };});
+  }
+  draw();
+}
+function miniWeb(forClient){
+  var h="<h3 class='orb'>Website Builder</h3><p class='muted'>Pilih template, atur HTML, CSS, dan JavaScript.</p>"+
+  "<div class='sec'>TEMPLATE</div><select id='wt'><option>Portfolio</option><option>Toko Online</option><option>Blog Teknologi</option></select>"+
+  "<div class='sec'>HTML — tag judul utama</div><select id='wh'><option value='x'>&lt;div&gt;Judul&lt;/div&gt;</option><option value='h1'>&lt;h1&gt;Judul&lt;/h1&gt;</option><option value='b'>&lt;b&gt;Judul&lt;/b&gt;</option></select>"+
+  "<div class='sec'>CSS — agar teks di tengah</div><select id='wc'><option value='x'>float:center</option><option value='ok'>text-align:center</option><option value='y'>align:middle</option></select>"+
+  "<div class='sec'>JavaScript — klik tombol mengubah teks</div><select id='wj'><option value='x'>button.onclick=text</option><option value='ok'>button.addEventListener('click',fn)</option><option value='y'>button.click=fn()</option></select>"+
+  "<div class='sec'>WARNA TEMA</div><select id='wk'><option value='#2ea6ff'>Biru neon</option><option value='#a15cff'>Ungu</option><option value='#2dff9a'>Hijau</option></select>"+
+  "<div class='row'><button class='btn pri' id='wgo'>Publikasikan</button></div><div id='wp'></div>";
+  showModal(h);
+  $("wgo").onclick=function(){
+    var ok=0;if($("wh").value==="h1")ok++;if($("wc").value==="ok")ok++;if($("wj").value==="ok")ok++;
+    var col=$("wk").value;
+    $("wp").innerHTML="<div class='preview' style='background:#0a0d26;border-color:"+col+"'><h2 style='color:"+col+";text-align:center'>"+esc($("wt").value)+"</h2><p class='muted'>Skor kualitas: "+ok+"/3</p></div><div class='row'><button class='btn pri' id='wdone'>Selesai</button></div>";
+    $("wdone").onclick=function(){
+      closeModal();
+      if(forClient){
+        var pay=Math.round((300000+S.skills.prog*15000+S.skills.ux*10000)*(ok/3)/1000)*1000;S.stats.freelance++;
+        log("🌐 Website klien: "+ok+"/3. "+gain({money:pay,ux:2,prog:2}));afterAct();
+      } else finishGame("Website Builder",ok,3,{prog:4,ux:5,money:120000},0,0);
+    };
+  };
+}
+function miniSec(){
+  var lines=[
+   {t:"query = \"SELECT * FROM users WHERE id=\"+input;",v:true},
+   {t:"password = md5(plain)  // tanpa salt",v:true},
+   {t:"app.use(helmet());",v:false},
+   {t:"db.prepare('SELECT * FROM u WHERE id=?').run(id);",v:false},
+   {t:"document.innerHTML = userComment;",v:true},
+   {t:"const token = crypto.randomBytes(32);",v:false},
+   {t:"Allow: ssh root login password=admin123",v:true},
+   {t:"if(!isAuth(user)) return 403;",v:false}
+  ];
+  var sel={};
+  var h="<h3 class='orb'>Cyber Security Mission</h3><p class='muted'>Temukan 4 baris yang mengandung vulnerability, lalu periksa.</p>"+lines.map(function(l,i){return "<button class='vul' data-i='"+i+"'>"+esc(l.t)+"</button>";}).join("")+"<div class='row'><button class='btn pri' id='sgo'>Periksa</button></div>";
+  showModal(h);
+  document.querySelectorAll("#mbox .vul").forEach(function(b){b.onclick=function(){var i=b.dataset.i;if(sel[i]){delete sel[i];b.classList.remove("sel");}else{sel[i]=1;b.classList.add("sel");}};});
+  $("sgo").onclick=function(){
+    var ok=0,bad=0;
+    document.querySelectorAll("#mbox .vul").forEach(function(b){var l=lines[+b.dataset.i];b.disabled=true;
+      if(l.v&&sel[b.dataset.i]){ok++;b.classList.add("ok");}else if(!l.v&&sel[b.dataset.i]){bad++;b.classList.add("bad");}else if(l.v){b.classList.add("bad");}});
+    var score=Math.max(0,ok-bad);
+    setTimeout(function(){closeModal();runQuiz("Lindungi Sistem",pick(QB.sec,2),function(o,t){finishGame("Cyber Security Mission",score>=3?o+2:(score>=2?o+1:o),t+2,{sec:7,ps:2,money:100000},0,0);});},1400);
+  };
+}
+
+/* ================== QUESTS ================== */
+var QUESTS=[
+ {id:"q1",t:"Hadiri kelas pemrograman pertama",k:"Akademik",test:function(s){return s.stats.classes>=1;},rw:{money:100000,rep:2}},
+ {id:"q2",t:"Selesaikan tugas Python (1 tugas kuliah)",k:"Akademik",test:function(s){return s.stats.tasks>=1;},rw:{money:150000,prog:2}},
+ {id:"q3",t:"Buat website pertama (Website Builder)",k:"Akademik",test:function(s){return (s.stats.mg||0)>=1||s.stats.freelance>=1;},rw:{money:200000,ux:2}},
+ {id:"q4",t:"Presentasikan proyek di Auditorium",k:"Akademik",test:function(s){return (s.stats.pres||0)>=1;},rw:{money:200000,kom:3}},
+ {id:"q5",t:"Bergabung organisasi mahasiswa",k:"Sosial",test:function(s){return s.orgs.length>=1;},rw:{rep:5,net:2}},
+ {id:"q6",t:"Bantu teman coding",k:"Sosial",test:function(s){return s.stats.helped>=1;},rw:{rep:4,kom:2}},
+ {id:"q7",t:"Bentuk dan selesaikan proyek kelompok",k:"Sosial",test:function(s){return (s.stats.groups||0)>=1;},rw:{money:300000,team:3}},
+ {id:"q8",t:"Buat portfolio (selesaikan 3 mini-game)",k:"Karier",test:function(s){return (s.stats.mg||0)>=3;},rw:{money:300000,rep:5}},
+ {id:"q9",t:"Ikuti internship",k:"Karier",test:function(s){return (s.stats.intern||0)>=1;},rw:{money:500000,rep:8}},
+ {id:"q10",t:"Ikuti hackathon atau kompetisi",k:"Karier",test:function(s){return s.stats.comps>=1;},rw:{money:400000,rep:6,ps:3}},
+ {id:"q11",t:"Dapat pekerjaan freelance pertama",k:"Karier",test:function(s){return s.stats.freelance>=1;},rw:{money:200000,prog:2}},
+ {id:"q12",t:"Capai IPK 3.5 setelah 2 semester",k:"Akademik",test:function(s){return s.hist.length>=7&&gpa()>=3.5;},rw:{money:1000000,rep:10}}
+];
+function checkQuests(){
+  QUESTS.forEach(function(q){
+    if(!S.quests[q.id]&&q.test(S)){S.quests[q.id]=true;var t=gain(q.rw);log("📜 Quest selesai: "+q.t+" ("+t+")");toast("Quest selesai: "+q.t);}
+  });
+}
+var BADGES=[
+ {id:"b1",n:"Mahasiswa Baru",ic:"🎒",t:function(s){return s.stats.classes>=1;}},
+ {id:"b2",n:"Rajin Kuliah",ic:"📘",t:function(s){return s.stats.classes>=20;}},
+ {id:"b3",n:"Tugas Master",ic:"✅",t:function(s){return s.stats.tasks>=10;}},
+ {id:"b4",n:"Coder Handal",ic:"💻",t:function(s){return s.skills.prog>=50;}},
+ {id:"b5",n:"AI Whisperer",ic:"🧠",t:function(s){return s.skills.ai>=50;}},
+ {id:"b6",n:"Cyber Guardian",ic:"🛡️",t:function(s){return s.skills.sec>=50;}},
+ {id:"b7",n:"Juara Kompetisi",ic:"🥇",t:function(s){return (s.stats.wins||0)>=1;}},
+ {id:"b8",n:"Sultan Kampus",ic:"💰",t:function(s){return s.money>=10000000;}},
+ {id:"b9",n:"Populer",ic:"🌟",t:function(s){return s.rep>=100;}},
+ {id:"b10",n:"Cum Laude",ic:"🎓",t:function(s){return s.graduated&&gpa()>=3.5;}},
+ {id:"b11",n:"Si Sempurna",ic:"💯",t:function(s){return (s.stats.perfect||0)>=3;}},
+ {id:"b12",n:"Freelancer",ic:"🧾",t:function(s){return s.stats.freelance>=5;}}
+];
+function checkBadges(){BADGES.forEach(function(b){if(S.badges.indexOf(b.id)<0&&b.t(S)){S.badges.push(b.id);toast("Badge baru: "+b.ic+" "+b.n);log("🏅 Achievement: "+b.n);}});}
+
+/* ================== CAREER ================== */
+function jobScore(k){return Math.round(JOBS[k].f(S));}
+function chooseCareer(k){
+  if(S.career)return;
+  S.career=k;S.clvl=0;S.cxp=0;log("💼 Kamu menjadi "+JOBS[k].n+"!");toast("Selamat bekerja sebagai "+JOBS[k].n);save();render();
+}
+function salary(){var j=JOBS[S.career];return Math.round(j.sal*(1+S.clvl*.55)*(0.8+jobScore(S.career)/200));}
+function work(){
+  var j=JOBS[S.career];
+  var chal=j.ch[rnd(0,j.ch.length-1)];
+  var qs=[{q:"Tantangan kerja: "+chal+". Bagaimana responsmu?",o:["Analisis masalah, prioritaskan, lalu komunikasikan ke tim","Abaikan sampai ada yang komplain","Salahkan rekan kerja","Matikan notifikasi"],a:0}];
+  runQuiz("Bulan Kerja: "+j.n,qs,function(ok){
+    S.months++;var sal=salary();
+    if(ok){S.money+=sal;S.cxp+=2+Math.round(jobScore(S.career)/40);S.rep+=2;log("💵 Bulan "+S.months+": gaji "+rp(sal)+" dan tantangan berhasil diatasi.");}
+    else{S.money+=Math.round(sal*.6);S.cxp+=1;log("💵 Bulan "+S.months+": tantangan gagal, gaji dipotong ("+rp(sal*.6)+").");}
+    var need=[0,6,14,26,42];
+    if(S.clvl<4&&S.cxp>=need[S.clvl+1]){S.clvl++;toast("Naik jabatan: "+LVLS[S.clvl]+" "+j.n);log("📈 Promosi menjadi "+LVLS[S.clvl]+" "+j.n+"!");}
+    S.energy=clamp(S.energy+15,0,100);save();render();
+  });
+}
+
+/* ================== RENDERERS ================== */
+function bar(label,val,max,cls){return "<div class='bar "+(cls||"")+"'><span>"+label+" <b>"+Math.round(val)+"/"+max+"</b></span><div class='t'><i style='width:"+Math.min(100,val/max*100)+"%'></i></div></div>";}
+function timeOfDay(){var u=10-S.ap;return u<=1?"🌅 Pagi":u<=4?"☀️ Siang":u<=6?"🌇 Sore":"🌙 Malam";}
+function renderHud(){
+  var tod=timeOfDay();
+  $("hud").innerHTML=
+   "<span class='chip'>👤 <b>"+esc(S.name)+"</b> · "+S.nim+"</span>"+
+   "<span class='chip'>"+(S.graduated?"🎓 Lulus":"Semester <b>"+S.sem+"</b> · Minggu <b>"+S.week+"</b>")+"</span>"+
+   "<span class='chip'>"+tod+"</span>"+
+   "<span class='chip'>IPK <b>"+gpa().toFixed(2)+"</b></span>"+
+   "<span class='chip'>💰 <b>"+rp(S.money)+"</b></span>"+
+   "<span class='chip'>⭐ <b>"+S.rep+"</b></span>";
+  $("bars").innerHTML=bar("⚡ Energi",S.energy,100,"en")+bar("⏱ Waktu minggu ini",S.ap,10,"ap")+bar("📆 Progress semester",S.graduated?16:Math.min(16,S.week-1),16,"sm")+bar("🎯 Quest",Object.keys(S.quests).length,QUESTS.length);
+  var dark=S.ap<=3?"brightness(.85) hue-rotate(10deg)":"none";document.body.style.filter=dark;
+}
+function renderLog(){$("log").innerHTML=S.log.map(function(l){return "<div>"+esc(l)+"</div>";}).join("")||"<div>Selamat datang di kampus!</div>";}
+var TABS=[["dash","📊 Dashboard"],["map","🗺️ Peta Kampus"],["class","🎓 Kuliah"],["skill","🧬 Skill"],["mini","🧩 Mini-Game"],["quest","📜 Quest"],["org","🤝 Organisasi"],["shop","🛒 Toko"],["career","💼 Karier"],["social","🌐 Multiplayer"],["rank","🏅 Prestasi"]];
+function setTab(t){TAB=t;render();}
+function renderTabs(){$("tabs").innerHTML=TABS.map(function(t){return "<button class='"+(t[0]===TAB?"on":"")+"' onclick='setTab(\""+t[0]+"\")'>"+t[1]+"</button>";}).join("");}
+function render(){renderHud();renderTabs();renderLog();var v=$("view");var f=VIEWS[TAB];v.innerHTML=f();if(TAB==="social")bindChat();}
+var VIEWS={
+ dash:function(){
+  var ev=currentEvent();
+  var h="";
+  if(ev)h+="<div class='event'>🔔 EVENT MINGGU INI: <b>"+ev.n+"</b>. Datang ke Hackathon Arena untuk berpartisipasi!</div>";
+  if(S.week===8&&!S.graduated)h+="<div class='event'>📝 UTS dilaksanakan setelah minggu ini. Pastikan penguasaan materi tinggi.</div>";
+  if(S.week===16&&!S.graduated)h+="<div class='event'>📝 Minggu terakhir: UAS dilaksanakan setelah ini.</div>";
+  h+="<div class='grid g2'><div class='card'><h3>👤 PROFIL MAHASISWA</h3><p>Nama: <b>"+esc(S.name)+"</b><br>NIM: "+S.nim+"<br>Jurusan: Informatika<br>Semester: "+(S.graduated?"Lulus":S.sem)+"<br>IPK: <b>"+gpa().toFixed(2)+"</b><br>Uang: "+rp(S.money)+"<br>Energi: "+S.energy+"/100<br>Reputasi: "+S.rep+"</p>"+(S.career?"<p style='margin-top:6px'>Karier: <b>"+JOBS[S.career].ic+" "+LVLS[S.clvl]+" "+JOBS[S.career].n+"</b></p>":"")+"</div>";
+  h+="<div class='card'><h3>🗓️ JADWAL KULIAH SEMESTER INI</h3>";
+  if(S.graduated)h+="<p>Kamu sudah lulus. Fokus pada karier!</p>";
+  else cc().forEach(function(c,i){var d=S.courses[c.id];h+="<p>"+["Senin","Selasa","Rabu","Kamis","Jumat"][i%5]+" · <b>"+c.name+"</b> ("+c.dosen+") — hadir "+d.att+"/16</p>";});
+  h+="</div></div>";
+  h+="<div class='sec'>SKILL TEKNOLOGI</div><div class='grid g3'>"+Object.keys(SKILLS).map(function(k){return "<div class='card'><p>"+SKILLS[k]+" <b>Lv."+S.skills[k]+"</b></p><div class='mini'><i style='width:"+S.skills[k]+"%'></i></div></div>";}).join("")+"</div>";
+  h+="<div class='sec'>QUEST AKTIF</div>"+QUESTS.filter(function(q){return !S.quests[q.id];}).slice(0,4).map(function(q){return "<div class='card' style='margin-bottom:6px'><p>["+q.k+"] "+q.t+"</p></div>";}).join("")||"<p class='muted'>Semua quest selesai!</p>";
+  h+="<div class='row'><button class='btn' onclick='manualSleep()'>⏭ Lewati Minggu</button><button class='btn dng' onclick='resetGame()'>Reset Game</button></div>";
+  return h;
+ },
+ map:function(){
+  var h="<p class='muted'>Kamu berada di: <b style='color:var(--green)'>"+LOCS[LOC].ic+" "+LOCS[LOC].n+"</b> · "+timeOfDay()+"</p><div class='sec'>PETA KAMPUS FUTURISTIK</div><div class='map'>";
+  for(var k in LOCS){var l=LOCS[k];h+="<button class='loc "+(k===LOC?"here":"")+"' onclick='goLoc(\""+k+"\")'><div class='ic'>"+l.ic+"</div><b>"+l.n+"</b><span>"+l.d+"</span><div class='zone'>"+l.z+"</div></button>";}
+  h+="</div><div class='sec'>AKTIVITAS DI "+LOCS[LOC].n.toUpperCase()+"</div>";
+  var n=NPCS[LOC];
+  h+="<div class='npc'><div class='av'>"+n.av+"</div><div style='flex:1'><b>"+n.n+"</b> <span class='tag'>"+n.t+"</span></div><button class='btn' onclick='talkNpc()'>Bicara</button></div>";
+  h+="<div class='grid g2'>"+locActions().map(function(a,i){
+    var lock=a.cond&&!a.cond();
+    return "<div class='card'><h3>"+a.label+"</h3><p>"+a.desc+"</p><div class='row'><span class='tag'>⏱ "+a.ap+"</span><span class='tag g'>⚡ -"+a.en+"</span>"+(a.cost?"<span class='tag y'>"+rp(a.cost)+"</span>":"")+"<button class='btn pri' "+(lock?"disabled":"")+" onclick='runLocAction("+i+")'>Lakukan</button></div></div>";}).join("")+"</div>";
+  return h;
+ },
+ class:function(){
+  if(S.graduated)return "<p>Kamu sudah lulus. Selamat!</p>"+histTable();
+  var h="<div class='sec'>MATA KULIAH SEMESTER "+S.sem+"</div><p class='muted'>Hadir di kelas butuh lokasi Gedung Fakultas. Kamu sekarang di "+LOCS[LOC].n+".</p><div class='grid g2' style='margin-top:10px'>";
+  cc().forEach(function(c){var d=S.courses[c.id];
+   h+="<div class='card'><h3>"+c.name+"</h3><p>👨‍🏫 "+c.dosen+" · Materi: "+c.materi.join(", ")+"</p><div class='mini'><i style='width:"+d.m+"%'></i></div><p>Penguasaan "+d.m+"% · Hadir "+d.att+"/16 · Tugas "+d.tk+"/3</p><p>UTS: "+(d.uts===null?"-":d.uts)+" · UAS: "+(d.uas===null?"-":d.uas)+"</p><div class='row'><button class='btn' onclick='attend(\""+c.id+"\")'>Hadiri Kelas</button><button class='btn' onclick='doTask(\""+c.id+"\")'>Kerjakan Tugas</button><button class='btn' onclick='studyCourse(\""+c.id+"\")'>Belajar</button></div></div>";});
+  h+="</div><div class='sec'>RIWAYAT NILAI</div>"+histTable();
+  return h;
+ },
+ skill:function(){
+  var h="<div class='sec'>SKILL TEKNOLOGI (1-100)</div><div class='grid g3'>"+Object.keys(SKILLS).map(function(k){return "<div class='card'><h3>"+SKILLS[k]+"</h3><p>Level "+S.skills[k]+"</p><div class='mini'><i style='width:"+S.skills[k]+"%'></i></div></div>";}).join("")+"</div>";
+  h+="<div class='sec'>SKILL SOSIAL</div><div class='grid g3'>"+Object.keys(SOCIAL).map(function(k){return "<div class='card'><h3>"+SOCIAL[k]+"</h3><p>Level "+S.soc[k]+"</p><div class='mini'><i style='width:"+S.soc[k]+"%'></i></div></div>";}).join("")+"</div>";
+  h+="<div class='sec'>STATUS AKADEMIK</div><div class='card'><p>Kelas dihadiri: "+S.stats.classes+" · Tugas selesai: "+S.stats.tasks+" · IPK: "+gpa().toFixed(2)+"</p></div>";
+  return h;
+ },
+ mini:function(){
+  var g=[["dbg","🐞 Debugging Challenge","Cari bug dan pilih perbaikan kode. +Programming",1],["alg","🧮 Algorithm Puzzle","Sorting, searching, logika, flowchart. +Problem Solving",1],["web","🌐 Website Builder","Pilih template, HTML, CSS, JavaScript. +UI/UX",2],["db","🗄️ Database Challenge","Tabel, query, JOIN. +Database",1],["sec","🛡️ Cyber Security Mission","Temukan vulnerability dan lindungi sistem. +Security",1]];
+  return "<div class='sec'>MINI GAME PEMROGRAMAN</div><div class='grid g2'>"+g.map(function(x){return "<div class='card'><h3>"+x[1]+"</h3><p>"+x[2]+"</p><div class='row'><span class='tag'>⏱ "+x[3]+"</span><button class='btn pri' onclick='startMini(\""+x[0]+"\")'>Mulai</button></div></div>";}).join("")+"</div>";
+ },
+ quest:function(){
+  var ks=["Akademik","Sosial","Karier"];
+  return ks.map(function(k){return "<div class='sec'>QUEST "+k.toUpperCase()+"</div>"+QUESTS.filter(function(q){return q.k===k;}).map(function(q){var d=S.quests[q.id];return "<div class='card' style='margin-bottom:8px'><p>"+(d?"✅":"⬜")+" <b>"+q.t+"</b></p></div>";}).join("");}).join("");
+ },
+ org:function(){
+  var h="<div class='sec'>ORGANISASI & KOMUNITAS</div><div class='grid g2'>"+Object.keys(ORGS).map(function(k){var o=ORGS[k];var j=S.orgs.indexOf(k)>=0;return "<div class='card'><h3>"+o.n+"</h3><p>"+o.desc+"</p><div class='row'>"+(j?"<span class='tag g'>Anggota</span>":"<span class='tag y'>Biaya "+rp(o.cost)+"</span>")+"</div></div>";}).join("")+"</div><p class='muted' style='margin-top:10px'>Gabung & ikut kegiatan di Student Center (tab Peta).</p>";
+  return h;
+ },
+ shop:function(){
+  return "<div class='sec'>TOKO TEKNOLOGI & UPGRADE KAMAR</div><div class='grid g3'>"+SHOP.map(function(it){
+   var own=S.items.indexOf(it.id)>=0;var lock=it.req&&S.items.indexOf(it.req)<0;
+   return "<div class='card'><h3>"+it.n+"</h3><p>"+it.d+"</p><div class='row'><span class='tag y'>"+rp(it.p)+"</span><button class='btn pri' "+((own||lock)?"disabled":"")+" onclick='buy(\""+it.id+"\")'>"+(own?"Dimiliki":lock?"Butuh laptop sebelumnya":"Beli")+"</button></div></div>";}).join("")+"</div>";
+ },
+ career:function(){
+  if(!S.graduated&&!S.career)return "<div class='sec'>KARIER SETELAH LULUS</div><p class='muted'>Lulus semester 8 untuk membuka pilihan karier. Preview:</p><div class='grid g3' style='margin-top:10px'>"+Object.keys(JOBS).map(function(k){var j=JOBS[k];return "<div class='card'><h3>"+j.ic+" "+j.n+"</h3><p>Skill utama: "+j.need+"<br>Gaji awal: "+rp(j.sal)+"<br>Kecocokanmu: "+jobScore(k)+"%</p></div>";}).join("")+"</div>";
+  if(!S.career)return "<div class='sec'>PILIH KARIERMU</div><div class='grid g3'>"+Object.keys(JOBS).map(function(k){var j=JOBS[k];return "<div class='card'><h3>"+j.ic+" "+j.n+"</h3><p>Skill utama: "+j.need+"<br>Gaji awal: "+rp(j.sal)+"<br>Kecocokan: <b>"+jobScore(k)+"%</b><br>Tantangan: "+j.ch.join(", ")+"</p><div class='row'><button class='btn pri' onclick='chooseCareer(\""+k+"\")'>Pilih</button></div></div>";}).join("")+"</div>";
+  var j=JOBS[S.career];var need=[0,6,14,26,42,999];
+  return "<div class='sec'>KARIER ANDA</div><div class='card'><h3>"+j.ic+" "+LVLS[S.clvl]+" "+j.n+"</h3><p>Gaji per bulan: <b>"+rp(salary())+"</b><br>Bulan bekerja: "+S.months+"<br>XP karier: "+S.cxp+(S.clvl<4?" / "+need[S.clvl+1]:" (MAX)")+"</p><div class='row'><button class='btn pri' onclick='work()'>Bekerja 1 Bulan</button></div></div>";
+ },
+ social:function(){
+  var online=BOTS.slice(0,5).map(function(b){return "<span class='tag g'>"+b+" 🟢</span>";}).join(" ");
+  return "<div class='sec'>MULTIPLAYER CAMPUS</div><p class='muted'>Online: "+online+" <span class='tag'>Kamu</span></p><p class='muted' style='margin:6px 0'>Chat tersinkron antar tab browser (BroadcastChannel) sehingga bisa dicoba multi-pemain lokal.</p><div class='chat' id='chat'></div><div class='row'><input type='text' id='cin' placeholder='Ketik pesan lalu Enter'><button class='btn pri' id='csend'>Kirim</button></div>";
+ },
+ rank:function(){
+  var me={n:S.name+" (Kamu)",g:gpa(),r:S.rep};
+  var bots=[{n:"Kevin",g:3.82,r:90},{n:"Rani",g:3.75,r:70},{n:"Alya",g:3.55,r:60},{n:"Bima",g:3.2,r:55},{n:"Dito",g:2.8,r:35}];
+  var all=bots.concat([me]).sort(function(a,b){return b.g-a.g||b.r-a.r;});
+  return "<div class='sec'>LEADERBOARD MAHASISWA TERBAIK</div><table><tr><th>#</th><th>Nama</th><th>IPK</th><th>Reputasi</th></tr>"+all.map(function(x,i){return "<tr><td>"+(i+1)+"</td><td>"+esc(x.n)+"</td><td>"+(x.g||0).toFixed(2)+"</td><td>"+x.r+"</td></tr>";}).join("")+"</table><div class='sec'>ACHIEVEMENT BADGE</div><div class='grid g3'>"+BADGES.map(function(b){var h=S.badges.indexOf(b.id)>=0;return "<div class='card' style='opacity:"+(h?1:.4)+"'><h3>"+b.ic+" "+b.n+"</h3><p>"+(h?"Terbuka":"Terkunci")+"</p></div>";}).join("")+"</div>";
+ }
+};
+function histTable(){
+  if(!S.hist.length)return "<p class='muted'>Belum ada nilai.</p>";
+  return "<table><tr><th>Sem</th><th>Mata Kuliah</th><th>Nilai</th><th>Huruf</th></tr>"+S.hist.map(function(h){return "<tr><td>"+h.sem+"</td><td>"+esc(h.name)+"</td><td>"+h.score+"</td><td>"+grade(h.score)+"</td></tr>";}).join("")+"</table>";
+}
+function goLoc(k){LOC=k;S.loc=k;log("🚶 Pergi ke "+LOCS[k].n+".");render();save();}
+function buy(id){
+  var it=SHOP.find(function(x){return x.id===id;});if(!it)return;
+  if(S.money<it.p){toast("Uang tidak cukup.",true);return;}
+  S.money-=it.p;S.items.push(id);
+  if(it.skill)addSkill(it.skill[0],it.skill[1]);
+  if(it.fx==="rep")S.rep+=it.v;
+  log("🛒 Membeli "+it.n+".");toast("Dibeli: "+it.n);checkBadges();save();render();
+}
+function manualSleep(){if(S.graduated&&!S.career){toast("Pilih karier dulu!",true);return;}S.ap=0;log("⏭ Minggu dilewati.");afterAct();}
+function resetGame(){if(confirm("Hapus semua progres dan mulai ulang?")){localStorage.removeItem(KEY);location.reload();}}
+function showModal(h){$("mbox").innerHTML=h;$("modal").classList.add("on");}
+function closeModal(){$("modal").classList.remove("on");}
+
+/* ===== chat / multiplayer ===== */
+var chatLog=[],bc=null;
+try{bc=new BroadcastChannel("informatika_life_chat");bc.onmessage=function(e){addChat(e.data.n,e.data.t,false);};}catch(e){bc=null;}
+function addChat(n,t,me){chatLog.push({n:n,t:t,me:me});if(chatLog.length>60)chatLog.shift();var c=$("chat");if(c){drawChat();}}
+function drawChat(){var c=$("chat");if(!c)return;c.innerHTML=chatLog.map(function(m){return "<p class='"+(m.me?"me":"")+"'><b>"+esc(m.n)+":</b> "+esc(m.t)+"</p>";}).join("");c.scrollTop=c.scrollHeight;}
+function bindChat(){
+  drawChat();
+  var send=function(){var i=$("cin");var t=i.value.trim();if(!t)return;addChat(S.name,t,true);if(bc)bc.postMessage({n:S.name,t:t});i.value="";};
+  $("csend").onclick=send;$("cin").onkeydown=function(e){if(e.key==="Enter")send();};
+}
+setInterval(function(){addChat(BOTS[rnd(0,BOTS.length-1)],BOTMSG[rnd(0,BOTMSG.length-1)],false);},15000);
+
+/* ================== START ================== */
+function intro(){
+  showModal("<h2 class='orb' style='text-align:center;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent'>INFORMATIKA LIFE</h2><p class='muted' style='text-align:center;margin:6px 0 14px'>CAMPUS SIMULATOR · 4 tahun · 8 semester · satu karier</p><div class='big'>🎓</div><p class='muted' style='margin:10px 0'>Atur waktu antara kuliah, tugas, organisasi, kompetisi, dan keuangan. Raih IPK tinggi, kuasai teknologi, lalu pilih kariermu.</p><input type='text' id='nm' placeholder='Nama mahasiswa' maxlength='20'><div class='row'><button class='btn pri' id='st'>Mulai Kuliah</button></div>");
+  $("st").onclick=function(){var n=$("nm").value.trim()||"Mahasiswa Baru";S=newState(n);closeModal();log("🎒 Hari pertama kuliah! Pergi ke Gedung Fakultas untuk hadir di kelas.");LOC="dorm";save();render();};
+}
+window.addEventListener("load",function(){
+  if(load()){LOC=S.loc||"dorm";if(!S.stats.groups)S.stats.groups=0;initCourses(S);render();}
+  else{S=newState("");render();intro();}
+});
+setInterval(function(){if(S)save();},30000);
+</script>
+</body>
+</html>

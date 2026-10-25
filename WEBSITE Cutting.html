@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protokol Diet 30 Hari - Masakan Rumahan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="https://cdn.phototourl.com/free/2026-07-31-61e27d23-8e52-42ff-a912-60e864377a70.jpg">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Loading Overlay */
+        #loading-overlay { transition: opacity 0.3s ease; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-20">
+
+    <!-- Loading Data Indicator -->
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-50/80 backdrop-blur-sm z-[200] flex flex-col items-center justify-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-orange-500 mb-4"></i>
+        <h2 class="text-lg font-bold text-gray-800">Menyinkronkan Data Cloud...</h2>
+        <p class="text-sm text-gray-500">Memuat progres diet Anda dari Firebase</p>
+    </div>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="space-y-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Protokol Defisit 30 Hari</h1>
+                    <p class="text-gray-600 mt-2 text-lg">Sistem Fleksibel: Intermittent Fasting & Masakan Rumahan.</p>
+                </div>
+                <div class="flex gap-2 flex-wrap items-center">
+                    <div class="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg border border-emerald-100 text-sm font-semibold flex items-center shadow-sm">
+                        <i class="fa-solid fa-cloud-check mr-2 text-emerald-500"></i> Cloud Sync Aktif
+                    </div>
+                    <button onclick="downloadHTML()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> Simpan Web
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg text-left text-sm text-blue-900 shadow-sm">
+                <strong>Strategi Masakan Bude:</strong> Karena menu harian tidak bisa diprediksi, senjata utama kita adalah <strong>Waktu Puasa (Intermittent Fasting)</strong> dan <strong>Kontrol Porsi</strong>. Anda bebas makan nasi dan lauk rumah, tapi catat estimasi porsinya di kalkulator bawah. Hentikan puasa jika merasa pusing berlebih.
+            </div>
+        </header>
+
+        <!-- Calculator Section -->
+        <section class="bg-slate-50 rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-6 border-b pb-4"><i class="fa-solid fa-calculator text-blue-500 mr-2"></i> 1. Kalkulator Kebutuhan Kalori</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Berat Badan (kg)</label>
+                    <input type="number" id="calc-weight" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Misal: 80">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tinggi (cm)</label>
+                    <input type="number" id="calc-height" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Misal: 165">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Usia</label>
+                    <input type="number" id="calc-age" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Misal: 25">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Gender</label>
+                    <select id="calc-gender" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition bg-slate-50">
+                        <option value="male">Pria</option>
+                        <option value="female">Wanita</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="calculateMacros()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> Generate Target Nutrisi
+            </button>
+
+            <!-- Results Area -->
+            <div id="macro-results" class="hidden mt-8 pt-6 border-t border-gray-100">
+                <div class="text-center mb-6">
+                    <p class="text-sm text-gray-500 font-semibold uppercase tracking-wider">Target Kalori Harian Anda</p>
+                    <div id="target-calories" class="text-5xl font-black text-gray-900 mt-1">0 <span class="text-xl text-gray-500 font-medium">kcal</span></div>
+                    <p class="text-sm text-red-500 mt-2 font-medium bg-red-50 inline-block px-3 py-1 rounded-full"><i class="fa-solid fa-arrow-down mr-1"></i> Defisit agresif diterapkan</p>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-rose-50 rounded-xl p-4 text-center border border-rose-100">
+                        <div class="text-xs text-rose-600 font-bold uppercase mb-1">Protein (Otot)</div>
+                        <div id="macro-protein" class="text-2xl font-bold text-gray-900">0g</div>
+                    </div>
+                    <div class="bg-amber-50 rounded-xl p-4 text-center border border-amber-100">
+                        <div class="text-xs text-amber-600 font-bold uppercase mb-1">Karbo (Energi)</div>
+                        <div id="macro-carbs" class="text-2xl font-bold text-gray-900">0g</div>
+                    </div>
+                    <div class="bg-emerald-50 rounded-xl p-4 text-center border border-emerald-100">
+                        <div class="text-xs text-emerald-600 font-bold uppercase mb-1">Lemak (Hormon)</div>
+                        <div id="macro-fat" class="text-2xl font-bold text-gray-900">0g</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3 Phases Module -->
+        <section class="bg-slate-50 rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="bg-gray-900 p-4 md:px-6 flex items-center">
+                <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-calendar-days text-blue-400 mr-2"></i> 2. Jadwal & Modul 3 Fase</h3>
+            </div>
+            
+            <div class="divide-y divide-gray-100">
+                <!-- Phase 1 -->
+                <div class="p-5 md:p-6 hover:bg-slate-50 transition">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-emerald-100 text-emerald-700 font-bold px-3 py-2 rounded-xl text-center min-w-[80px]">
+                            <div class="text-[10px] uppercase tracking-wider mb-1">Fase 1</div>
+                            <div class="text-2xl leading-none">1-10</div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Adaptasi Puasa (IF 16:8)</h4>
+                            <p class="text-sm text-gray-600 mb-4">Tujuan: Membiasakan tubuh dengan jendela makan tanpa mengubah drastis masakan yang dimakan.</p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-slate-50 border border-gray-200 p-4 rounded-xl">
+                                    <strong class="text-gray-800 block mb-2"><i class="fa-solid fa-utensils text-gray-400 mr-2"></i> Aturan Makan Rumahan</strong>
+                                    <ul class="list-disc pl-5 space-y-1.5 text-gray-600 marker:text-gray-300">
+                                        <li><strong>Jendela Makan:</strong> 12.00 Siang - 20.00 Malam.</li>
+                                        <li>Makan masakan Bude seperti biasa, TAPI batasi nasi maksimal <strong>1.5 centong</strong> per makan.</li>
+                                        <li>Perbanyak ambil kuah/sayur agar kenyang.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 border border-gray-200 p-4 rounded-xl">
+                                    <strong class="text-gray-800 block mb-2"><i class="fa-solid fa-person-walking text-gray-400 mr-2"></i> Olahraga Ringan</strong>
+                                    <ul class="list-disc pl-5 space-y-1.5 text-gray-600 marker:text-gray-300">
+                                        <li>Jalan kaki santai 30-45 menit sehari.</li>
+                                        <li>Targetkan 8.000 langkah (bisa dicek lewat HP).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="p-5 md:p-6 hover:bg-slate-50 transition">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-amber-100 text-amber-700 font-bold px-3 py-2 rounded-xl text-center min-w-[80px]">
+                            <div class="text-[10px] uppercase tracking-wider mb-1">Fase 2</div>
+                            <div class="text-2xl leading-none">11-20</div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Pengetatan Porsi (IF 18:6)</h4>
+                            <p class="text-sm text-gray-600 mb-4">Tujuan: Menekan kalori masuk lebih ketat sambil memaksa tubuh membakar lemak di jam puasa.</p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-slate-50 border border-gray-200 p-4 rounded-xl">
+                                    <strong class="text-gray-800 block mb-2"><i class="fa-solid fa-utensils text-gray-400 mr-2"></i> Aturan Makan Rumahan</strong>
+                                    <ul class="list-disc pl-5 space-y-1.5 text-gray-600 marker:text-gray-300">
+                                        <li><strong>Jendela Makan:</strong> 14.00 Siang - 20.00 Malam.</li>
+                                        <li>Nasi maksimal <strong>1 centong datar</strong> sekali makan.</li>
+                                        <li>Jika lauknya digoreng (ayam/ikan), makan dagingnya saja, sisihkan kulit/tepungnya.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 border border-gray-200 p-4 rounded-xl">
+                                    <strong class="text-gray-800 block mb-2"><i class="fa-solid fa-fire-burner text-gray-400 mr-2"></i> Olahraga Sedang</strong>
+                                    <ul class="list-disc pl-5 space-y-1.5 text-gray-600 marker:text-gray-300">
+                                        <li>Jalan cepat (Brisk walk) 40 menit.</li>
+                                        <li>Lakukan 3-4x seminggu.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="p-5 md:p-6 hover:bg-slate-50 transition bg-red-50/30">
+                    <div class="flex items-start gap-4">
+                        <div class="bg-red-100 text-red-700 font-bold px-3 py-2 rounded-xl text-center min-w-[80px]">
+                            <div class="text-[10px] uppercase tracking-wider mb-1">Fase 3</div>
+                            <div class="text-2xl leading-none">21-30</div>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900 mb-1">Push Terakhir (IF 20:4 / OMAD)</h4>
+                            <p class="text-sm text-gray-600 mb-4">Tujuan: Jendela makan sangat sempit untuk mencegah overeating otomatis tanpa pusing menghitung.</p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-slate-50 border border-red-100 p-4 rounded-xl shadow-sm">
+                                    <strong class="text-red-800 block mb-2"><i class="fa-solid fa-utensils text-red-400 mr-2"></i> Aturan Ketat</strong>
+                                    <ul class="list-disc pl-5 space-y-1.5 text-gray-700 marker:text-red-300">
+                                        <li><strong>Jendela Makan:</strong> 16.00 Sore - 20.00 Malam. (Hanya 1-2x makan besar).</li>
+                                        <li>Habiskan Lauk & Sayur DULUAN. Nasi ditaruh terakhir jika masih lapar (max 1 centong).</li>
+                                        <li>Stop kerupuk dan minuman manis sepenuhnya.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-50 border border-red-100 p-4 rounded-xl shadow-sm">
+                                    <strong class="text-red-800 block mb-2"><i class="fa-solid fa-person-walking text-red-400 mr-2"></i> Olahraga (Hati-hati)</strong>
+                                    <ul class="list-disc pl-5 space-y-1.5 text-gray-700 marker:text-red-300">
+                                        <li>Jalan kaki santai saja (kalori masuk sangat sedikit, hindari olahraga berat agar tidak pingsan).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Food Calculator Tracker -->
+        <section class="bg-slate-50 rounded-2xl shadow-sm border border-orange-200 p-6 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900"><i class="fa-solid fa-plate-wheat text-orange-500 mr-2"></i> 3. Catatan Makanan Bude</h3>
+                    <p class="text-sm text-gray-500 mt-1">Catat estimasi makanan harian agar tidak kelebihan batas kalori.</p>
+                </div>
+                <div class="text-left md:text-right bg-orange-50 p-3 rounded-xl border border-orange-100">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Sisa Kalori Hari Ini</p>
+                    <div class="text-3xl font-black text-gray-900"><span id="food-remaining" class="text-orange-500">0</span> <span class="text-sm font-medium text-gray-500">kcal</span></div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-12 gap-6">
+                <!-- Input Form -->
+                <div class="md:col-span-5 bg-orange-50/40 p-5 rounded-xl border border-orange-100">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Pilih Menu (Estimasi)</label>
+                            <select id="food-select" class="w-full border-gray-300 border rounded-lg p-3 focus:ring-2 focus:ring-orange-500 outline-none text-sm bg-slate-50">
+                                <!-- Generated via JS -->
+                            </select>
+                            <div class="mt-2 text-right">
+                                <button onclick="toggleCustomFood()" class="text-xs text-orange-600 font-bold hover:underline transition"><i class="fa-solid fa-pen-to-square"></i> + Input Makanan Kustom</button>
+                            </div>
+
+                            <!-- Custom Food Input Box -->
+                            <div id="custom-food-form" class="hidden mt-3 p-4 bg-slate-50 border border-orange-200 rounded-lg shadow-inner">
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">Nama Makanan/Minuman Baru</label>
+                                        <input type="text" id="custom-food-name" class="w-full border-gray-300 border rounded-md p-2 outline-none text-sm focus:ring-1 focus:ring-orange-500" placeholder="Contoh: Sayur Asem">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">Total Kalori (Angka saja)</label>
+                                        <input type="number" id="custom-food-cal" class="w-full border-gray-300 border rounded-md p-2 outline-none text-sm focus:ring-1 focus:ring-orange-500" placeholder="Contoh: 120">
+                                    </div>
+                                    <button onclick="saveCustomFood()" class="w-full bg-orange-100 text-orange-700 border border-orange-200 font-bold py-2 rounded-md hover:bg-orange-200 transition text-sm">
+                                        Simpan & Tambahkan ke Pilihan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-1/3">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">Porsi</label>
+                                <input type="number" id="food-qty" value="1" min="1" class="w-full border-gray-300 border rounded-lg p-3 focus:ring-2 focus:ring-orange-500 outline-none text-sm">
+                            </div>
+                            <div class="w-2/3 flex items-end">
+                                <button onclick="addFood()" class="w-full bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition shadow-sm">
+                                    <i class="fa-solid fa-plus mr-1"></i> Tambah
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 italic">*Jika masakan tidak ada di daftar, pilih menu yang paling mirip atau gunakan 'Kustom Kalori'.</p>
+                    </div>
+                </div>
+
+                <!-- List & Progress -->
+                <div class="md:col-span-7 flex flex-col justify-between">
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs font-bold text-gray-600 mb-2">
+                            <span>Dimakan: <span id="food-total-text" class="text-gray-900 text-sm">0 kcal</span></span>
+                            <span>Target: <span id="food-target-text" class="text-gray-900 text-sm">-</span></span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-4 border border-gray-200 overflow-hidden">
+                            <div id="food-progress-bar" class="bg-orange-400 h-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Food Log List -->
+                    <div class="bg-gray-50 rounded-xl border border-gray-200 flex-grow p-3 flex flex-col">
+                        <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-200 shrink-0">
+                            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Daftar Konsumsi</span>
+                            <button onclick="clearAllFood()" class="text-xs text-red-500 hover:text-red-700 hover:bg-red-100 font-bold transition flex items-center gap-1 bg-red-50 px-2 py-1.5 rounded-md border border-red-100">
+                                <i class="fa-solid fa-trash-can"></i> Kosongkan
+                            </button>
+                        </div>
+                        <div class="overflow-y-auto max-h-[180px] custom-scrollbar flex-grow">
+                            <ul id="food-log-list" class="space-y-2">
+                                <!-- Items Generated via JS -->
+                            </ul>
+                            <div id="food-empty-state" class="h-full flex flex-col items-center justify-center text-gray-400 py-6">
+                                <i class="fa-solid fa-utensils text-3xl mb-2 text-gray-300"></i>
+                                <p class="text-sm">Belum ada makanan dicatat hari ini</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Water Tracker -->
+        <section class="bg-slate-50 rounded-2xl shadow-sm border border-cyan-200 p-6 md:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-droplet text-cyan-500 mr-2"></i> 4. Target Air Putih (3 Liter)</h3>
+                    <p class="text-sm text-gray-500">Lemak dipecah dan dibuang melalui napas, keringat, dan urin. Minum minimal 12 gelas/hari.</p>
+                </div>
+                <button onclick="resetWater()" class="text-sm text-gray-400 hover:text-cyan-600 font-medium">Reset</button>
+            </div>
+            
+            <div class="flex flex-wrap gap-3" id="water-grid">
+                <!-- Gelas digenerate JS -->
+            </div>
+            <p class="text-center text-sm font-semibold text-cyan-600 mt-4"><span id="water-count">0</span> / 12 Gelas Terkumpul</p>
+        </section>
+
+        <!-- 30-Day Checkbox -->
+        <section class="bg-slate-50 rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 relative">
+            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1"><i class="fa-solid fa-calendar-check text-emerald-500 mr-2"></i> 5. Pelacak & Riwayat 30 Hari</h3>
+                    <p class="text-sm text-gray-500">Klik hari untuk melihat riwayat atau mengubah status.</p>
+                </div>
+                <button onclick="openSaveModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan Data Hari Ini
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-5 md:grid-cols-10 gap-3" id="tracker-grid">
+                <!-- Checkbox digenerate JS -->
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- ================= MODALS ================= -->
+    
+    <!-- Generic Message Modal -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/60 hidden flex-col items-center justify-center z-[100] p-4 backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-slate-50 p-6 rounded-2xl shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform duration-300" id="msg-modal-content">
+            <div id="msg-icon" class="text-4xl mb-4"></div>
+            <h3 id="msg-title" class="text-xl font-extrabold text-gray-900 mb-2">Pesan</h3>
+            <p id="msg-body" class="text-sm text-gray-600 mb-6 leading-relaxed whitespace-pre-line">Isi pesan</p>
+            <button onclick="closeMsgModal()" class="bg-gray-900 hover:bg-black text-white px-6 py-2.5 rounded-xl font-bold w-full transition shadow-sm">Mengerti & Tutup</button>
+        </div>
+    </div>
+
+    <!-- Save Progress Modal -->
+    <div id="save-modal" class="fixed inset-0 bg-black/60 hidden flex-col items-center justify-center z-50 p-4 backdrop-blur-sm opacity-0 transition-opacity">
+        <div class="bg-slate-50 rounded-2xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300" id="save-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-900">Simpan Progress Hari Ini</h2>
+                <button onclick="closeSaveModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            
+            <div class="bg-orange-50 border border-orange-100 p-4 rounded-xl mb-5 grid grid-cols-2 gap-4 text-center">
+                <div>
+                    <p class="text-[10px] text-orange-600 font-bold uppercase mb-1 tracking-wider">Total Kalori</p>
+                    <p id="save-summary-cal" class="text-2xl font-black text-gray-900">0 <span class="text-sm font-medium text-gray-500">kcal</span></p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-cyan-600 font-bold uppercase mb-1 tracking-wider">Air Putih</p>
+                    <p id="save-summary-water" class="text-2xl font-black text-gray-900">0 <span class="text-sm font-medium text-gray-500">gelas</span></p>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Simpan ke Hari Ke-Berapa?</label>
+                <select id="save-day-select" class="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-gray-50 font-medium cursor-pointer">
+                    <!-- Generated Options -->
+                </select>
+                <p class="text-xs text-gray-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i> Data makanan dan air hari ini akan disimpan permanen ke hari yang dipilih dan kotak hari akan dicentang otomatis.</p>
+            </div>
+
+            <button onclick="confirmSaveDay()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan & Tandai Selesai
+            </button>
+        </div>
+    </div>
+
+    <!-- Detail History Modal -->
+    <div id="detail-modal" class="fixed inset-0 bg-black/60 hidden flex-col items-center justify-center z-50 p-4 backdrop-blur-sm opacity-0 transition-opacity">
+        <div class="bg-slate-50 rounded-2xl p-6 w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-300" id="detail-modal-content">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-5 shrink-0">
+                <div class="flex items-center gap-3">
+                    <h2 id="detail-title" class="text-2xl font-black text-gray-900">Hari X</h2>
+                    <span id="detail-status" class=""></span>
+                </div>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">
+                
+                <!-- Empty State -->
+                <div id="detail-empty" class="text-center py-10 hidden flex-col items-center justify-center h-full">
+                    <div class="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mb-3">
+                        <i class="fa-regular fa-folder-open text-3xl text-gray-300"></i>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-700 mb-1">Belum Ada Data</p>
+                    <p class="text-xs text-gray-500">Anda belum menyimpan riwayat makanan atau air minum untuk hari ini.</p>
+                </div>
+
+                <!-- Data Content -->
+                <div id="detail-content" class="space-y-5 hidden pb-2">
+                    <p id="detail-date" class="text-xs text-gray-500 font-medium bg-gray-50 inline-block px-3 py-1 rounded-full border border-gray-200"></p>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-center">
+                            <p class="text-[10px] text-orange-600 font-bold uppercase mb-1 tracking-wider">Total Kalori</p>
+                            <p id="detail-cal" class="text-xl font-black text-gray-900">0 <span class="text-sm font-medium text-gray-500">kcal</span></p>
+                        </div>
+                        <div class="bg-cyan-50 p-4 rounded-xl border border-cyan-100 text-center">
+                            <p class="text-[10px] text-cyan-600 font-bold uppercase mb-1 tracking-wider">Air Putih</p>
+                            <p id="detail-water" class="text-xl font-black text-gray-900">0 <span class="text-sm font-medium text-gray-500">gelas</span></p>
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <div class="bg-gray-50 p-3 border-b border-gray-200">
+                            <h4 class="text-xs font-bold text-gray-800 uppercase tracking-wider"><i class="fa-solid fa-list-ul mr-2 text-gray-400"></i> Riwayat Makanan</h4>
+                        </div>
+                        <ul id="detail-food-list" class="divide-y divide-gray-100 bg-slate-50">
+                            <!-- Injected by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="pt-5 mt-2 border-t border-gray-100 shrink-0">
+                <button id="detail-toggle-btn" onclick="toggleDayStatus()" class=""></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Food Modal -->
+    <div id="edit-food-modal" class="fixed inset-0 bg-black/60 hidden flex-col items-center justify-center z-[150] p-4 backdrop-blur-sm opacity-0 transition-opacity">
+        <div class="bg-slate-50 rounded-2xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300" id="edit-food-modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-900">Edit Catatan Makanan</h2>
+                <button onclick="closeEditFoodModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            </div>
+            <div class="space-y-4 mb-6">
+                <input type="hidden" id="edit-food-id">
+                <input type="hidden" id="edit-food-mode" value="today">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Nama Makanan</label>
+                    <input type="text" id="edit-food-name" class="w-full border-gray-300 border rounded-lg p-3 outline-none text-sm focus:ring-1 focus:ring-orange-500">
+                </div>
+                <div class="flex gap-3">
+                    <div class="w-1/3">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Porsi</label>
+                        <input type="number" id="edit-food-qty" min="0.1" step="0.1" oninput="updateEditCal()" class="w-full border-gray-300 border rounded-lg p-3 outline-none text-sm focus:ring-1 focus:ring-orange-500">
+                    </div>
+                    <div class="w-2/3">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Total Kalori</label>
+                        <input type="number" id="edit-food-cal" class="w-full border-gray-300 border rounded-lg p-3 outline-none text-sm focus:ring-1 focus:ring-orange-500">
+                    </div>
+                </div>
+            </div>
+            <button onclick="saveEditFood()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition shadow-md flex justify-center items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase Integration Logic -->
+    <script type="module">
+        // Menggunakan Firebase versi 11.6.1 sesuai standar platform
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRqtDo6I0JRBxV-2Cr4D0W8xRr0rDYXpI",
+            authDomain: "keuangan-project-91d0a.firebaseapp.com",
+            projectId: "keuangan-project-91d0a",
+            storageBucket: "keuangan-project-91d0a.firebasestorage.app",
+            messagingSenderId: "412887443168",
+            appId: "1:412887443168:web:bb38eb69e2b677df805285",
+            measurementId: "G-95KQYRMYCC"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Referensi penyimpanan Cloud (Bisa disesuaikan nama collection-nya)
+        const DATABASE_REF = doc(db, "diet_data", "my_personal_diet");
+
+        // --- DATA DASAR (STATIC) ---
+        const foodDatabase = [
+            { id: 'f1', name: 'Nasi Putih (1 Centong Munjung)', cal: 130 },
+            { id: 'f2', name: 'Nasi Putih (1 Centong Datar)', cal: 100 },
+            { id: 'f3', name: 'Telur Dadar/Ceplok', cal: 110 },
+            { id: 'f4', name: 'Ayam Goreng Paha/Dada', cal: 250 },
+            { id: 'f5', name: 'Ayam Bakar/Opor', cal: 160 },
+            { id: 'f6', name: 'Ikan Goreng (Nila/Lele)', cal: 200 },
+            { id: 'f7', name: 'Tahu/Tempe Goreng (1 ptg)', cal: 70 },
+            { id: 'f8', name: 'Tahu/Tempe Bacem (1 ptg)', cal: 40 },
+            { id: 'f9', name: 'Sayur Sop/Bening (1 mangkuk)', cal: 60 },
+            { id: 'f10', name: 'Sayur Bersantan/Lodeh', cal: 150 },
+            { id: 'f11', name: 'Tumis Kangkung/Sayur', cal: 120 },
+            { id: 'f12', name: 'Kerupuk / Peyek (1 keping)', cal: 50 },
+            { id: 'f13', name: 'Gorengan (Bakwan/Mendoan)', cal: 120 },
+            { id: 'f14', name: 'Teh Manis (1 Gelas)', cal: 100 },
+            { id: 'f15', name: 'Susu / Kopi Susu', cal: 150 },
+            { id: 'f16', name: 'Mie Instan (1 Bungkus)', cal: 350 }
+        ];
+
+        // Default State (Jika belum ada data di cloud)
+        const defaultState = {
+            foodData: { date: new Date().toDateString(), items: [], target: 0 },
+            customFoods: [],
+            waterData: { date: new Date().toDateString(), count: 0 },
+            tracker30Days: Array(30).fill(false),
+            historyData: Array(30).fill(null)
+        };
+
+        // State Global Aplikasi
+        let dietState = structuredClone(defaultState);
+        let combinedDatabase = [...foodDatabase];
+        let currentDetailDayIndex = 0;
+
+        // --- FUNGSI CLOUD SYNC ---
+        async function loadData() {
+            try {
+                const docSnap = await getDoc(DATABASE_REF);
+                if (docSnap.exists()) {
+                    const saved = docSnap.data();
+                    dietState = { ...defaultState, ...saved }; // Merge aman
+                }
+                
+                // Menyembunyikan Loading
+                const loader = document.getElementById('loading-overlay');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 300);
+
+                initAllTrackers();
+            } catch (error) {
+                console.error("Gagal menarik data dari Firebase:", error);
+                
+                const loader = document.getElementById('loading-overlay');
+                loader.style.display = 'none';
+                
+                showMsg("Mode Offline", "Gagal memuat data dari Cloud. Menggunakan data default.", "error");
+                initAllTrackers();
+            }
+        }
+
+        async function saveData() {
+            try {
+                await setDoc(DATABASE_REF, dietState);
+            } catch (error) {
+                console.error("Gagal menyimpan ke Firebase:", error);
+                showMsg("Sinkronisasi Gagal", "Gagal menyimpan data ke Cloud. Periksa koneksi internet Anda.", "error");
+            }
+        }
+
+        function initAllTrackers() {
+            initDayTracker();
+            initWaterTracker();
+            initFoodTracker();
+        }
+
+        // Memulai proses saat web dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+        });
+
+
+        // Karena module type script membatasi scope, kita ekspos fungsinya ke window
+        window.showMsg = showMsg;
+        window.closeMsgModal = closeMsgModal;
+        window.calculateMacros = calculateMacros;
+        window.toggleCustomFood = toggleCustomFood;
+        window.saveCustomFood = saveCustomFood;
+        window.addFood = addFood;
+        window.deleteFood = deleteFood;
+        window.clearAllFood = clearAllFood;
+        window.resetWater = resetWater;
+        window.toggleWater = toggleWater;
+        window.openSaveModal = openSaveModal;
+        window.closeSaveModal = closeSaveModal;
+        window.confirmSaveDay = confirmSaveDay;
+        window.openDetailModal = openDetailModal;
+        window.closeDetailModal = closeDetailModal;
+        window.toggleDayStatus = toggleDayStatus;
+        window.downloadHTML = downloadHTML;
+        window.openEditFoodModal = openEditFoodModal;
+        window.closeEditFoodModal = closeEditFoodModal;
+        window.saveEditFood = saveEditFood;
+        window.updateEditCal = updateEditCal;
+        window.openEditHistoryFoodModal = openEditHistoryFoodModal;
+        window.deleteHistoryFood = deleteHistoryFood;
+
+
+        // --- MODAL UTILS ---
+        function showMsg(title, msg, type = 'info') {
+            const modal = document.getElementById('msg-modal');
+            const content = document.getElementById('msg-modal-content');
+            const iconEl = document.getElementById('msg-icon');
+            
+            document.getElementById('msg-title').textContent = title;
+            document.getElementById('msg-body').textContent = msg;
+
+            if (type === 'error') {
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
+                document.getElementById('msg-title').className = "text-xl font-extrabold text-red-600 mb-2";
+            } else if (type === 'success') {
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
+                document.getElementById('msg-title').className = "text-xl font-extrabold text-emerald-600 mb-2";
+            } else {
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-info text-blue-500"></i>';
+                document.getElementById('msg-title').className = "text-xl font-extrabold text-blue-600 mb-2";
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeMsgModal() {
+            const modal = document.getElementById('msg-modal');
+            const content = document.getElementById('msg-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        // --- 1. CALCULATOR LOGIC ---
+        function calculateMacros() {
+            const w = parseFloat(document.getElementById('calc-weight').value);
+            const h = parseFloat(document.getElementById('calc-height').value);
+            const a = parseFloat(document.getElementById('calc-age').value);
+            const gender = document.getElementById('calc-gender').value;
+
+            if (!w || !h || !a) {
+                showMsg("Data Tidak Lengkap", "Mohon isi semua data (Berat, Tinggi, Usia) di kalkulator terlebih dahulu.", "error");
+                return;
+            }
+
+            let bmr = (10 * w) + (6.25 * h) - (5 * a);
+            bmr = gender === 'male' ? bmr + 5 : bmr - 161;
+
+            const tdee = bmr * 1.2; 
+            let deficit = 800;
+            let targetCalories = Math.round(tdee - deficit);
+            let minCalories = gender === 'male' ? 1500 : 1200;
+
+            if (targetCalories < minCalories) {
+                targetCalories = minCalories;
+            }
+
+            let protein = Math.round(w * 1.8);
+            let proteinCals = protein * 4;
+
+            let fat = Math.max(35, Math.round(w * 0.7));
+            let fatCals = fat * 9;
+
+            let carbCals = targetCalories - (proteinCals + fatCals);
+            let carbs = Math.max(20, Math.round(carbCals / 4));
+
+            if (carbs < 20) {
+                carbs = 20;
+                targetCalories = proteinCals + fatCals + (carbs * 4);
+            }
+
+            document.getElementById('target-calories').innerHTML = `${targetCalories} <span class="text-xl text-gray-500 font-medium">kcal</span>`;
+            document.getElementById('macro-protein').textContent = `${protein}g`;
+            document.getElementById('macro-fat').textContent = `${fat}g`;
+            document.getElementById('macro-carbs').textContent = `${carbs}g`;
+            document.getElementById('macro-results').classList.remove('hidden');
+
+            // Save to State & Cloud
+            let today = new Date().toDateString();
+            if (dietState.foodData.date !== today) {
+                dietState.foodData = { date: today, items: [], target: targetCalories };
+            } else {
+                dietState.foodData.target = targetCalories;
+            }
+            
+            renderFoodList(dietState.foodData);
+            saveData();
+        }
+
+        // --- 2. FOOD TRACKER LOGIC ---
+        function initFoodTracker() {
+            combinedDatabase = [...foodDatabase, ...dietState.customFoods];
+
+            const select = document.getElementById('food-select');
+            select.innerHTML = ''; 
+            combinedDatabase.forEach(food => {
+                const option = document.createElement('option');
+                option.value = food.id;
+                option.textContent = `${food.name} (~${food.cal} kcal)`;
+                select.appendChild(option);
+            });
+
+            let today = new Date().toDateString();
+            if (dietState.foodData.date !== today) {
+                dietState.foodData = { date: today, items: [], target: dietState.foodData.target || 0 };
+                saveData(); // Lakukan sinkronisasi karena tereset hari baru
+            }
+
+            renderFoodList(dietState.foodData);
+        }
+
+        function addFood() {
+            const selectId = document.getElementById('food-select').value;
+            const qty = parseFloat(document.getElementById('food-qty').value) || 1;
+            
+            const selectedFood = combinedDatabase.find(f => f.id === selectId);
+            if(selectedFood) {
+                const newItem = {
+                    id: Date.now().toString(),
+                    name: selectedFood.name,
+                    qty: qty,
+                    cal: Math.round(selectedFood.cal * qty)
+                };
+                
+                dietState.foodData.items.push(newItem);
+                renderFoodList(dietState.foodData);
+                saveData(); // Sinkron ke Firebase
+            }
+        }
+
+        function deleteFood(itemId) {
+            dietState.foodData.items = dietState.foodData.items.filter(item => item.id !== itemId);
+            renderFoodList(dietState.foodData);
+            saveData(); // Sinkron ke Firebase
+        }
+
+        function clearAllFood() {
+            if (dietState.foodData.items.length === 0) return;
+            
+            // Kosongkan array makanan di hari ini
+            dietState.foodData.items = [];
+            renderFoodList(dietState.foodData);
+            
+            // Sinkronkan data kosong ke cloud
+            saveData(); 
+            
+            showMsg("Berhasil", "Semua catatan makanan hari ini telah dikosongkan.", "success");
+        }
+
+        function renderFoodList(data) {
+            const listEl = document.getElementById('food-log-list');
+            const emptyEl = document.getElementById('food-empty-state');
+            
+            listEl.innerHTML = '';
+            let totalCals = 0;
+
+            if (!data.items || data.items.length === 0) {
+                emptyEl.classList.remove('hidden');
+            } else {
+                emptyEl.classList.add('hidden');
+                data.items.forEach(item => {
+                    totalCals += item.cal;
+                    const li = document.createElement('li');
+                    li.className = "bg-slate-50 p-3 rounded-xl border border-gray-200 flex justify-between items-center text-sm shadow-sm";
+                    li.innerHTML = `
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-800">${item.name}</span>
+                            <span class="text-[11px] text-gray-500 font-medium">Jumlah Porsi: ${item.qty}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-orange-600 font-black bg-orange-50 border border-orange-100 px-2.5 py-1 rounded-lg">${item.cal} kcal</span>
+                            <button onclick="openEditFoodModal('${item.id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 w-8 h-8 rounded-md flex items-center justify-center transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteFood('${item.id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 w-8 h-8 rounded-md flex items-center justify-center transition"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    `;
+                    listEl.appendChild(li);
+                });
+            }
+
+            document.getElementById('food-total-text').textContent = `${totalCals} kcal`;
+            
+            let target = data.target || 0;
+            if(target === 0) {
+                document.getElementById('food-target-text').textContent = "Pencet tombol Generate Target";
+                document.getElementById('food-remaining').textContent = "0";
+                document.getElementById('food-progress-bar').style.width = "0%";
+            } else {
+                document.getElementById('food-target-text').textContent = `${target} kcal`;
+                let remaining = target - totalCals;
+                document.getElementById('food-remaining').textContent = remaining > 0 ? remaining : 0;
+                
+                let percentage = (totalCals / target) * 100;
+                let bar = document.getElementById('food-progress-bar');
+                
+                if (percentage > 100) percentage = 100;
+                bar.style.width = `${percentage}%`;
+                
+                if(percentage > 100 || remaining < 0) {
+                    bar.classList.replace('bg-orange-400', 'bg-red-500');
+                    document.getElementById('food-remaining').classList.replace('text-orange-500', 'text-red-600');
+                } else if (percentage > 80) {
+                    bar.classList.replace('bg-orange-400', 'bg-amber-500');
+                    bar.classList.replace('bg-red-500', 'bg-amber-500');
+                    document.getElementById('food-remaining').classList.replace('text-red-600', 'text-amber-500');
+                    document.getElementById('food-remaining').classList.replace('text-orange-500', 'text-amber-500');
+                } else {
+                    bar.classList.replace('bg-red-500', 'bg-orange-400');
+                    bar.classList.replace('bg-amber-500', 'bg-orange-400');
+                    document.getElementById('food-remaining').classList.replace('text-red-600', 'text-orange-500');
+                    document.getElementById('food-remaining').classList.replace('text-amber-500', 'text-orange-500');
+                }
+            }
+        }
+
+        // --- EDIT FOOD LOGIC ---
+        let currentBaseCal = 0;
+
+        function openEditFoodModal(itemId) {
+            const item = dietState.foodData.items.find(i => i.id === itemId);
+            if(!item) return;
+
+            document.getElementById('edit-food-id').value = item.id;
+            document.getElementById('edit-food-mode').value = 'today';
+            document.getElementById('edit-food-name').value = item.name;
+            document.getElementById('edit-food-qty').value = item.qty;
+            document.getElementById('edit-food-cal').value = item.cal;
+
+            // Simpan rasio kalori awal untuk auto-kalkulasi
+            currentBaseCal = item.cal / item.qty;
+
+            const modal = document.getElementById('edit-food-modal');
+            const content = document.getElementById('edit-food-modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeEditFoodModal() {
+            const modal = document.getElementById('edit-food-modal');
+            const content = document.getElementById('edit-food-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        function updateEditCal() {
+            const newQty = parseFloat(document.getElementById('edit-food-qty').value);
+            if(!isNaN(newQty) && newQty > 0 && typeof currentBaseCal === 'number') {
+                document.getElementById('edit-food-cal').value = Math.round(currentBaseCal * newQty);
+            }
+        }
+
+        function openEditHistoryFoodModal(itemId) {
+            const dayData = dietState.historyData[currentDetailDayIndex];
+            if(!dayData || !dayData.items) return;
+            
+            const item = dayData.items.find(i => i.id === itemId);
+            if(!item) return;
+
+            document.getElementById('edit-food-id').value = item.id;
+            document.getElementById('edit-food-mode').value = 'history';
+            document.getElementById('edit-food-name').value = item.name;
+            document.getElementById('edit-food-qty').value = item.qty;
+            document.getElementById('edit-food-cal').value = item.cal;
+
+            currentBaseCal = item.cal / item.qty;
+
+            const modal = document.getElementById('edit-food-modal');
+            const content = document.getElementById('edit-food-modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function deleteHistoryFood(itemId) {
+            const dayData = dietState.historyData[currentDetailDayIndex];
+            if(!dayData || !dayData.items) return;
+            
+            if(confirm("Hapus makanan ini dari riwayat?")) {
+                dayData.items = dayData.items.filter(i => i.id !== itemId);
+                // Hitung ulang total kalori di hari tersebut
+                dayData.totalCals = dayData.items.reduce((sum, item) => sum + item.cal, 0);
+                
+                saveData(); // Sinkron ke Firebase
+                openDetailModal(currentDetailDayIndex); // Refresh UI Modal Riwayat
+            }
+        }
+
+        function saveEditFood() {
+            const id = document.getElementById('edit-food-id').value;
+            const mode = document.getElementById('edit-food-mode').value;
+            const name = document.getElementById('edit-food-name').value.trim();
+            const qty = parseFloat(document.getElementById('edit-food-qty').value);
+            const cal = parseInt(document.getElementById('edit-food-cal').value);
+
+            if(!name || isNaN(qty) || qty <= 0 || isNaN(cal) || cal < 0) {
+                showMsg("Input Tidak Valid", "Pastikan nama, porsi, dan kalori diisi dengan benar.", "error");
+                return;
+            }
+
+            if (mode === 'today') {
+                const itemIndex = dietState.foodData.items.findIndex(i => i.id === id);
+                if(itemIndex > -1) {
+                    dietState.foodData.items[itemIndex].name = name;
+                    dietState.foodData.items[itemIndex].qty = qty;
+                    dietState.foodData.items[itemIndex].cal = cal;
+
+                    renderFoodList(dietState.foodData);
+                    saveData(); // Sinkron ke Firebase
+                    closeEditFoodModal();
+                    showMsg("Berhasil", "Catatan makanan hari ini berhasil diubah.", "success");
+                }
+            } else if (mode === 'history') {
+                const dayData = dietState.historyData[currentDetailDayIndex];
+                if (dayData && dayData.items) {
+                    const itemIndex = dayData.items.findIndex(i => i.id === id);
+                    if(itemIndex > -1) {
+                        dayData.items[itemIndex].name = name;
+                        dayData.items[itemIndex].qty = qty;
+                        dayData.items[itemIndex].cal = cal;
+                        
+                        // Hitung ulang total kalori hari tersebut
+                        dayData.totalCals = dayData.items.reduce((sum, item) => sum + item.cal, 0);
+
+                        saveData(); // Sinkron ke Firebase
+                        closeEditFoodModal();
+                        openDetailModal(currentDetailDayIndex); // Refresh Modal Riwayat
+                        showMsg("Berhasil", "Riwayat makanan berhasil diubah.", "success");
+                    }
+                }
+            }
+        }
+
+        // --- CUSTOM FOOD LOGIC ---
+        function toggleCustomFood() {
+            const form = document.getElementById('custom-food-form');
+            form.classList.toggle('hidden');
+        }
+
+        function saveCustomFood() {
+            const name = document.getElementById('custom-food-name').value.trim();
+            const cal = parseInt(document.getElementById('custom-food-cal').value);
+
+            if (!name || isNaN(cal) || cal <= 0) {
+                showMsg("Input Tidak Valid", "Mohon isi nama masakan dan jumlah kalori berupa angka.", "error");
+                return;
+            }
+
+            const newCustomItem = {
+                id: 'c_' + Date.now(),
+                name: name + ' (Kustom)',
+                cal: cal
+            };
+
+            dietState.customFoods.push(newCustomItem);
+            saveData(); // Sinkron Database
+
+            document.getElementById('custom-food-name').value = '';
+            document.getElementById('custom-food-cal').value = '';
+            toggleCustomFood();
+
+            initFoodTracker();
+            document.getElementById('food-select').value = newCustomItem.id;
+            
+            showMsg("Berhasil", `${name} berhasil ditambahkan ke dalam database pilihan.`, "success");
+        }
+
+        // --- 3. WATER TRACKER LOGIC ---
+        function initWaterTracker() {
+            let today = new Date().toDateString();
+            if (dietState.waterData.date !== today) {
+                dietState.waterData = { date: today, count: 0 };
+                saveData(); // Reset hari baru
+            }
+            renderWaterGrid(dietState.waterData.count);
+        }
+
+        function toggleWater(index) {
+            if(index <= dietState.waterData.count) {
+                dietState.waterData.count = index - 1; 
+            } else {
+                dietState.waterData.count = index; 
+            }
+            renderWaterGrid(dietState.waterData.count);
+            saveData(); // Simpan ke Cloud
+        }
+
+        function resetWater() {
+            let today = new Date().toDateString();
+            dietState.waterData = { date: today, count: 0 };
+            renderWaterGrid(0);
+            saveData(); // Simpan ke Cloud
+        }
+
+        function renderWaterGrid(count) {
+            const grid = document.getElementById('water-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 12; i++) {
+                const isFull = i <= count;
+                const div = document.createElement('div');
+                div.onclick = () => toggleWater(i);
+                div.className = `w-12 h-14 rounded-xl flex items-center justify-center cursor-pointer transition-all border-2 
+                    ${isFull ? 'bg-cyan-400 border-cyan-400 shadow-inner scale-95' : 'bg-cyan-50 border-cyan-100 hover:border-cyan-300'}`;
+                div.innerHTML = `<i class="fa-solid fa-glass-water text-xl ${isFull ? 'text-white' : 'text-cyan-200'}"></i>`;
+                grid.appendChild(div);
+            }
+            document.getElementById('water-count').textContent = count;
+        }
+
+        // --- 4. 30-DAY TRACKER LOGIC ---
+        function initDayTracker() {
+            const grid = document.getElementById('tracker-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 30; i++) {
+                const dayDiv = document.createElement('div');
+                const isChecked = dietState.tracker30Days[i];
+                
+                dayDiv.onclick = () => openDetailModal(i);
+                
+                dayDiv.className = `aspect-square rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all border-2 
+                    ${isChecked ? 'bg-emerald-500 border-emerald-500 shadow-md transform hover:scale-105' : 'bg-slate-50 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50'}`;
+                
+                dayDiv.innerHTML = `
+                    <span class="text-[10px] font-bold ${isChecked ? 'text-emerald-100' : 'text-gray-400'}">HARI</span>
+                    <span class="text-xl font-black ${isChecked ? 'text-white' : 'text-gray-700'} leading-none my-0.5">${i + 1}</span>
+                    ${isChecked ? '<i class="fa-solid fa-check-circle text-white mt-1 text-sm shadow-sm rounded-full"></i>' : ''}
+                `;
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        // --- 5. HISTORY & SAVING LOGIC ---
+        function openSaveModal() {
+            let totalCals = 0;
+            if (dietState.foodData && dietState.foodData.items) {
+                totalCals = dietState.foodData.items.reduce((sum, item) => sum + item.cal, 0);
+            }
+            let waterCount = dietState.waterData ? dietState.waterData.count : 0;
+
+            document.getElementById('save-summary-cal').innerHTML = `${totalCals} <span class="text-sm font-medium text-gray-500">kcal</span>`;
+            document.getElementById('save-summary-water').innerHTML = `${waterCount} <span class="text-sm font-medium text-gray-500">gelas</span>`;
+
+            // Prepare dropdown
+            let firstUnchecked = dietState.tracker30Days.indexOf(false);
+            let daySelect = document.getElementById('save-day-select');
+            daySelect.innerHTML = '';
+            
+            for (let i = 1; i <= 30; i++) {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `Hari ke-${i} ${dietState.tracker30Days[i-1] ? ' (Sudah Selesai - Akan Ditimpa)' : ''}`;
+                daySelect.appendChild(opt);
+            }
+            
+            if (firstUnchecked !== -1) {
+                daySelect.value = firstUnchecked + 1;
+            } else {
+                daySelect.value = 30; 
+            }
+
+            const modal = document.getElementById('save-modal');
+            const content = document.getElementById('save-modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeSaveModal() {
+            const modal = document.getElementById('save-modal');
+            const content = document.getElementById('save-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        function confirmSaveDay() {
+            let dayStr = document.getElementById('save-day-select').value;
+            let dayIndex = parseInt(dayStr) - 1;
+
+            let totalCals = 0;
+            let items = [];
+            if (dietState.foodData && dietState.foodData.items) {
+                totalCals = dietState.foodData.items.reduce((sum, item) => sum + item.cal, 0);
+                items = [...dietState.foodData.items]; // clone array
+            }
+            let waterCount = dietState.waterData ? dietState.waterData.count : 0;
+
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = new Date().toLocaleDateString('id-ID', dateOptions);
+
+            // Simpan ke state
+            dietState.historyData[dayIndex] = {
+                date: dateString,
+                totalCals: totalCals,
+                waterCount: waterCount,
+                items: items
+            };
+            dietState.tracker30Days[dayIndex] = true;
+
+            // Push ke Firebase
+            saveData();
+
+            closeSaveModal();
+            initDayTracker(); 
+            
+            showMsg("Data Disimpan di Cloud!", `Progress hari ini berhasil disinkronkan dan disimpan ke Hari ke-${dayIndex + 1}.`, "success");
+        }
+
+        // --- 6. DETAIL HISTORY MODAL LOGIC ---
+        function openDetailModal(dayIndex) {
+            currentDetailDayIndex = dayIndex;
+            
+            let dayData = dietState.historyData[dayIndex];
+            let isDone = dietState.tracker30Days[dayIndex];
+
+            document.getElementById('detail-title').textContent = `Hari ke-${dayIndex + 1}`;
+            
+            // Set Status Badge
+            let statusBadge = document.getElementById('detail-status');
+            if (isDone) {
+                statusBadge.className = "bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-bold border border-emerald-200 uppercase tracking-wide";
+                statusBadge.innerHTML = '<i class="fa-solid fa-check-circle mr-1"></i> Selesai';
+            } else {
+                statusBadge.className = "bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-[11px] font-bold border border-gray-200 uppercase tracking-wide";
+                statusBadge.innerHTML = '<i class="fa-solid fa-clock mr-1"></i> Belum Selesai';
+            }
+
+            const contentDiv = document.getElementById('detail-content');
+            const emptyDiv = document.getElementById('detail-empty');
+
+            if (dayData && (dayData.items.length > 0 || dayData.waterCount > 0)) {
+                document.getElementById('detail-date').textContent = dayData.date || "Tanggal Tidak Tersedia";
+                document.getElementById('detail-cal').innerHTML = `${dayData.totalCals} <span class="text-sm font-medium text-gray-500">kcal</span>`;
+                document.getElementById('detail-water').innerHTML = `${dayData.waterCount} <span class="text-sm font-medium text-gray-500">gelas</span>`;
+                
+                let list = document.getElementById('detail-food-list');
+                list.innerHTML = '';
+                
+                if (dayData.items.length === 0) {
+                    list.innerHTML = '<li class="text-sm text-gray-400 text-center py-4 italic">Hanya puasa air, tidak ada makanan tercatat.</li>';
+                } else {
+                    dayData.items.forEach(item => {
+                        list.innerHTML += `
+                            <li class="flex flex-col bg-slate-50 p-3 rounded-xl border border-gray-100 mb-2 shadow-sm">
+                                <div class="flex justify-between items-center w-full">
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-800 font-bold">${item.name}</span>
+                                        <span class="text-[11px] text-gray-500 font-medium">Jumlah Porsi: ${item.qty}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-black text-orange-600 bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-100">${item.cal} kcal</span>
+                                        <button onclick="openEditHistoryFoodModal('${item.id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 w-8 h-8 rounded-md flex items-center justify-center transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        <button onclick="deleteHistoryFood('${item.id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 w-8 h-8 rounded-md flex items-center justify-center transition"><i class="fa-solid fa-trash-can"></i></button>
+                                    </div>
+                                </div>
+                            </li>`;
+                    });
+                }
+                
+                contentDiv.classList.remove('hidden');
+                emptyDiv.classList.add('hidden');
+                emptyDiv.classList.remove('flex');
+            } else {
+                contentDiv.classList.add('hidden');
+                emptyDiv.classList.remove('hidden');
+                emptyDiv.classList.add('flex');
+            }
+
+            let toggleBtn = document.getElementById('detail-toggle-btn');
+            if (isDone) {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-rotate-left mr-2"></i> Batal Tandai Selesai';
+                toggleBtn.className = "w-full bg-slate-50 text-red-500 font-bold py-3 rounded-xl border border-red-200 hover:bg-red-50 transition shadow-sm";
+            } else {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Tandai Selesai (Tanpa Data)';
+                toggleBtn.className = "w-full bg-emerald-500 text-white font-bold py-3 rounded-xl hover:bg-emerald-600 transition shadow-sm";
+            }
+
+            const modal = document.getElementById('detail-modal');
+            const modalContent = document.getElementById('detail-modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detail-modal');
+            const content = document.getElementById('detail-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        function toggleDayStatus() {
+            dietState.tracker30Days[currentDetailDayIndex] = !dietState.tracker30Days[currentDetailDayIndex];
+            
+            saveData(); // Sinkron Database
+
+            initDayTracker(); // re-render main grid
+            openDetailModal(currentDetailDayIndex); // refresh modal state
+        }
+
+        function downloadHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Aplikasi_Diet_Bude.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            const guideText = "File HTML berhasil diunduh.\n\nData Anda sekarang tersinkronisasi di Firebase (Cloud). Jika Anda membuka file hasil unduhan ini di perangkat lain, seluruh data harian akan otomatis tertarik dari server cloud.";
+            
+            showMsg("Unduh Berhasil!", guideText, "success");
+        }
+    </script>
+</body>
+</html>

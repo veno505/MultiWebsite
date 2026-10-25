@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased bg-black">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marveyno | Premium Immersive Portfolio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Oswald for massive impact, Inter for clean reading -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Oswald:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#030303',
+                        surface: '#111111',
+                        accent: '#ffffff',
+                        muted: '#666666'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Oswald', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --cursor-size: 10px;
+        }
+
+        body {
+            background-color: theme('colors.dark');
+            color: theme('colors.accent');
+            margin: 0;
+            overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::-webkit-scrollbar { display: none; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- SPA Page Routing CSS --- */
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            min-height: 100vh;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .page.active {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            position: relative;
+        }
+
+        /* --- Page Transition Curtain --- */
+        .curtain {
+            position: fixed;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .curtain-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: 4vw;
+            color: #000;
+            text-transform: uppercase;
+            overflow: hidden;
+        }
+        .curtain-text span {
+            display: block;
+            transform: translateY(100%);
+        }
+
+        /* --- Film Grain Noise --- */
+        .noise {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.05;
+            background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+
+        /* --- Custom Magnetic Cursor --- */
+        .cursor-dot {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--cursor-size);
+            height: var(--cursor-size);
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+            will-change: transform;
+        }
+        .cursor-ring {
+            position: fixed;
+            top: 0; left: 0;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            will-change: transform, width, height, background, border-color;
+            transition: width 0.3s ease, height 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+        }
+        body.hovering .cursor-ring {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(2px);
+            border-color: transparent;
+        }
+
+        /* --- WebGL Background --- */
+        #webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* --- Utilities --- */
+        .split-char {
+            display: inline-block;
+            overflow: hidden;
+            vertical-align: top;
+        }
+        .split-char span {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+        
+        .img-reveal-wrap {
+            overflow: hidden;
+            position: relative;
+        }
+        .img-reveal-wrap img {
+            transform: scale(1.2);
+            transform-origin: center;
+        }
+
+        .premium-border {
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: border-color 0.4s;
+        }
+        .premium-border:hover {
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        /* --- Bug Fix: Menonaktifkan custom cursor di perangkat layar sentuh (HP/Tablet) agar tidak memblokir tap --- */
+        @media (pointer: coarse) {
+            .cursor-dot, .cursor-ring { display: none !important; }
+            body { cursor: auto !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <!-- Page Transition Mask -->
+    <div class="curtain">
+        <div class="curtain-text"><span id="curtain-label">LOADING</span></div>
+    </div>
+
+    <!-- WebGL Canvas (Bug Fix: z-index dipastikan -1 agar tidak memblokir klik) -->
+    <canvas id="webgl-canvas" style="z-index: -1;"></canvas>
+
+    <!-- Global Navigation -->
+    <nav class="fixed top-0 left-0 w-full z-50 px-6 py-8 md:px-12 flex justify-between items-center mix-blend-difference">
+        <div class="font-display text-2xl font-bold tracking-widest cursor-pointer route-link hoverable" data-route="page-home">
+            MRVYN.
+        </div>
+        <div class="flex gap-6 md:gap-12 font-sans text-xs md:text-sm uppercase tracking-widest text-white/70">
+            <a class="hover:text-white transition-colors cursor-pointer route-link hoverable" data-route="page-works">Works</a>
+            <a class="hover:text-white transition-colors cursor-pointer route-link hoverable" data-route="page-about">About</a>
+            <a class="hover:text-white transition-colors cursor-pointer route-link hoverable" data-route="page-contact">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Main SPA Container -->
+    <main id="app-container" class="relative w-full">
+
+        <!-- ================= PAGE 1: HOME ================= -->
+        <section id="page-home" class="page active">
+            <div class="min-h-screen flex flex-col justify-center px-6 md:px-24">
+                <div class="w-full max-w-7xl mx-auto pt-20">
+                    <p class="font-sans text-sm md:text-lg text-muted uppercase tracking-[0.4em] mb-4 split-text">
+                        System Online // Architect
+                    </p>
+                    <h1 class="font-display text-[15vw] md:text-[11vw] font-bold leading-[0.85] uppercase -ml-1 md:-ml-2 split-text">
+                        Marveyno
+                    </h1>
+                    <div class="mt-8 md:mt-12 flex flex-col md:flex-row gap-8 md:items-end justify-between border-t border-white/10 pt-8">
+                        <p class="font-sans text-sm md:text-base text-white/80 max-w-md leading-relaxed split-text">
+                            A creative developer bridging the gap between high-end digital design and robust engineering. Specializing in WebGL and fluid interactive experiences.
+                        </p>
+                        <button class="route-link hoverable group relative flex items-center justify-center w-32 h-32 md:w-40 md:h-40 rounded-full border border-white/20 hover:border-white hover:bg-white transition-all duration-500 overflow-hidden" data-route="page-works">
+                            <span class="font-display text-sm uppercase tracking-widest group-hover:text-black transition-colors duration-500 z-10">Explore</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 2: WORKS ================= -->
+        <section id="page-works" class="page">
+            <div class="min-h-screen pt-32 pb-24 px-6 md:px-24 max-w-screen-2xl mx-auto">
+                <h2 class="font-display text-[10vw] md:text-[6vw] leading-none uppercase mb-16 split-text">Selected Works</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
+                    
+                    <!-- Project 1 (Clickable) -->
+                    <div class="project-card group cursor-pointer route-link hoverable" data-route="page-proj-commerce" data-title="CommerceHub">
+                        <div class="img-reveal-wrap w-full aspect-[4/5] md:aspect-square bg-surface rounded-sm mb-6 premium-border">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1600&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700" alt="CommerceHub">
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-display text-3xl md:text-4xl uppercase mb-2">CommerceHub</h3>
+                                <p class="font-sans text-muted text-sm tracking-wide">3D Try-On Application</p>
+                            </div>
+                            <span class="font-sans text-xs border border-white/20 rounded-full px-4 py-1">2026</span>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 (Clickable) -->
+                    <div class="project-card group cursor-pointer route-link hoverable mt-0 md:mt-32" data-route="page-proj-sea" data-title="Sea of Numbers">
+                        <div class="img-reveal-wrap w-full aspect-[4/5] md:aspect-square bg-surface rounded-sm mb-6 premium-border">
+                            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700" alt="Sea of Numbers">
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-display text-3xl md:text-4xl uppercase mb-2">Sea of Numbers</h3>
+                                <p class="font-sans text-muted text-sm tracking-wide">2D Game Engine</p>
+                            </div>
+                            <span class="font-sans text-xs border border-white/20 rounded-full px-4 py-1">2025</span>
+                        </div>
+                    </div>
+
+                    <!-- Project 3 (Dummy) -->
+                    <div class="project-card group cursor-pointer hoverable">
+                        <div class="img-reveal-wrap w-full aspect-[4/5] md:aspect-square bg-surface rounded-sm mb-6 premium-border">
+                            <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=1600&auto=format&fit=crop" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700" alt="Neon Drift">
+                        </div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-display text-3xl md:text-4xl uppercase mb-2">Neon Drift</h3>
+                                <p class="font-sans text-muted text-sm tracking-wide">Creative Campaign</p>
+                            </div>
+                            <span class="font-sans text-xs border border-white/20 rounded-full px-4 py-1">2025</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 3: ABOUT ================= -->
+        <section id="page-about" class="page">
+            <div class="min-h-screen pt-32 pb-24 px-6 md:px-24 max-w-screen-xl mx-auto flex flex-col md:flex-row gap-16 md:gap-24">
+                <div class="w-full md:w-1/2">
+                    <h2 class="font-display text-[10vw] md:text-[5vw] leading-none uppercase mb-8 split-text">Identity</h2>
+                    <div class="img-reveal-wrap w-full aspect-[3/4] bg-surface rounded-sm premium-border">
+                        <!-- Abstract portrait representation -->
+                        <img src="https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=1600&auto=format&fit=crop" class="w-full h-full object-cover grayscale mix-blend-lighten opacity-80" alt="Marveyno">
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 flex flex-col justify-center">
+                    <div class="font-sans text-lg md:text-xl leading-relaxed text-white/90 space-y-6">
+                        <p class="split-text">I am an independent creative developer focused on crafting immersive digital experiences. I blend high-end design principles with performant code.</p>
+                        <p class="split-text">My expertise lies in building interactive WebGL environments, fluid animations, and custom 2D game engines that captivate users.</p>
+                    </div>
+                    
+                    <div class="mt-16 border-t border-white/10 pt-8">
+                        <h4 class="font-sans text-xs text-muted uppercase tracking-widest mb-6">Core Technologies</h4>
+                        <div class="flex flex-wrap gap-3 font-display text-sm tracking-widest">
+                            <span class="border border-white/20 rounded-full px-5 py-2">Three.js</span>
+                            <span class="border border-white/20 rounded-full px-5 py-2">WebGL</span>
+                            <span class="border border-white/20 rounded-full px-5 py-2">GSAP</span>
+                            <span class="border border-white/20 rounded-full px-5 py-2">TypeScript</span>
+                            <span class="border border-white/20 rounded-full px-5 py-2">Tailwind</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 4: CONTACT ================= -->
+        <section id="page-contact" class="page">
+            <div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
+                <p class="font-sans text-sm text-muted uppercase tracking-[0.4em] mb-8 split-text">Initiate Connection</p>
+                <a href="mailto:hello@marveyno.com" class="hoverable inline-block">
+                    <h2 class="font-display text-[12vw] md:text-[8vw] leading-none uppercase hover:text-white/50 transition-colors duration-500 split-text">
+                        Let's Talk
+                    </h2>
+                </a>
+                <div class="mt-20 flex gap-8 font-sans text-sm uppercase tracking-widest text-muted">
+                    <a href="#" class="hoverable hover:text-white transition-colors">Twitter</a>
+                    <a href="#" class="hoverable hover:text-white transition-colors">GitHub</a>
+                    <a href="#" class="hoverable hover:text-white transition-colors">LinkedIn</a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= PAGE 5: PROJECT DETAIL (CommerceHub) ================= -->
+        <section id="page-proj-commerce" class="page">
+            <div class="pt-32 pb-24">
+                <div class="px-6 md:px-24 max-w-screen-2xl mx-auto mb-12">
+                    <button class="route-link hoverable font-sans text-xs uppercase tracking-widest border border-white/20 px-6 py-2 rounded-full mb-12 hover:bg-white hover:text-black transition-colors" data-route="page-works">Back to Works</button>
+                    <h1 class="font-display text-[12vw] md:text-[8vw] leading-none uppercase split-text">CommerceHub</h1>
+                    <div class="flex gap-4 mt-6">
+                        <span class="font-sans text-xs text-muted uppercase tracking-widest">WebGL</span>
+                        <span class="font-sans text-xs text-muted uppercase tracking-widest">E-Commerce</span>
+                    </div>
+                </div>
+                
+                <div class="w-full h-[60vh] md:h-[80vh] img-reveal-wrap mb-24">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" class="w-full h-full object-cover" alt="CommerceHub Full">
+                </div>
+
+                <div class="px-6 md:px-24 max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+                    <div>
+                        <h3 class="font-display text-2xl uppercase mb-6">The Challenge</h3>
+                        <p class="font-sans text-white/70 leading-relaxed">Creating a highly performant 3D try-on experience for premium techwear directly in the browser. The requirement was flawless rendering of complex fabric textures without compromising frame rates on mobile devices.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl uppercase mb-6">The Solution</h3>
+                        <p class="font-sans text-white/70 leading-relaxed">Implemented a custom WebGL renderer utilizing optimized GLTF models. Wrote custom GLSL shaders to handle dynamic lighting and fabric material simulation, achieving a steady 60FPS across all modern devices.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 6: PROJECT DETAIL (Sea of Numbers) ================= -->
+        <section id="page-proj-sea" class="page">
+            <div class="pt-32 pb-24">
+                <div class="px-6 md:px-24 max-w-screen-2xl mx-auto mb-12">
+                    <button class="route-link hoverable font-sans text-xs uppercase tracking-widest border border-white/20 px-6 py-2 rounded-full mb-12 hover:bg-white hover:text-black transition-colors" data-route="page-works">Back to Works</button>
+                    <h1 class="font-display text-[10vw] md:text-[7vw] leading-none uppercase split-text">Sea of Numbers</h1>
+                    <div class="flex gap-4 mt-6">
+                        <span class="font-sans text-xs text-muted uppercase tracking-widest">Game Dev</span>
+                        <span class="font-sans text-xs text-muted uppercase tracking-widest">Canvas API</span>
+                    </div>
+                </div>
+                
+                <div class="w-full h-[60vh] md:h-[80vh] img-reveal-wrap mb-24">
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2564&auto=format&fit=crop" class="w-full h-full object-cover" alt="Sea of Numbers Full">
+                </div>
+
+                <div class="px-6 md:px-24 max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+                    <div>
+                        <h3 class="font-display text-2xl uppercase mb-6">Overview</h3>
+                        <p class="font-sans text-white/70 leading-relaxed">A fast-paced 2D educational platformer built entirely from scratch using the HTML5 Canvas API and TypeScript. No external game engines were used.</p>
+                    </div>
+                    <div>
+                        <h3 class="font-display text-2xl uppercase mb-6">Engineering</h3>
+                        <p class="font-sans text-white/70 leading-relaxed">Architected a custom physics engine handling AABB collision detection, fluid character momentum, and a scalable entity-component system (ECS) for managing hundreds of on-screen elements.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Scripts: GSAP, Lenis, Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // --- 1. SMOOTH SCROLL (LENIS) & GSAP SYNC ---
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                direction: 'vertical',
+                smooth: true,
+            });
+
+            // Bug Fix: Sinkronisasi Lenis dengan GSAP untuk mencegah jitter
+            lenis.on('scroll', ScrollTrigger.update);
+
+            gsap.ticker.add((time)=>{
+              lenis.raf(time * 1000);
+            });
+            gsap.ticker.lagSmoothing(0);
+
+            // --- 2. CUSTOM MAGNETIC CURSOR & BUTTONS ---
+            gsap.registerPlugin(ScrollTrigger);
+
+            const dot = document.querySelector('.cursor-dot');
+            const ring = document.querySelector('.cursor-ring');
+            
+            gsap.set([dot, ring], { xPercent: -50, yPercent: -50 });
+            
+            const setDotX = gsap.quickSetter(dot, "x", "px");
+            const setDotY = gsap.quickSetter(dot, "y", "px");
+            const setRingX = gsap.quickSetter(ring, "x", "px");
+            const setRingY = gsap.quickSetter(ring, "y", "px");
+            
+            let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            let ringPos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+                setDotX(mouse.x);
+                setDotY(mouse.y);
+            });
+
+            gsap.ticker.add(() => {
+                const dt = 1.0 - Math.pow(1.0 - 0.15, gsap.ticker.deltaRatio());
+                ringPos.x += (mouse.x - ringPos.x) * dt;
+                ringPos.y += (mouse.y - ringPos.y) * dt;
+                setRingX(ringPos.x);
+                setRingY(ringPos.y);
+            });
+
+            function attachHoverEvents() {
+                document.querySelectorAll('.hoverable, a, button').forEach(el => {
+                    // Hanya tambahkan event jika belum ada penanda
+                    if(el.dataset.magneticInit) return;
+                    el.dataset.magneticInit = 'true';
+
+                    el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                    el.addEventListener('mouseleave', () => {
+                        document.body.classList.remove('hovering');
+                        gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+                    });
+                    
+                    if(el.classList.contains('hoverable')) {
+                        el.addEventListener('mousemove', (e) => {
+                            const rect = el.getBoundingClientRect();
+                            // Bug Fix: Kurangi nilai transform saat ini dari perhitungan posisi untuk mencegah Jitter
+                            const currentX = gsap.getProperty(el, "x") || 0;
+                            const currentY = gsap.getProperty(el, "y") || 0;
+                            const x = e.clientX - (rect.left - currentX) - rect.width / 2;
+                            const y = e.clientY - (rect.top - currentY) - rect.height / 2;
+                            
+                            // Magnetic pull
+                            gsap.to(el, { x: x * 0.3, y: y * 0.3, duration: 0.3, ease: "power2.out" });
+                        });
+                    }
+                });
+            }
+            attachHoverEvents();
+
+            // --- 3. TEXT SPLITTING UTILITY (For GSAP) ---
+            function splitTextUtility() {
+                document.querySelectorAll('.split-text').forEach(el => {
+                    if (el.classList.contains('splitted')) return;
+                    const text = el.innerText;
+                    el.innerHTML = '';
+                    // Split words, then characters
+                    const words = text.split(' ');
+                    words.forEach((word, i) => {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.style.display = 'inline-block';
+                        wordSpan.style.whiteSpace = 'nowrap';
+                        
+                        word.split('').forEach(char => {
+                            const charWrap = document.createElement('span');
+                            charWrap.className = 'split-char';
+                            const innerSpan = document.createElement('span');
+                            innerSpan.innerHTML = char;
+                            charWrap.appendChild(innerSpan);
+                            wordSpan.appendChild(charWrap);
+                        });
+
+                        el.appendChild(wordSpan);
+                        // Add space after word unless it's the last one
+                        if (i < words.length - 1) {
+                            el.appendChild(document.createTextNode(' '));
+                        }
+                    });
+                    el.classList.add('splitted');
+                });
+            }
+
+            // --- 4. PAGE TRANSITION & ENTRY ANIMATIONS ---
+            function resetPageAnimation(pageId) {
+                const page = document.getElementById(pageId);
+                if (!page) return;
+                
+                // Kembalikan posisi teks ke bawah agar siap dianimasikan lagi
+                const chars = page.querySelectorAll('.split-char span');
+                if (chars.length > 0) gsap.set(chars, { y: '100%' });
+                
+                // Kembalikan posisi gambar agar siap dianimasikan lagi
+                const images = page.querySelectorAll('.img-reveal-wrap img');
+                if (images.length > 0) gsap.set(images, { scale: 1.2, opacity: 0 });
+
+                // Bug Fix: Sembunyikan project-card agar tidak berkedip (flicker) sebelum ScrollTrigger berjalan
+                const projectCards = page.querySelectorAll('.project-card');
+                if (projectCards.length > 0) gsap.set(projectCards, { y: 80, opacity: 0 });
+            }
+
+            function playEntryAnimation(pageId) {
+                const page = document.getElementById(pageId);
+                if (!page) return;
+
+                const tl = gsap.timeline();
+                
+                // Animate text characters up
+                const chars = page.querySelectorAll('.split-char span');
+                if (chars.length > 0) {
+                    tl.fromTo(chars, 
+                        { y: '100%' }, 
+                        { y: '0%', duration: 1, stagger: 0.015, ease: "power4.out" }
+                    );
+                }
+
+                // Animate images zooming out slightly
+                const images = page.querySelectorAll('.img-reveal-wrap img');
+                if (images.length > 0) {
+                    tl.fromTo(images,
+                        { scale: 1.2, opacity: 0 },
+                        { scale: 1, opacity: 1, duration: 1.5, ease: "power3.out", stagger: 0.2 },
+                        "<0.2" // start slightly after text
+                    );
+                }
+            }
+
+            // --- 4.5. SCROLL TRIGGER ANIMATIONS ---
+            function initScrollAnimations() {
+                // Kill previous triggers
+                ScrollTrigger.getAll().forEach(t => t.kill());
+
+                const activePage = document.querySelector('.page.active');
+                if (!activePage) return;
+
+                // Animate project cards in Works page
+                const projectCards = activePage.querySelectorAll('.project-card');
+                projectCards.forEach(card => {
+                    gsap.to(card, 
+                        {
+                            y: 0, opacity: 1, duration: 1.2, ease: "power3.out",
+                            scrollTrigger: {
+                                trigger: card,
+                                start: "top 85%",
+                                toggleActions: "play none none reverse"
+                            }
+                        }
+                    );
+                });
+
+                // Parallax images
+                const images = activePage.querySelectorAll('.img-reveal-wrap img');
+                images.forEach(img => {
+                    gsap.to(img, {
+                        yPercent: 15,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: img.parentElement,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: true
+                        }
+                    });
+                });
+            }
+
+            // Initial setup
+            splitTextUtility();
+            document.querySelectorAll('.page:not(.active)').forEach(p => resetPageAnimation(p.id));
+            setTimeout(() => {
+                playEntryAnimation('page-home');
+                initScrollAnimations();
+            }, 500);
+
+            // --- 5. SPA ROUTER LOGIC ---
+            const curtain = document.querySelector('.curtain');
+            const curtainTextSpan = document.querySelector('#curtain-label');
+            const curtainTextInner = document.querySelector('.curtain-text span');
+            let isAnimating = false;
+
+            function updateNavActiveState(targetRoute) {
+                // Bug Fix: Memberi highlight pada menu navigasi yang sedang aktif
+                document.querySelectorAll('nav a').forEach(a => {
+                    a.classList.remove('text-white', 'font-bold');
+                    a.classList.add('text-white/70');
+                    if(a.getAttribute('data-route') === targetRoute) {
+                        a.classList.add('text-white', 'font-bold');
+                        a.classList.remove('text-white/70');
+                    }
+                });
+            }
+
+            document.querySelectorAll('.route-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if(isAnimating) return;
+                    
+                    const targetRoute = link.getAttribute('data-route');
+                    const label = link.getAttribute('data-title') || link.innerText || "Loading";
+                    
+                    const currentPage = document.querySelector('.page.active');
+                    // Don't navigate if already on page
+                    if (currentPage && currentPage.id === targetRoute) return;
+
+                    isAnimating = true;
+                    document.body.classList.remove('hovering'); // reset cursor
+                    
+                    // Bug Fix: Kunci scrolling agar layar tidak bergeser saat Loading tertutup
+                    lenis.stop(); 
+
+                    // Set transition label
+                    curtainTextSpan.innerText = label;
+                    gsap.set(curtainTextInner, { y: '100%' });
+                    updateNavActiveState(targetRoute);
+
+                    // Curtain Drop Timeline
+                    const tl = gsap.timeline({
+                        onComplete: () => {
+                            // Swap pages internally while curtain is down
+                            if (currentPage) {
+                                currentPage.classList.remove('active');
+                                resetPageAnimation(currentPage.id); // Bug Fix: Reset halaman lama
+                            }
+                            const targetPage = document.getElementById(targetRoute);
+                            targetPage.classList.add('active');
+                            
+                            // Bug Fix: Reset posisi scroll secara instan saat layar masih tertutup
+                            lenis.scrollTo(0, { immediate: true });
+                            
+                            // Curtain Lift Timeline
+                            const liftTl = gsap.timeline({
+                                onComplete: () => {
+                                    isAnimating = false;
+                                    lenis.start(); // Buka kembali penguncian scroll
+                                    playEntryAnimation(targetRoute);
+                                    initScrollAnimations();
+                                    
+                                    // Bug Fix: Refresh ScrollTrigger agar kalkulasi tinggi DOM akurat
+                                    ScrollTrigger.refresh();
+                                }
+                            });
+                            
+                            liftTl.to(curtainTextInner, { y: '-100%', duration: 0.6, ease: "power3.in" })
+                                  .to(curtain, { y: '-100%', duration: 0.8, ease: "power4.inOut" }, "<");
+                        }
+                    });
+
+                    // Drop curtain
+                    tl.set(curtain, { y: '100%' })
+                      .to(curtain, { y: '0%', duration: 0.8, ease: "power4.inOut" })
+                      .to(curtainTextInner, { y: '0%', duration: 0.6, ease: "power3.out" }, "-=0.4");
+                });
+            });
+
+
+            // --- 6. WEBGL: PREMIUM LIQUID MESH ---
+            const canvas = document.getElementById('webgl-canvas');
+            const scene = new THREE.Scene();
+            
+            // Fog to fade out edges
+            scene.fog = new THREE.FogExp2(0x030303, 0.03);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 8;
+
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Lighting for physical material
+            const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+            scene.add(ambient);
+
+            const spotLight = new THREE.SpotLight(0xffffff, 100);
+            spotLight.position.set(10, 10, 10);
+            spotLight.angle = 0.15;
+            spotLight.penumbra = 1;
+            scene.add(spotLight);
+
+            const pointLight1 = new THREE.PointLight(0x4444ff, 150, 50); // blue
+            pointLight1.position.set(-5, -2, 5);
+            scene.add(pointLight1);
+            
+            const pointLight2 = new THREE.PointLight(0x8822ff, 100, 50); // purple
+            pointLight2.position.set(5, -5, 2);
+            scene.add(pointLight2);
+
+            // Liquid geometry (Medium res for JS performance)
+            const geometry = new THREE.IcosahedronGeometry(2.5, 40);
+            const positions = geometry.attributes.position.clone();
+            geometry.userData.originalPositions = positions;
+
+            // Premium Liquid Material
+            const material = new THREE.MeshPhysicalMaterial({
+                color: 0x000000,
+                metalness: 0.9,
+                roughness: 0.2,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.1,
+                wireframe: false
+            });
+
+            const sphere = new THREE.Mesh(geometry, material);
+            scene.add(sphere);
+
+            let clock = new THREE.Clock();
+
+            function animateWebGL() {
+                requestAnimationFrame(animateWebGL);
+                
+                const time = clock.getElapsedTime() * 0.5;
+
+                // Mouse Parallax mapping
+                const targetX = (mouse.x / window.innerWidth - 0.5) * 2;
+                const targetY = -(mouse.y / window.innerHeight - 0.5) * 2;
+                
+                sphere.rotation.y -= 0.002;
+
+                // Gentle parallax follow
+                scene.rotation.x += (targetY * 0.1 - scene.rotation.x) * 0.05;
+                scene.rotation.y += (targetX * 0.1 - scene.rotation.y) * 0.05;
+
+                // Vertex Mutation (Organic Liquid Noise)
+                const positionAttribute = sphere.geometry.attributes.position;
+                const originalPositions = sphere.geometry.userData.originalPositions;
+                const vertex = new THREE.Vector3();
+
+                for ( let i = 0; i < positionAttribute.count; i ++ ) {
+                    vertex.fromBufferAttribute( originalPositions, i );
+                    
+                    const noise = Math.sin(vertex.x * 1.5 + time) * 
+                                  Math.cos(vertex.y * 1.5 + time * 0.8) * 
+                                  Math.sin(vertex.z * 1.5 + time * 1.2);
+                    
+                    vertex.multiplyScalar( 1 + noise * 0.15 );
+                    positionAttribute.setXYZ( i, vertex.x, vertex.y, vertex.z );
+                }
+                
+                sphere.geometry.computeVertexNormals();
+                positionAttribute.needsUpdate = true;
+
+                renderer.render(scene, camera);
+            }
+            animateWebGL();
+
+            // Resize handling
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Made by Charles Vemoy</title>
+    
+    <!-- Google Fonts & Tailwind CSS CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        maruko: {
+                            yellow: '#fcd34d',
+                            yellowLight: '#fef3c7',
+                            red: '#ef4444',
+                            redLight: '#fee2e2',
+                            cream: '#fffdf5',
+                            navy: '#1e3a8a',
+                            charcoal: '#433422'
+                        }
+                    },
+                    fontFamily: {
+                        'cute': ['"Fredoka"', 'sans-serif'],
+                        'body': ['"Quicksand"', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'comic': '4px 4px 0px 0px #433422',
+                        'comic-lg': '8px 8px 0px 0px #433422',
+                        'polaroid': '0 8px 16px rgba(67, 52, 34, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fffdf5;
+            background-image: radial-gradient(#fcd34d 10%, transparent 11%), radial-gradient(#fcd34d 10%, transparent 11%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            color: #433422;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        .comic-border { border: 3px solid #433422; }
+        .hidden-section { display: none !important; }
+        .cursor::after {
+            content: '_';
+            animation: blink 0.8s step-start infinite;
+            color: #ef4444;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes floatSlow {
+            0% { transform: translateY(110vh) scale(0.6) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.3) rotate(360deg); opacity: 0; }
+        }
+        .float-particle {
+            position: fixed;
+            bottom: -10vh;
+            z-index: 1;
+            pointer-events: none;
+            animation: floatSlow linear infinite;
+        }
+        .polaroid-frame {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #ffffff;
+        }
+        .polaroid-frame:hover {
+            transform: translateY(-8px) scale(1.04) rotate(var(--tilt, 2deg)) !important;
+            box-shadow: 12px 12px 0px 0px #433422;
+        }
+        .vinyl-spin { animation: spinRecord 4s linear infinite; }
+        @keyframes spinRecord { 100% { transform: rotate(360deg); } }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .active-accordion .accordion-content { max-height: 180px; }
+        .active-accordion .accordion-arrow { transform: rotate(180deg); }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-body antialiased min-h-screen relative flex flex-col items-center pb-24">
+
+    <!-- Floating Background -->
+    <div id="floating-elements-container" class="fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Navbar -->
+    <nav class="sticky top-4 left-0 right-0 z-40 w-[92%] max-w-5xl mx-auto bg-white comic-border shadow-comic rounded-2xl px-6 py-3 flex justify-between items-center mt-4">
+        <div class="flex items-center gap-3">
+            <svg class="w-8 h-8 drop-shadow" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="35" fill="#fcd34d" stroke="#433422" stroke-width="4"/>
+                <path d="M15 50 Q 50 20 85 50" fill="#fcd34d" stroke="#433422" stroke-width="4"/>
+                <rect x="35" y="50" width="30" height="8" rx="4" fill="#ef4444" stroke="#433422" stroke-width="3"/>
+                <path d="M25 50 L 75 50" stroke="#433422" stroke-width="4"/>
+            </svg>
+            <span class="font-cute text-xl md:text-2xl font-bold text-maruko-navy tracking-tight" id="nav-logo">Loading...</span>
+        </div>
+        <div class="hidden md:flex items-center gap-6 font-cute font-semibold text-gray-700">
+            <a href="#story" class="hover:text-red-500 transition-colors">Our Story</a>
+            <a href="#countup" class="hover:text-red-500 transition-colors">Waktu Kita</a>
+            <a href="#moments" class="hover:text-red-500 transition-colors">Memories</a>
+            <a href="#faq" class="hover:text-red-500 transition-colors">Tanya Jawab</a>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="bg-maruko-yellow hover:bg-yellow-400 border-2 border-maruko-charcoal rounded-full px-4 py-1.5 flex items-center gap-2 cursor-pointer transition-all active:translate-y-0.5 shadow-[2px_2px_0px_0px_#433422]" onclick="toggleMusic()">
+                <div id="vinyl-disc" class="text-maruko-charcoal flex items-center justify-center">
+                    <i data-lucide="disc" class="w-4 h-4"></i>
+                </div>
+                <span class="font-cute text-xs font-bold text-maruko-charcoal tracking-wide select-none" id="music-status">MUTED</span>
+            </div>
+        </div>
+    </nav>
+
+    <audio id="background-audio" loop>
+        <source id="audio-source" src="" type="audio/mpeg">
+    </audio>
+
+    <!-- MAIN CONTAINER -->
+    <main id="main-view" class="relative z-10 w-full max-w-5xl mx-auto px-4 py-10 flex flex-col gap-20">
+
+        <!-- 1. HERO SECTION -->
+        <header class="text-center mt-6 flex flex-col items-center gap-6">
+            <div class="bg-red-100 text-red-600 border-2 border-red-500 font-cute font-bold text-xs px-5 py-2.5 rounded-full tracking-wider uppercase shadow-sm flex items-center gap-2">
+                <span>Special Request! 🎒</span>
+            </div>
+            <div class="relative py-4">
+                <svg class="w-28 h-28 mx-auto mb-4 drop-shadow-md" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20,65 C15,35 30,10 60,10 C90,10 105,35 100,65 C95,55 90,50 85,55 C80,48 75,45 70,50 C65,42 55,42 50,50 C45,45 40,48 35,55 C30,50 25,55 20,65 Z" fill="#433422"/>
+                    <circle cx="60" cy="65" r="35" fill="#fef08a" stroke="#433422" stroke-width="4"/>
+                    <path d="M30,55 Q40,50 45,55 Q53,46 60,55 Q67,46 75,55 Q80,50 90,55" stroke="#433422" stroke-width="3" fill="none"/>
+                    <circle cx="48" cy="68" r="3" fill="#433422"/>
+                    <circle cx="72" cy="68" r="3" fill="#433422"/>
+                    <ellipse cx="38" cy="74" rx="6" ry="4" fill="#f87171" opacity="0.8"/>
+                    <ellipse cx="82" cy="74" rx="6" ry="4" fill="#f87171" opacity="0.8"/>
+                    <path d="M54,77 Q60,82 66,77" stroke="#433422" stroke-width="3" fill="none" stroke-linecap="round"/>
+                </svg>
+                <h1 class="font-cute text-4xl md:text-6xl font-bold tracking-wide leading-tight text-maruko-navy" id="maruko-typewriter-greeting"></h1>
+            </div>
+            <p id="hero-desc" class="text-lg md:text-xl font-medium text-gray-700 max-w-2xl mx-auto mt-2 leading-relaxed px-4"></p>
+            <div class="mt-2 flex items-center gap-3 bg-white px-4 py-2 rounded-full border-2 border-maruko-charcoal shadow-comic">
+                <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="font-cute text-xs font-bold uppercase tracking-wider text-gray-600">Surat Cinta Resmi Dari Hati</span>
+            </div>
+        </header>
+
+        <!-- 2. OUR STORY -->
+        <section id="story" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="font-cute text-3xl md:text-5xl font-bold text-maruko-charcoal flex justify-center items-center gap-2">
+                    <span>Buku Catatan Harian Kita 📖</span>
+                </h2>
+                <p class="text-gray-600 mt-2 font-medium">Perjalanan seru kita berdua yang penuh canda tawa!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 px-4" id="chapters-grid"></div>
+        </section>
+
+        <!-- 3. COUNT-UP TIMER -->
+        <section id="countup" class="scroll-mt-24 bg-white p-8 md:p-12 rounded-[2.5rem] comic-border shadow-comic-lg text-center relative overflow-hidden mx-4">
+            <div class="absolute top-0 left-0 w-full h-4 bg-gradient-to-r from-maruko-yellow via-maruko-red to-maruko-yellow"></div>
+            <h2 class="font-cute text-3xl md:text-5xl font-bold text-maruko-charcoal mb-3 mt-4">Waktu yang Kita Habiskan Bersama... ⏰</h2>
+            <p class="text-gray-600 font-medium mb-8">Setiap detiknya berharga banget sejak pertama kali kita deket!</p>
+            <div class="flex justify-center flex-wrap gap-4 md:gap-8">
+                <div class="flex flex-col items-center">
+                    <div class="bg-maruko-yellow border-4 border-maruko-charcoal text-maruko-charcoal w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center text-3xl md:text-5xl font-cute font-bold shadow-comic" id="days">00</div>
+                    <span class="mt-4 text-sm font-bold uppercase text-maruko-charcoal font-cute">Hari</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="bg-maruko-red border-4 border-maruko-charcoal text-white w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center text-3xl md:text-5xl font-cute font-bold shadow-comic" id="hours">00</div>
+                    <span class="mt-4 text-sm font-bold uppercase text-maruko-charcoal font-cute">Jam</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="bg-white border-4 border-maruko-charcoal text-maruko-charcoal w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center text-3xl md:text-5xl font-cute font-bold shadow-comic" id="mins">00</div>
+                    <span class="mt-4 text-sm font-bold uppercase text-maruko-charcoal font-cute">Menit</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="bg-maruko-navy border-4 border-maruko-charcoal text-white w-20 h-20 md:w-28 md:h-28 rounded-2xl flex items-center justify-center text-3xl md:text-5xl font-cute font-bold shadow-comic" id="secs">00</div>
+                    <span class="mt-4 text-sm font-bold uppercase text-maruko-charcoal font-cute">Detik</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. PHOTO GALLERY -->
+        <section id="moments" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="font-cute text-3xl md:text-5xl font-bold text-maruko-charcoal">Galeri Foto Gemes Kita 📸</h2>
+                <p class="text-gray-600 mt-2 font-medium">Beberapa potongan momen yang wajib diabadikan.</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4" id="photo-grid"></div>
+        </section>
+
+        <!-- 5. FAQ ACCORDION -->
+        <section id="faq" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="font-cute text-3xl md:text-5xl font-bold text-maruko-charcoal">Tanya Jawab 🧐</h2>
+                <p class="text-gray-600 mt-2 font-medium">Beberapa pertanyaan krusial yang perlu dijawab!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto px-4" id="faq-grid"></div>
+        </section>
+
+        <!-- 6. PROPOSAL BOX -->
+        <section id="proposal-box" class="bg-white p-8 md:p-14 rounded-[3rem] comic-border shadow-comic-lg text-center relative overflow-hidden mb-16 mx-4">
+            <div class="absolute inset-0 bg-[radial-gradient(#fee2e2_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div>
+            <div class="relative z-10">
+                <span class="inline-block bg-maruko-yellow text-maruko-charcoal font-cute font-bold text-sm px-6 py-2 rounded-full border-2 border-maruko-charcoal shadow-comic mb-8 animate-bounce">
+                    PERTANYAAN PALING PENTING! 💌
+                </span>
+                <h2 class="font-cute text-4xl md:text-6xl font-bold text-maruko-navy mb-6">Dear Favorite Person,</h2>
+                <p id="proposal-main-text" class="text-lg md:text-2xl font-medium leading-relaxed mb-12 max-w-3xl mx-auto text-gray-700"></p>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-8 min-h-[160px] relative">
+                    <button id="btn-yes" class="bg-maruko-red hover:bg-red-600 text-white font-cute font-bold text-2xl md:text-3xl px-16 py-5 rounded-full border-4 border-maruko-charcoal shadow-comic hover:scale-105 active:translate-y-1 active:shadow-[2px_2px_0px_0px_#433422] transition-all z-10" onclick="celebrateYes()">
+                        YES! MAU BANGET 💖
+                    </button>
+                    <button id="btn-no" class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-cute font-semibold text-xl px-12 py-4 rounded-full border-4 border-maruko-charcoal shadow-comic transition-all duration-200 z-20">
+                        Nggak Mau 💔
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- SUCCESS SCREEN -->
+    <section id="success-view" class="hidden-section fixed inset-0 z-50 bg-maruko-cream flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white p-6 md:p-12 rounded-[3rem] comic-border shadow-comic-lg max-w-2xl text-center flex flex-col items-center gap-6 my-auto scale-95 transition-transform duration-500" id="success-card">
+            <span class="bg-maruko-yellow text-maruko-charcoal border-2 border-maruko-charcoal font-cute font-bold text-xs px-5 py-2.5 rounded-full uppercase shadow-sm">
+                Misi Sukses! 🥳🎉
+            </span>
+            <h1 id="success-headline" class="font-cute text-4xl md:text-6xl font-bold text-maruko-red animate-pulse leading-tight"></h1>
+            <div class="relative w-64 h-64">
+                <svg class="w-full h-full drop-shadow-md" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M75,20 Q100,5 95,25 Q80,25 75,20" fill="#fcd34d" stroke="#433422" stroke-width="3"/>
+                    <path d="M20,60 C15,30 30,5 60,5 C90,5 105,30 100,60 C95,50 90,45 85,50 C80,43 75,40 70,45 C65,37 55,37 50,45 C45,40 40,43 35,50 C30,45 25,50 20,60 Z" fill="#433422"/>
+                    <circle cx="60" cy="60" r="32" fill="#fef08a" stroke="#433422" stroke-width="4"/>
+                    <path d="M43,62 Q48,58 51,62" stroke="#433422" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <path d="M69,62 Q74,58 77,62" stroke="#433422" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <circle cx="36" cy="68" r="7" fill="#f87171" opacity="0.9"/>
+                    <circle cx="84" cy="68" r="7" fill="#f87171" opacity="0.9"/>
+                    <path d="M52,72 Q60,82 68,72 Z" fill="#ef4444" stroke="#433422" stroke-width="3"/>
+                    <path d="M40,92 L80,92 L75,115 L45,115 Z" fill="#ef4444" stroke="#433422" stroke-width="3"/>
+                    <path d="M15,25 L25,30" stroke="#fcd34d" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M100,30 L110,25" stroke="#fcd34d" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <p id="success-sub" class="text-xl md:text-2xl font-bold font-cute text-maruko-navy leading-relaxed"></p>
+            <div class="border-4 border-dashed border-maruko-red rounded-3xl p-6 bg-red-50 w-full text-center flex flex-col gap-3 relative">
+                <span class="absolute top-2 right-4 text-xs font-cute text-red-500 font-bold rotate-12">LULUS SELEKSI! 🏆</span>
+                <span class="font-cute text-xs font-bold text-maruko-red uppercase tracking-wider">Sertifikat Resmi</span>
+                <p class="font-cute text-2xl font-bold text-maruko-charcoal">SURAT KEPUTUSAN JADIAN 📜</p>
+                <p class="text-sm font-semibold text-gray-600 leading-relaxed">
+                    Ditetapkan bahwa mulai hari ini, kita berdua dinyatakan resmi berpacaran dengan tingkat kebahagiaan yang wajib dipelihara bersama-sama setiap harinya!
+                </p>
+                <div class="flex justify-center items-center gap-2 mt-2 text-maruko-red">
+                    <i data-lucide="heart" class="w-5 h-5 fill-maruko-red animate-ping"></i>
+                    <span class="font-cute text-sm font-bold tracking-widest">LEVEL KECERIAAN: INFINITE! ✨</span>
+                </div>
+            </div>
+            <p id="success-footer-msg" class="text-gray-500 font-medium text-sm"></p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-white border-t-4 border-maruko-charcoal mt-16 py-10 px-6 text-center relative z-10">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="font-cute text-xl font-bold text-maruko-navy flex items-center gap-2 justify-center">
+                <span id="footer-logo">Loading...</span>
+                <i data-lucide="heart" class="w-5 h-5 fill-maruko-red text-maruko-red animate-pulse"></i>
+            </div>
+            <p class="font-cute text-sm text-gray-600 font-semibold tracking-wide">
+                Dibuat penuh senyuman buat kamu — Kita bareng-bareng terus ya!
+            </p>
+            <div class="flex items-center gap-4 text-maruko-charcoal">
+                <i data-lucide="smile" class="w-5 h-5 text-maruko-yellow"></i>
+                <i data-lucide="heart" class="w-5 h-5 text-maruko-red fill-maruko-red"></i>
+                <i data-lucide="sparkles" class="w-5 h-5 text-blue-500"></i>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!--          BAGIAN SCRIPT UTAMA KODE          -->
+    <!-- ========================================== -->
+    <script>
+        // 🌸 KELOLA SEMUA TEKS DAN FOTO KAMU DI SINI 🌸
+        const MY_CONFIG = {
+            navLogo: "Made by Charles Vemoy", 
+            greeting: "Hai Cantiik, kiw kiw 🌸✨", 
+            heroDesc: "Welcome to Mobile Legends,eh eh salah Welcome to Vemoy Website sang  editor berkelas Aku mau ngomong banya deh di web ini,sebenernya aku bikin ini bukan karena iseng,tapi karena ada yang pengen aku omongin dari lumayan lama, so baca sampai akhir yaa cantiilk",
+            
+            // Format waktu hitung maju sudah disesuaikan
+            startDate: "2025-09-05T00:00:00", 
+            
+            // Lagu dikosongkan jadi lagu default
+            musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            
+            // Pesan surat sebelum tombol pilihan jadian
+            proposalText: "Aku sadar hidup ngga selalu lancar kadang ribet n cape, tapi kalau dilewatibareng kamu, semua jadi kerasa happy full energi. Aku seriusan mau terus denger cerita kamu, nemenin kamu jajan, dan aku mau kamu jadi yang pertama buat aku.",
+            
+            // Teks Tampilan saat dia klik "YES!"
+            successHeadline: "LETSGOO!!  AKHIRNYA ! 💕",
+            successSub: "Makasih ya cantiik udah mau nerima aku! 💖",
+            successFooter: "LETSGOO JALAN JALAN☕🍰",
+            
+            // Catatan Perjalanan Cerita (Wajib 4 Bab)
+            chapters: [
+                { title: "Bab 1: Awal Mula 🗺️", desc: "Pertama kali chat. Rasanya canggung tapi jujur seru banget ,heran juga akunya kenapa harus lewat leo yakk hufftaku dari awal udah tau si kamu itu orang nya bakal gemesin dan ternyata ramalan aku bener,maklum cenayang." },
+                { title: "Bab 2: Ketawa Bareng 🍧", desc: "dari yang sering bercandaan, sering aku bikin kesel, dengerin cerita random kamu seharian tanpa bosen. Beneran bikin kecanduan hehe." },
+                { title: "Bab 3: Komplotan Ceria 🎒", desc: "Aku sadar aku bisa jadi diriku yang paling random pas bareng kamu, tanpa perlu gengsi sama sekali itu jadi bukti kalo aku beneran nyaman sama kamu. tapi aku bingung kenapa kamunya masih ngga begitu terbuka n masih malu malu ke aku." },
+                { title: "Bab 4: Hari Ini & Nanti 🌟", desc: "Distaym buat naikin level we just friend jadi sesuatu yang lebih bermakna anjay bermakna wkwk." }
+            ],
+            
+            // Sumber Foto Polaroid (Wajib 6 Foto)
+            photos: [
+                { url: "https://cdn.phototourl.com/free/2026-07-10-650a9292-aca8-4b8a-9ef4-d6f1df4db58c.jpg", caption: "Beneran gugup tapi seneng bgt,ngeselin nya rambut aku lagi recovery dari gundul." },
+                { url: "https://cdn.phototourl.com/free/2026-07-10-c08c7386-a8f5-4428-a135-300e8467a9b7.jpg", caption: "Seru banget + racunin kamu buat nonton avatar hehe." },
+                { url: "https://cdn.phototourl.com/free/2026-07-10-ae053892-d42f-4bd5-88f5-8a1ea622628e.jpg", caption: "Hari itu aku seneng banget sih,karna firsr bisa cubit pipi kamu wkwk." },
+                { url: "https://cdn.phototourl.com/free/2026-07-10-24483f5a-20ab-4f35-b8dc-9721093a211d.jpg", caption: "Aku seneng karena bisa nemenin day one kamu haid" },
+                { url: "https://cdn.phototourl.com/free/2026-07-10-cdb131cd-cbd4-48ab-8e01-11f76cf7903a.jpg", caption: "Dingin + ngantuk banget sih tapi tetep seru because with u." },
+                { url: "https://cdn.phototourl.com/free/2026-07-10-25e3b603-8891-4965-abf3-7263b37cf711.jpg", caption: "Hari yang bikin aku ngerasa ada,happy initnya seneng banget karena ngerayain ultah aku sama kamu kalo di inget lagi bikin aku nangis karna aku belum pernah ngerasain kaya gitu MAKASIH BANGET MOY KAMU YANG NGEBUAT HARI TERPENTING AKU JADI PALING BAHAGIA" }
+            ],
+            
+            // Tanya Jawab Absurd
+            faqs: [
+                { q: "Kenapa aku buat website ini?", a: "Karena aku pengen nyampein semuanya dengan cara yang spesial. Biar kamu bisa baca pelan-pelan tanpa aku keburu grogi atau lupa mau ngomong apa. 😭!" },
+                { q: "Sejak kapan aku suka n nyaman sama kamu?", a: "Jujur aku juga nggak tahu tanggal pastinya. Yang aku tahu, lama-lama aku jadi selalu nunggu chat kamu, seneng kalau ketemu kamu, dan hari rasanya lebih seru kalau ada kamu. KANGEN BANGET kalo abis ketemu" },
+                { q: "Kenapa kamu (Jemoy Cantiik)?", a: "Kalo kamu tau,kamu itu first experience aku moy, jujur sebelum nya aku ngga pernah pacaran deketin cewe pun ngga pernah,aku ngerasa ko pertama ketemu kamu ko kayana ini deh orangnya karna kamu bener bisa buat aku ngerasan nyaman happy n aku ngerasa sefrekuensi juga. Jadi banyak hal yang masih canggung dan baru buat aku,tapi justru itu yang bikin spesial." },
+                { q: "Tau bedanya WIFI sama kamu ngga?", a: "kalo WIFI nyambung ke Internet, kalo kamu nyambung ke aku asek asek asek" }
+            ]
+        };
+
+        // --- SISTEM PEMBACAAN CONFIG ---
+        let timerInterval = null;
+        window.addEventListener('DOMContentLoaded', () => {
+            initDOM();
+            initTypewriter();
+            initCountUp();
+            initFloatingElements();
+            initEversiveNoButton();
+            lucide.createIcons();
+        });
+
+        function initDOM() {
+            document.getElementById('nav-logo').innerText = MY_CONFIG.navLogo;
+            document.getElementById('footer-logo').innerText = MY_CONFIG.navLogo;
+            document.getElementById('hero-desc').innerText = MY_CONFIG.heroDesc;
+            document.getElementById('proposal-main-text').innerHTML = MY_CONFIG.proposalText + 
+                `<strong class="text-maruko-red font-cute text-3xl md:text-4xl block mt-6 select-none leading-normal">Will you be my girlfriend? 💖<br></strong>`;
+            document.getElementById('success-headline').innerText = MY_CONFIG.successHeadline;
+            document.getElementById('success-sub').innerText = MY_CONFIG.successSub;
+            document.getElementById('success-footer-msg').innerText = MY_CONFIG.successFooter;
+            document.getElementById('audio-source').src = MY_CONFIG.musicUrl;
+
+            // Render Bab
+            const chGrid = document.getElementById('chapters-grid');
+            chGrid.innerHTML = '';
+            const bgColors = ['bg-amber-50', 'bg-red-50', 'bg-blue-50', 'bg-emerald-50'];
+            const textColors = ['text-maruko-charcoal', 'text-maruko-red', 'text-maruko-navy', 'text-emerald-800'];
+            MY_CONFIG.chapters.forEach((ch, idx) => {
+                chGrid.innerHTML += `
+                    <div class="${bgColors[idx % 4]} p-6 rounded-3xl comic-border shadow-comic hover:-translate-y-1 transition-transform">
+                        <h3 class="font-cute text-xl font-bold ${textColors[idx % 4]} mb-2">${ch.title}</h3>
+                        <p class="text-sm leading-relaxed text-gray-700 font-medium">${ch.desc}</p>
+                    </div>`;
+            });
+
+            // Render Foto
+            const pGrid = document.getElementById('photo-grid');
+            pGrid.innerHTML = '';
+            const tilts = ['2deg', '-2deg', '3deg', '-3deg', '1.5deg', '-1.5deg'];
+            MY_CONFIG.photos.forEach((photo, idx) => {
+                pGrid.innerHTML += `
+                    <div class="polaroid-frame p-4 comic-border shadow-comic rounded-sm" style="--tilt: ${tilts[idx % 6]}; transform: rotate(${tilts[idx % 6]})">
+                        <div class="w-full aspect-square bg-gray-100 comic-border overflow-hidden rounded-md relative group">
+                            <img src="${photo.url}" alt="Memory" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                        <p class="font-cute text-sm text-center font-semibold mt-4 text-maruko-charcoal tracking-wide px-2 h-10 overflow-hidden text-ellipsis">${photo.caption}</p>
+                    </div>`;
+            });
+
+            // Render FAQ
+            const fGrid = document.getElementById('faq-grid');
+            fGrid.innerHTML = '';
+            MY_CONFIG.faqs.forEach((faq) => {
+                fGrid.innerHTML += `
+                    <div class="bg-white comic-border shadow-comic rounded-2xl overflow-hidden transition-all">
+                        <button onclick="toggleAccordion(this)" class="w-full p-5 text-left font-cute text-base md:text-lg font-bold text-maruko-charcoal flex justify-between items-center gap-4 hover:bg-yellow-50/40 transition-colors">
+                            <span>${faq.q}</span>
+                            <i data-lucide="chevron-down" class="accordion-arrow w-5 h-5 text-maruko-red transition-transform duration-300 shrink-0"></i>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 border-t-2 border-dashed border-maruko-charcoal/30 text-sm font-medium leading-relaxed text-gray-600 bg-amber-50/20">${faq.a}</div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function toggleAccordion(btn) {
+            const parent = btn.parentElement;
+            const isActive = parent.classList.contains('active-accordion');
+            document.querySelectorAll('#faq-grid > div').forEach(el => el.classList.remove('active-accordion'));
+            if (!isActive) parent.classList.add('active-accordion');
+        }
+
+        function initTypewriter() {
+            const target = document.getElementById('maruko-typewriter-greeting');
+            const text = MY_CONFIG.greeting;
+            let idx = 0;
+            target.classList.add('cursor');
+            function type() {
+                if (idx < text.length) {
+                    target.innerHTML += text.charAt(idx);
+                    idx++;
+                    setTimeout(type, 100);
+                } else {
+                    setTimeout(() => target.classList.remove('cursor'), 1500);
+                }
+            }
+            type();
+        }
+
+        function initCountUp() {
+            if (timerInterval) clearInterval(timerInterval);
+            const daysEl = document.getElementById('days'), hoursEl = document.getElementById('hours'), minsEl = document.getElementById('mins'), secsEl = document.getElementById('secs');
+            function updateTime() {
+                const diff = new Date().getTime() - new Date(MY_CONFIG.startDate).getTime();
+                if (isNaN(diff) || diff < 0) return;
+                daysEl.innerText = String(Math.floor(diff / 86400000)).padStart(2, '0');
+                hoursEl.innerText = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
+                minsEl.innerText = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+                secsEl.innerText = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+            }
+            setInterval(updateTime, 1000);
+            updateTime();
+        }
+
+        function initFloatingElements() {
+            const container = document.getElementById('floating-elements-container');
+            const shapes = ['🌸', '💖', '🎒', '✨', '🎈', '❤️'];
+            for (let i = 0; i < 15; i++) {
+                const p = document.createElement('div');
+                p.className = 'float-particle';
+                p.innerText = shapes[Math.floor(Math.random() * shapes.length)];
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.animationDuration = `${10 + Math.random() * 12}s`;
+                p.style.animationDelay = `${Math.random() * -15}s`;
+                p.style.fontSize = `${16 + Math.random() * 20}px`;
+                container.appendChild(p);
+            }
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById('background-audio');
+            const statusText = document.getElementById('music-status');
+            const disc = document.getElementById('vinyl-disc');
+            if (audio.paused) {
+                audio.play().then(() => {
+                    statusText.innerText = "PLAYING";
+                    disc.classList.add('vinyl-spin');
+                }).catch(() => alert("Klik layar sekali lagi untuk memutar musik ya!"));
+            } else {
+                audio.pause();
+                statusText.innerText = "MUTED";
+                disc.classList.remove('vinyl-spin');
+            }
+        }
+
+        function initEversiveNoButton() {
+            const btnNo = document.getElementById('btn-no'), btnYes = document.getElementById('btn-yes');
+            let counter = 0;
+            function escape() {
+                counter++;
+                const x = Math.random() * (window.innerWidth - btnNo.offsetWidth - 40) + 20;
+                const y = Math.random() * (window.innerHeight - btnNo.offsetHeight - 40) + 20;
+                btnNo.style.position = 'fixed';
+                btnNo.style.left = `${x}px`;
+                btnNo.style.top = `${y}px`;
+                if (counter <= 10) btnYes.style.transform = `scale(${1 + (counter * 0.15)})`;
+            }
+            btnNo.addEventListener('mouseenter', escape);
+            btnNo.addEventListener('touchstart', (e) => { e.preventDefault(); escape(); });
+        }
+
+        function celebrateYes() {
+            document.getElementById('background-audio').pause();
+            document.getElementById('success-view').classList.remove('hidden-section');
+            setTimeout(() => document.getElementById('success-card').classList.add('scale-100'), 50);
+            
+            const end = Date.now() + 5000;
+            const interval = setInterval(() => {
+                if (Date.now() > end) return clearInterval(interval);
+                confetti({ startVelocity: 30, spread: 360, ticks: 60, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+            }, 200);
+        }
+    </script>
+</body>
+</html>

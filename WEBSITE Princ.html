@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protokol Bulking Princess 30 Hari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+        
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background-color: #fdf2f8; /* pink-50 */
+            background-image: radial-gradient(#fbcfe8 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Custom scrollbar girly pink */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fdf2f8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #f472b6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #db2777; }
+        
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(252, 165, 165, 0.3);
+        }
+
+        .sparkle-text {
+            background: linear-gradient(to right, #db2777, #9333ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen pb-20">
+
+    <main class="max-w-4xl mx-auto p-4 md:p-8 space-y-8">
+        
+        <!-- Header -->
+        <header class="space-y-4 pt-4">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-crown text-pink-500 text-xl"></i>
+                        <span class="text-pink-600 font-bold uppercase tracking-wider text-sm">Glow-Up Journey</span>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-black text-gray-900 tracking-tight sparkle-text">Protokol Bulking Princess</h1>
+                    <p class="text-gray-600 mt-2 text-lg font-medium">Membangun kurva ideal (+5 s/d 7 Kg) dalam 30 Hari ✨</p>
+                </div>
+                <div class="flex gap-2 flex-wrap items-center">
+                    <div class="bg-pink-100 text-pink-700 px-4 py-2 rounded-xl border border-pink-200 text-sm font-bold flex items-center shadow-sm">
+                        <i class="fa-solid fa-arrow-trend-up mr-2 text-pink-500"></i> Extreme Surplus
+                    </div>
+                    <button onclick="downloadHTML()" class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md transition flex items-center gap-2 transform hover:scale-105">
+                        <i class="fa-solid fa-download"></i> Simpan App
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Panduan Bookmark -->
+            <div class="glass-panel border-l-4 border-rose-400 p-4 rounded-r-2xl rounded-l-md text-left text-sm text-rose-900 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 opacity-10"><i class="fa-solid fa-bookmark text-6xl"></i></div>
+                <strong><i class="fa-solid fa-star text-rose-500 mr-1"></i> Jangan Hilang Jejakmu, Princess:</strong> 
+                Klik tombol <strong>Simpan App</strong>. Buka file yang ter-download di browser, lalu klik tanda bintang ⭐ di pojok kanan atas URL (atau <strong>Ctrl + D</strong>). Web ini akan tersimpan permanen di HP/Laptop kamu!
+            </div>
+
+            <div class="glass-panel border-l-4 border-fuchsia-400 p-4 rounded-r-2xl rounded-l-md text-left text-sm text-fuchsia-900 shadow-sm relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 opacity-10"><i class="fa-solid fa-dumbbell text-6xl"></i></div>
+                <strong><i class="fa-solid fa-wand-magic-sparkles text-fuchsia-500 mr-1"></i> Strategi Glow-Up:</strong> Target 7-10 kg sebulan butuh asupan kalori yang *sangat besar*. Jangan hanya mengandalkan makanan bersih, manfaatkan makanan tinggi kalori yang mudah dikonsumsi (Susu full cream, selai kacang, es krim) ditambah <strong>Latihan Beban</strong> agar massa yang terbentuk juga berisi otot!
+            </div>
+        </header>
+
+        <!-- Calculator Section -->
+        <section class="glass-panel rounded-3xl shadow-lg p-6 md:p-8">
+            <h2 class="text-xl font-extrabold text-gray-900 mb-6 border-b border-pink-100 pb-4 flex items-center">
+                <div class="bg-pink-100 p-2 rounded-xl mr-3 text-pink-500"><i class="fa-solid fa-calculator"></i></div>
+                1. Kalkulator Royal Surplus (Target +7-10 kg)
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Berat Saat Ini (kg)</label>
+                    <input type="number" id="calc-weight" class="w-full border-2 border-pink-100 rounded-xl p-3 focus:border-pink-400 focus:ring-0 outline-none transition bg-white/50" placeholder="Misal: 45">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Tinggi (cm)</label>
+                    <input type="number" id="calc-height" class="w-full border-2 border-pink-100 rounded-xl p-3 focus:border-pink-400 focus:ring-0 outline-none transition bg-white/50" placeholder="Misal: 160">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Usia</label>
+                    <input type="number" id="calc-age" class="w-full border-2 border-pink-100 rounded-xl p-3 focus:border-pink-400 focus:ring-0 outline-none transition bg-white/50" placeholder="Misal: 22">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Gender</label>
+                    <select id="calc-gender" class="w-full border-2 border-pink-100 rounded-xl p-3 focus:border-pink-400 focus:ring-0 outline-none transition bg-white/50 font-medium">
+                        <option value="female">Princess (Wanita)</option>
+                        <option value="male">Prince (Pria)</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="calculateMacros()" class="w-full bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-600 hover:to-fuchsia-600 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-pink-200 flex justify-center items-center gap-2 transform hover:-translate-y-0.5">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Hitung Target Nutrisi Ekstrim
+            </button>
+
+            <!-- Results Area -->
+            <div id="macro-results" class="hidden mt-8 pt-6 border-t border-pink-100">
+                <div class="text-center mb-6">
+                    <p class="text-sm text-pink-500 font-bold uppercase tracking-widest">Target Makan Harianmu (Surplus)</p>
+                    <div id="target-calories" class="text-6xl font-black text-gray-900 mt-2 tracking-tight">0 <span class="text-2xl text-gray-400 font-bold">kcal</span></div>
+                    <p class="text-sm text-fuchsia-600 mt-3 font-bold bg-fuchsia-50 border border-fuchsia-100 inline-block px-4 py-1.5 rounded-full shadow-sm">
+                        <i class="fa-solid fa-arrow-up mr-1"></i> Ditambah surplus +1300 s/d +1800 kalori (Target 5-7 kg/Bulan)
+                    </p>
+                </div>
+                <div class="grid grid-cols-3 gap-3 md:gap-4">
+                    <div class="bg-rose-50 rounded-2xl p-4 text-center border-2 border-rose-100 shadow-sm">
+                        <div class="text-[10px] md:text-xs text-rose-600 font-black uppercase mb-1 tracking-wider">Protein<br><span class="font-medium normal-case text-rose-400">(Bahan Otot)</span></div>
+                        <div id="macro-protein" class="text-xl md:text-3xl font-black text-gray-900">0g</div>
+                    </div>
+                    <div class="bg-fuchsia-50 rounded-2xl p-4 text-center border-2 border-fuchsia-100 shadow-sm">
+                        <div class="text-[10px] md:text-xs text-fuchsia-600 font-black uppercase mb-1 tracking-wider">Karbo<br><span class="font-medium normal-case text-fuchsia-400">(Energi Latihan)</span></div>
+                        <div id="macro-carbs" class="text-xl md:text-3xl font-black text-gray-900">0g</div>
+                    </div>
+                    <div class="bg-pink-50 rounded-2xl p-4 text-center border-2 border-pink-100 shadow-sm">
+                        <div class="text-[10px] md:text-xs text-pink-600 font-black uppercase mb-1 tracking-wider">Lemak<br><span class="font-medium normal-case text-pink-400">(Hormon Sehat)</span></div>
+                        <div id="macro-fat" class="text-xl md:text-3xl font-black text-gray-900">0g</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3 Phases Module -->
+        <section class="glass-panel rounded-3xl shadow-lg overflow-hidden border border-pink-100">
+            <div class="bg-gradient-to-r from-pink-400 to-rose-400 p-5 md:px-8 flex items-center justify-between">
+                <h3 class="text-xl font-black text-white flex items-center">
+                    <i class="fa-solid fa-map-location-dot mr-3"></i> 2. Peta Perjalanan Bulking Ekstrim
+                </h3>
+                <i class="fa-regular fa-compass text-white/50 text-3xl"></i>
+            </div>
+            
+            <div class="divide-y divide-pink-50">
+                <!-- Phase 1 -->
+                <div class="p-5 md:p-8 hover:bg-pink-50/50 transition">
+                    <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                        <div class="bg-white border-2 border-pink-200 text-pink-500 font-black px-4 py-3 rounded-2xl text-center min-w-[90px] shadow-sm">
+                            <div class="text-[10px] uppercase tracking-widest mb-1 text-pink-400">FASE 1</div>
+                            <div class="text-3xl leading-none">1-10</div>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-black text-gray-900 mb-2">Pelebaran Lambung (Royal Feast)</h4>
+                            <p class="text-sm text-gray-600 mb-4 font-medium">Tujuan: Karena target kalori sangat tinggi, kamu harus minum kalorimu agar tidak begah.</p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-100">
+                                    <strong class="text-pink-600 block mb-3 font-bold"><i class="fa-solid fa-utensils text-pink-300 mr-2"></i> Strategi Makan</strong>
+                                    <ul class="list-disc pl-5 space-y-2 text-gray-600 marker:text-pink-300 font-medium">
+                                        <li>Makan <strong>4-5 kali sehari</strong> (porsi sedang-besar).</li>
+                                        <li><strong>Wajib Minum Kalori:</strong> Buat shake susu + selai kacang + pisang (Bisa sumbang 800+ kalori dengan mudah).</li>
+                                        <li>Gunakan minyak sehat (zaitun) ekstra di setiap masakan.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-100">
+                                    <strong class="text-pink-600 block mb-3 font-bold"><i class="fa-solid fa-person-running text-pink-300 mr-2"></i> Olahraga (Ringan-Sedang)</strong>
+                                    <ul class="list-disc pl-5 space-y-2 text-gray-600 marker:text-pink-300 font-medium">
+                                        <li>Adaptasi home workout 2-3x seminggu.</li>
+                                        <li>Jangan kardio berlebihan! Fokus hemat kalori untuk ditimbun.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="p-5 md:p-8 hover:bg-pink-50/50 transition">
+                    <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                        <div class="bg-fuchsia-100 border-2 border-fuchsia-200 text-fuchsia-600 font-black px-4 py-3 rounded-2xl text-center min-w-[90px] shadow-sm">
+                            <div class="text-[10px] uppercase tracking-widest mb-1 text-fuchsia-400">FASE 2</div>
+                            <div class="text-3xl leading-none">11-20</div>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-black text-gray-900 mb-2">Pembangunan Kastil Otot</h4>
+                            <p class="text-sm text-gray-600 mb-4 font-medium">Tujuan: Karena berat badan naik cepat, pastikan tubuh dilatih beban agar yang naik tidak dominan lemak perut.</p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-fuchsia-100">
+                                    <strong class="text-fuchsia-600 block mb-3 font-bold"><i class="fa-solid fa-egg text-fuchsia-300 mr-2"></i> Fokus Nutrisi Padat</strong>
+                                    <ul class="list-disc pl-5 space-y-2 text-gray-600 marker:text-fuchsia-300 font-medium">
+                                        <li>Tambahkan telur rebus sebagai snack camilan.</li>
+                                        <li>Makan es krim atau dessert di malam hari untuk mengejar sisa kalori (Dirty bulk strategy).</li>
+                                        <li>Pastikan bar kalori di kalkulator bawah tercapai 100%.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-fuchsia-100">
+                                    <strong class="text-fuchsia-600 block mb-3 font-bold"><i class="fa-solid fa-dumbbell text-fuchsia-300 mr-2"></i> Latihan Beban</strong>
+                                    <ul class="list-disc pl-5 space-y-2 text-gray-600 marker:text-fuchsia-300 font-medium">
+                                        <li>Gunakan beban (Dumbbell/Botol air/Karet resistance).</li>
+                                        <li>Fokus squats, lunges, dan glute bridge agar lemak/otot terdistribusi ke kurva badan.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="p-5 md:p-8 bg-rose-50/50 hover:bg-rose-100/50 transition">
+                    <div class="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+                        <div class="bg-rose-500 border-2 border-rose-600 text-white font-black px-4 py-3 rounded-2xl text-center min-w-[90px] shadow-md shadow-rose-200">
+                            <div class="text-[10px] uppercase tracking-widest mb-1 text-rose-200">FASE 3</div>
+                            <div class="text-3xl leading-none">21-30</div>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-black text-gray-900 mb-2">Mahkota Kekuatan (Final 10kg Push)</h4>
+                            <p class="text-sm text-gray-600 mb-4 font-medium">Tujuan: Konsistensi super ketat. Ini fase terberat untuk menelan semua kalori itu setiap hari.</p>
+                            <div class="grid md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-rose-200">
+                                    <strong class="text-rose-600 block mb-3 font-bold"><i class="fa-solid fa-bullseye text-rose-300 mr-2"></i> Target Ketat</strong>
+                                    <ul class="list-disc pl-5 space-y-2 text-gray-600 marker:text-rose-400 font-medium">
+                                        <li>Makan walau tidak lapar! (Gunakan pengingat alarm HP untuk jadwal ngemil).</li>
+                                        <li>Tidur wajib 7-8 jam untuk optimalisasi hormon pertumbuhan.</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-rose-200">
+                                    <strong class="text-rose-600 block mb-3 font-bold"><i class="fa-solid fa-fire text-rose-300 mr-2"></i> Progressive Overload</strong>
+                                    <ul class="list-disc pl-5 space-y-2 text-gray-600 marker:text-rose-400 font-medium">
+                                        <li>Tambah beban dari minggu sebelumnya.</li>
+                                        <li>Otot harus terus ditantang agar kalori raksasa ini menjadi daging, bukan sekadar lemak.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Food Calculator Tracker -->
+        <section class="glass-panel rounded-3xl shadow-lg border border-pink-200 p-6 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-6">
+                <div>
+                    <h3 class="text-2xl font-black text-gray-900 flex items-center">
+                        <div class="bg-pink-100 p-2 rounded-xl mr-3 text-pink-500"><i class="fa-solid fa-bowl-food"></i></div>
+                        3. Buku Harian Santapan
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-2 font-medium">Catat makanmu. Untuk target bulking 10kg, bar harus sampai <span class="text-pink-500 font-bold">100% penuh!</span></p>
+                </div>
+                <div class="text-left md:text-right bg-white p-4 rounded-2xl border-2 border-pink-100 shadow-sm min-w-[200px]">
+                    <p class="text-[10px] font-black text-pink-400 uppercase tracking-widest mb-1">Status Kalori Hari Ini</p>
+                    <div class="text-3xl font-black text-gray-900 leading-none">
+                        <span id="food-remaining" class="text-pink-500">0</span> 
+                        <span class="text-sm font-bold text-gray-400">/ <span id="food-target-text-small">-</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-12 gap-6 md:gap-8">
+                <!-- Input Form -->
+                <div class="md:col-span-5 bg-pink-50/50 p-5 rounded-2xl border border-pink-100">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Menu Tinggi Kalorimu</label>
+                            <select id="food-select" class="w-full border-2 border-pink-200 rounded-xl p-3 focus:border-pink-400 focus:ring-0 outline-none text-sm bg-white font-medium shadow-sm">
+                                <!-- Generated via JS -->
+                            </select>
+                            <div class="mt-2 text-right">
+                                <button onclick="toggleCustomFood()" class="text-xs text-pink-500 font-bold hover:text-pink-700 transition flex items-center justify-end w-full gap-1">
+                                    <i class="fa-solid fa-pen-to-square"></i> Buat Menu Baru Sendiri
+                                </button>
+                            </div>
+
+                            <!-- Custom Food Input Box -->
+                            <div id="custom-food-form" class="hidden mt-3 p-4 bg-white border-2 border-pink-200 rounded-xl shadow-sm">
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">Nama Makanan Baru</label>
+                                        <input type="text" id="custom-food-name" class="w-full border-2 border-pink-100 rounded-lg p-2 outline-none text-sm focus:border-pink-400 font-medium" placeholder="Contoh: Pasta Carbonara Keju">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-700 mb-1">Total Kalori (Perkiraan)</label>
+                                        <input type="number" id="custom-food-cal" class="w-full border-2 border-pink-100 rounded-lg p-2 outline-none text-sm focus:border-pink-400 font-medium" placeholder="Contoh: 800">
+                                    </div>
+                                    <button onclick="saveCustomFood()" class="w-full bg-pink-100 text-pink-700 border border-pink-200 font-bold py-2.5 rounded-lg hover:bg-pink-200 transition text-sm flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-floppy-disk"></i> Simpan ke Menu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-1/3">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Porsi</label>
+                                <input type="number" id="food-qty" value="1" min="1" step="0.5" class="w-full border-2 border-pink-200 rounded-xl p-3 text-center focus:border-pink-400 outline-none text-base font-bold shadow-sm">
+                            </div>
+                            <div class="w-2/3 flex items-end">
+                                <button onclick="addFood()" class="w-full bg-pink-500 text-white font-black py-3 rounded-xl hover:bg-pink-600 transition shadow-md shadow-pink-200 flex justify-center items-center gap-2">
+                                    <i class="fa-solid fa-plus"></i> Makan!
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- List & Progress -->
+                <div class="md:col-span-7 flex flex-col justify-between bg-white p-5 rounded-2xl border border-pink-100 shadow-sm">
+                    <div class="mb-5">
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Dimakan</p>
+                                <p class="text-xl font-black text-gray-800" id="food-total-text">0 kcal</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-black text-pink-400 uppercase tracking-widest">Target Bulking</p>
+                                <p class="text-sm font-bold text-pink-600" id="food-target-text">-</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-5 border border-gray-200 overflow-hidden relative shadow-inner">
+                            <div id="food-progress-bar" class="bg-gradient-to-r from-rose-300 to-pink-400 h-full transition-all duration-700 rounded-full" style="width: 0%"></div>
+                            <!-- Success indicator text overlay -->
+                            <div id="progress-success-text" class="absolute inset-0 flex items-center justify-center text-xs font-bold text-white opacity-0 transition-opacity drop-shadow-md">
+                                TARGET TERCAPAI! ✨
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 font-medium text-center" id="progress-subtext">Perut harus siap, ayo isi kalorinya Princess!</p>
+                    </div>
+
+                    <!-- Food Log List -->
+                    <div class="flex-grow overflow-y-auto max-h-[200px] custom-scrollbar pr-2">
+                        <ul id="food-log-list" class="space-y-3">
+                            <!-- Items Generated via JS -->
+                        </ul>
+                        <div id="food-empty-state" class="h-full flex flex-col items-center justify-center text-pink-200 py-10">
+                            <i class="fa-solid fa-plate-wheat text-5xl mb-3 drop-shadow-sm"></i>
+                            <p class="text-sm font-bold text-gray-400">Buku harian masih kosong</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Water Tracker -->
+        <section class="glass-panel rounded-3xl shadow-lg border border-blue-200 p-6 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+                <div>
+                    <h3 class="text-xl font-black text-gray-900 flex items-center">
+                        <div class="bg-blue-100 p-2 rounded-xl mr-3 text-blue-500"><i class="fa-solid fa-droplet"></i></div>
+                        4. Potion Hidrasi Ekstra (3.5 Liter)
+                    </h3>
+                    <p class="text-sm text-gray-500 mt-1 font-medium">Asupan makan sangat tinggi butuh air tinggi untuk dicerna. Minum 14 gelas!</p>
+                </div>
+                <button onclick="resetWater()" class="bg-white border border-blue-100 text-blue-400 hover:text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-xl text-sm font-bold transition shadow-sm">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> Reset Air
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 md:gap-3 justify-center md:justify-start" id="water-grid">
+                <!-- Gelas digenerate JS -->
+            </div>
+            <p class="text-center md:text-left text-sm font-black text-blue-500 mt-5 bg-blue-50 inline-block px-4 py-2 rounded-xl border border-blue-100">
+                <i class="fa-solid fa-glass-water mr-1"></i> Terkumpul: <span id="water-count" class="text-lg">0</span> / 14 Gelas
+            </p>
+        </section>
+
+        <!-- 30-Day Checkbox -->
+        <section class="glass-panel rounded-3xl shadow-lg border border-pink-200 p-6 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="text-xl font-black text-gray-900 mb-1 flex items-center">
+                        <div class="bg-fuchsia-100 p-2 rounded-xl mr-3 text-fuchsia-500"><i class="fa-solid fa-calendar-check"></i></div>
+                        5. Jurnal 30 Hari Glow-Up
+                    </h3>
+                    <p class="text-sm text-gray-500 font-medium">Klik pada hari untuk melihat riwayat atau mencentang progres harianmu.</p>
+                </div>
+                <button onclick="openSaveModal()" class="bg-gray-900 hover:bg-black text-white px-6 py-3 rounded-xl text-sm font-black shadow-lg transition flex items-center justify-center gap-2 transform hover:scale-105">
+                    <i class="fa-solid fa-lock"></i> Kunci Progres Hari Ini
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-5 md:grid-cols-10 gap-3 md:gap-4" id="tracker-grid">
+                <!-- Checkbox digenerate JS -->
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- ================= MODALS ================= -->
+    
+    <!-- Generic Message Modal -->
+    <div id="msg-modal" class="fixed inset-0 bg-pink-900/40 hidden flex-col items-center justify-center z-[100] p-4 backdrop-blur-sm transition-opacity opacity-0">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform duration-300 border-2 border-pink-100" id="msg-modal-content">
+            <div id="msg-icon" class="text-6xl mb-4 drop-shadow-md"></div>
+            <h3 id="msg-title" class="text-2xl font-black text-gray-900 mb-2">Pesan</h3>
+            <p id="msg-body" class="text-sm text-gray-600 mb-8 font-medium leading-relaxed whitespace-pre-line">Isi pesan</p>
+            <button onclick="closeMsgModal()" class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-xl font-black w-full transition shadow-md">Baik, Princess 💖</button>
+        </div>
+    </div>
+
+    <!-- Save Progress Modal -->
+    <div id="save-modal" class="fixed inset-0 bg-pink-900/40 hidden flex-col items-center justify-center z-50 p-4 backdrop-blur-sm opacity-0 transition-opacity">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl transform scale-95 transition-transform duration-300 border-2 border-pink-100" id="save-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-gray-900">Simpan Jurnal Hari Ini</h2>
+                <button onclick="closeSaveModal()" class="text-gray-400 hover:text-pink-500 bg-gray-50 hover:bg-pink-50 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="bg-gradient-to-r from-pink-50 to-fuchsia-50 border border-pink-200 p-5 rounded-2xl mb-6 grid grid-cols-2 gap-4 text-center shadow-inner">
+                <div>
+                    <p class="text-[10px] text-pink-600 font-black uppercase mb-1 tracking-widest">Total Kalori</p>
+                    <p id="save-summary-cal" class="text-3xl font-black text-gray-900">0 <span class="text-sm font-bold text-gray-500">kcal</span></p>
+                </div>
+                <div class="border-l border-pink-200">
+                    <p class="text-[10px] text-blue-600 font-black uppercase mb-1 tracking-widest">Potion Air</p>
+                    <p id="save-summary-water" class="text-3xl font-black text-gray-900">0 <span class="text-sm font-bold text-gray-500">gelas</span></p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Simpan ke Hari Ke-Berapa?</label>
+                <select id="save-day-select" class="w-full border-2 border-pink-200 rounded-xl p-3.5 focus:border-pink-500 focus:ring-0 outline-none text-sm bg-white font-bold cursor-pointer text-pink-700 shadow-sm">
+                    <!-- Generated Options -->
+                </select>
+                <p class="text-xs text-gray-500 mt-2 font-medium bg-gray-50 p-2 rounded-lg"><i class="fa-solid fa-circle-info mr-1 text-pink-400"></i> Data makanan & air hari ini akan dikunci permanen di jurnal dan kotak hari akan dicentang otomatis.</p>
+            </div>
+
+            <button onclick="confirmSaveDay()" class="w-full bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600 text-white font-black py-4 rounded-xl transition shadow-lg flex justify-center items-center gap-2 text-lg">
+                <i class="fa-solid fa-lock"></i> Kunci & Tandai Selesai
+            </button>
+        </div>
+    </div>
+
+    <!-- Detail History Modal -->
+    <div id="detail-modal" class="fixed inset-0 bg-pink-900/40 hidden flex-col items-center justify-center z-50 p-4 backdrop-blur-sm opacity-0 transition-opacity">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-md max-h-[85vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 border-2 border-pink-100" id="detail-modal-content">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6 shrink-0">
+                <div class="flex flex-col">
+                    <h2 id="detail-title" class="text-2xl font-black text-gray-900">Hari X</h2>
+                    <div id="detail-status-container" class="mt-1"></div>
+                </div>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-pink-500 bg-gray-50 hover:bg-pink-50 w-10 h-10 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div class="overflow-y-auto flex-grow pr-2 custom-scrollbar">
+                
+                <!-- Empty State -->
+                <div id="detail-empty" class="text-center py-12 hidden flex-col items-center justify-center h-full">
+                    <div class="bg-pink-50 w-20 h-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fa-regular fa-book-open text-4xl text-pink-300"></i>
+                    </div>
+                    <p class="text-base font-black text-gray-800 mb-1">Jurnal Kosong</p>
+                    <p class="text-sm text-gray-500 font-medium px-4">Princess belum mencatat riwayat makanan atau air di hari ini.</p>
+                </div>
+
+                <!-- Data Content -->
+                <div id="detail-content" class="space-y-6 hidden pb-4">
+                    <p id="detail-date" class="text-xs text-pink-600 font-bold bg-pink-50 inline-block px-3 py-1.5 rounded-lg border border-pink-100 uppercase tracking-wide"></p>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-white p-4 rounded-2xl border-2 border-fuchsia-100 text-center shadow-sm">
+                            <p class="text-[10px] text-fuchsia-500 font-black uppercase mb-1 tracking-widest"><i class="fa-solid fa-fire text-fuchsia-300 mr-1"></i> Kalori Masuk</p>
+                            <p id="detail-cal" class="text-2xl font-black text-gray-900">0 <span class="text-sm font-bold text-gray-400">kcal</span></p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border-2 border-blue-100 text-center shadow-sm">
+                            <p class="text-[10px] text-blue-500 font-black uppercase mb-1 tracking-widest"><i class="fa-solid fa-droplet text-blue-300 mr-1"></i> Air Diminum</p>
+                            <p id="detail-water" class="text-2xl font-black text-gray-900">0 <span class="text-sm font-bold text-gray-400">gelas</span></p>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-pink-100 rounded-2xl overflow-hidden shadow-sm">
+                        <div class="bg-pink-50 p-3 border-b border-pink-100">
+                            <h4 class="text-xs font-black text-pink-700 uppercase tracking-widest"><i class="fa-solid fa-utensils mr-2 text-pink-400"></i> Riwayat Santapan</h4>
+                        </div>
+                        <ul id="detail-food-list" class="divide-y divide-pink-50 bg-white">
+                            <!-- Injected by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="pt-5 mt-2 border-t border-gray-100 shrink-0">
+                <button id="detail-toggle-btn" onclick="toggleDayStatus()" class=""></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA BESIS BULKING ---
+        const foodDatabase = [
+            { id: 'b1', name: 'Nasi Putih (1 Centong Munjung)', cal: 130 },
+            { id: 'b2', name: 'Dada Ayam Bakar/Rebus (100g)', cal: 165 },
+            { id: 'b3', name: 'Telur Rebus/Ceplok (1 Butir)', cal: 75 },
+            { id: 'b4', name: 'Susu Full Cream (1 Gelas 250ml)', cal: 160 },
+            { id: 'b5', name: 'Roti Gandum (2 Lembar)', cal: 140 },
+            { id: 'b6', name: 'Selai Kacang (1 Sdm)', cal: 95 },
+            { id: 'b7', name: 'Alpukat (1 Buah Sedang)', cal: 250 },
+            { id: 'b8', name: 'Oatmeal (4 Sdm) + Susu', cal: 220 },
+            { id: 'b9', name: 'Pasta/Spaghetti Bolognese (1 Porsi)', cal: 400 },
+            { id: 'b10', name: 'Daging Sapi Lada Hitam (1 Porsi)', cal: 300 },
+            { id: 'b11', name: 'Smoothie Buah + Yoghurt', cal: 200 },
+            { id: 'b12', name: 'Tahu/Tempe Goreng (2 Potong)', cal: 140 },
+            { id: 'b13', name: 'Kacang Almond (Segenggam)', cal: 160 },
+            { id: 'b14', name: 'Ayam Goreng Tepung (Paha Atas)', cal: 350 },
+            { id: 'b15', name: 'Es Krim (1 Scoop) - Treat', cal: 140 },
+            { id: 'b16', name: 'Whey Protein (1 Scoop)', cal: 120 },
+            // Menu extra kalori tinggi untuk kejar 5-7kg
+            { id: 'b17', name: 'Bulking Shake (Susu+Pisang+SelaiKacang)', cal: 650 },
+            { id: 'b18', name: 'Mie Instan Goreng (Double Porsi)', cal: 760 },
+            { id: 'b19', name: 'Pizza (1 Slice Besar)', cal: 285 }
+        ];
+
+        let combinedDatabase = [...foodDatabase];
+        let currentDetailDayIndex = 0;
+
+        // --- INIT ALL ---
+        window.onload = function() {
+            initDayTracker();
+            initWaterTracker();
+            initFoodTracker();
+        };
+
+        // --- MODAL UTILS ---
+        function showMsg(title, msg, type = 'info') {
+            const modal = document.getElementById('msg-modal');
+            const content = document.getElementById('msg-modal-content');
+            const iconEl = document.getElementById('msg-icon');
+            
+            document.getElementById('msg-title').textContent = title;
+            document.getElementById('msg-body').textContent = msg;
+
+            if (type === 'error') {
+                iconEl.innerHTML = '<i class="fa-solid fa-circle-exclamation text-rose-500"></i>';
+                document.getElementById('msg-title').className = "text-2xl font-black text-rose-600 mb-2";
+            } else if (type === 'success') {
+                iconEl.innerHTML = '<i class="fa-solid fa-crown text-fuchsia-500"></i>';
+                document.getElementById('msg-title').className = "text-2xl font-black text-fuchsia-600 mb-2";
+            } else {
+                iconEl.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i>';
+                document.getElementById('msg-title').className = "text-2xl font-black text-pink-600 mb-2";
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeMsgModal() {
+            const modal = document.getElementById('msg-modal');
+            const content = document.getElementById('msg-modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        // --- STREAMING_CHUNK:Implementing Calculator & Data Logic... ---
+        // --- 1. CALCULATOR LOGIC (BULKING) ---
+        function calculateMacros() {
+            const w = parseFloat(document.getElementById('calc-weight').value);
+            const h = parseFloat(document.getElementById('calc-height').value);
+            const a = parseFloat(document.getElementById('calc-age').value);
+            const gender = document.getElementById('calc-gender').value;
+
+            if (!w || !h || !a) {
+                showMsg("Oops, Data Kosong!", "Tolong isi Berat, Tinggi, dan Usia kamu dulu ya Princess.", "error");
+                return;
+            }
+
+            // Mifflin-St Jeor Equation
+            let bmr = (10 * w) + (6.25 * h) - (5 * a);
+            bmr = gender === 'male' ? bmr + 5 : bmr - 161;
+
+            // Sedentary to Light active base
+            const tdee = bmr * 1.25; 
+            
+            // BULKING SURPLUS (Target 5-7 kg per bulan)
+            // 5 kg/bulan = +1283 kcal/hari. 7 kg/bulan = +1796 kcal/hari.
+            let surplus = gender === 'female' ? 1300 : 1800;
+            let targetCalories = Math.round(tdee + surplus);
+
+            // Bulking Macros
+            let protein = Math.round(w * 1.8); // 1.8g per kg for building muscle
+            let proteinCals = protein * 4;
+
+            // Lemak dinaikkan jadi 1.3g agar mudah mengejar target kalori tanpa terlalu begah
+            let fat = Math.round(w * 1.3); 
+            let fatCals = fat * 9;
+
+            let carbCals = targetCalories - (proteinCals + fatCals);
+            let carbs = Math.max(50, Math.round(carbCals / 4)); // Rest is energy
+
+            document.getElementById('target-calories').innerHTML = `${targetCalories} <span class="text-3xl text-gray-400 font-bold">kcal</span>`;
+            document.getElementById('macro-protein').textContent = `${protein}g`;
+            document.getElementById('macro-fat').textContent = `${fat}g`;
+            document.getElementById('macro-carbs').textContent = `${carbs}g`;
+
+            document.getElementById('macro-results').classList.remove('hidden');
+
+            // Save target
+            let today = new Date().toDateString();
+            let foodData = JSON.parse(localStorage.getItem('bulkFoodData')) || { date: today, items: [], target: 0 };
+            foodData.target = targetCalories;
+            localStorage.setItem('bulkFoodData', JSON.stringify(foodData));
+            
+            renderFoodList(foodData);
+        }
+
+        // --- 2. FOOD TRACKER LOGIC ---
+        function initFoodTracker() {
+            let savedCustomFoods = JSON.parse(localStorage.getItem('bulkCustomFoods')) || [];
+            combinedDatabase = [...foodDatabase, ...savedCustomFoods];
+
+            const select = document.getElementById('food-select');
+            select.innerHTML = ''; 
+            combinedDatabase.forEach(food => {
+                const option = document.createElement('option');
+                option.value = food.id;
+                option.textContent = `${food.name} (~${food.cal} kcal)`;
+                select.appendChild(option);
+            });
+
+            let today = new Date().toDateString();
+            let foodData = JSON.parse(localStorage.getItem('bulkFoodData')) || null;
+            
+            if (!foodData || foodData.date !== today) {
+                let existingTarget = foodData ? foodData.target : 0;
+                foodData = { date: today, items: [], target: existingTarget };
+                localStorage.setItem('bulkFoodData', JSON.stringify(foodData));
+            }
+
+            renderFoodList(foodData);
+        }
+
+        function toggleCustomFood() {
+            const form = document.getElementById('custom-food-form');
+            form.classList.toggle('hidden');
+        }
+
+        function saveCustomFood() {
+            const name = document.getElementById('custom-food-name').value.trim();
+            const cal = parseInt(document.getElementById('custom-food-cal').value);
+
+            if (!name || isNaN(cal) || cal <= 0) {
+                showMsg("Format Salah", "Isi nama makanan dan angka kalori dengan benar ya.", "error");
+                return;
+            }
+
+            const newCustomItem = {
+                id: 'c_' + Date.now(),
+                name: name + ' ✨',
+                cal: cal
+            };
+
+            let customDatabase = JSON.parse(localStorage.getItem('bulkCustomFoods')) || [];
+            customDatabase.push(newCustomItem);
+            localStorage.setItem('bulkCustomFoods', JSON.stringify(customDatabase));
+
+            document.getElementById('custom-food-name').value = '';
+            document.getElementById('custom-food-cal').value = '';
+            toggleCustomFood();
+
+            initFoodTracker();
+            document.getElementById('food-select').value = newCustomItem.id;
+            
+            showMsg("Menu Ditambahkan!", `${name} siap untuk bantu bulkingmu.`, "success");
+        }
+
+        function addFood() {
+            let foodData = JSON.parse(localStorage.getItem('bulkFoodData'));
+            const selectId = document.getElementById('food-select').value;
+            const qty = parseFloat(document.getElementById('food-qty').value) || 1;
+            
+            const selectedFood = combinedDatabase.find(f => f.id === selectId);
+            if(selectedFood) {
+                const newItem = {
+                    id: Date.now().toString(),
+                    name: selectedFood.name,
+                    qty: qty,
+                    cal: Math.round(selectedFood.cal * qty)
+                };
+                foodData.items.push(newItem);
+                localStorage.setItem('bulkFoodData', JSON.stringify(foodData));
+                renderFoodList(foodData);
+            }
+        }
+
+        function deleteFood(itemId) {
+            let foodData = JSON.parse(localStorage.getItem('bulkFoodData'));
+            foodData.items = foodData.items.filter(item => item.id !== itemId);
+            localStorage.setItem('bulkFoodData', JSON.stringify(foodData));
+            renderFoodList(foodData);
+        }
+
+        function renderFoodList(data) {
+            const listEl = document.getElementById('food-log-list');
+            const emptyEl = document.getElementById('food-empty-state');
+            const progressBar = document.getElementById('food-progress-bar');
+            const successText = document.getElementById('progress-success-text');
+            const subText = document.getElementById('progress-subtext');
+            
+            listEl.innerHTML = '';
+            let totalCals = 0;
+
+            if (!data.items || data.items.length === 0) {
+                emptyEl.classList.remove('hidden');
+            } else {
+                emptyEl.classList.add('hidden');
+                data.items.forEach(item => {
+                    totalCals += item.cal;
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center text-sm py-2 px-1";
+                    li.innerHTML = `
+                        <div class="flex flex-col">
+                            <span class="font-bold text-gray-800">${item.name}</span>
+                            <span class="text-[11px] text-pink-400 font-bold uppercase tracking-wider">Porsi: ${item.qty}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-pink-600 font-black bg-pink-50 px-2 py-1 rounded-lg">${item.cal} kcal</span>
+                            <button onclick="deleteFood('${item.id}')" class="text-gray-300 hover:text-rose-500 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    `;
+                    listEl.appendChild(li);
+                });
+            }
+
+            document.getElementById('food-total-text').textContent = `${totalCals} kcal`;
+            document.getElementById('food-remaining').textContent = totalCals;
+            
+            let target = data.target || 0;
+            if(target === 0) {
+                document.getElementById('food-target-text').textContent = "Pencet Tombol Hitung!";
+                document.getElementById('food-target-text-small').textContent = "-";
+                progressBar.style.width = "0%";
+                successText.classList.add('opacity-0');
+            } else {
+                document.getElementById('food-target-text').textContent = `${target} kcal`;
+                document.getElementById('food-target-text-small').textContent = target;
+                
+                let percentage = (totalCals / target) * 100;
+                
+                if (percentage > 100) percentage = 100;
+                progressBar.style.width = `${percentage}%`;
+                
+                // Styling based on Bulking Goal (Hitting target is Good)
+                if(percentage >= 100) {
+                    progressBar.className = "bg-gradient-to-r from-fuchsia-400 to-fuchsia-500 h-full transition-all duration-700 rounded-full";
+                    successText.classList.remove('opacity-0');
+                    subText.textContent = "Hebat! Kalori raksasa hari ini tercapai! Otot & kurva siap mekar! 👑";
+                    subText.className = "text-xs mt-2 font-bold text-center text-fuchsia-600";
+                    document.getElementById('food-remaining').className = "text-fuchsia-500";
+                } else if (percentage > 70) {
+                    progressBar.className = "bg-gradient-to-r from-pink-400 to-pink-500 h-full transition-all duration-700 rounded-full";
+                    successText.classList.add('opacity-0');
+                    subText.textContent = "Bagus sekali Princess! Ayo selesaikan sisa kalorinya sebelum tidur!";
+                    subText.className = "text-xs text-gray-500 mt-2 font-medium text-center";
+                    document.getElementById('food-remaining').className = "text-pink-500";
+                } else {
+                    progressBar.className = "bg-gradient-to-r from-rose-200 to-pink-300 h-full transition-all duration-700 rounded-full";
+                    successText.classList.add('opacity-0');
+                    subText.textContent = "Targetmu sangat tinggi. Minum kalorimu kalau sulit dimakan!";
+                    subText.className = "text-xs text-gray-500 mt-2 font-medium text-center";
+                    document.getElementById('food-remaining').className = "text-gray-700";
+                }
+            }
+        }
+
+        // --- 3. WATER TRACKER LOGIC ---
+        function initWaterTracker() {
+            let today = new Date().toDateString();
+            let waterData = JSON.parse(localStorage.getItem('bulkWaterData')) || { date: today, count: 0 };
+            
+            if (waterData.date !== today) {
+                waterData = { date: today, count: 0 };
+                localStorage.setItem('bulkWaterData', JSON.stringify(waterData));
+            }
+            renderWaterGrid(waterData.count);
+        }
+
+        function toggleWater(index) {
+            let waterData = JSON.parse(localStorage.getItem('bulkWaterData'));
+            if(index <= waterData.count) {
+                waterData.count = index - 1; 
+            } else {
+                waterData.count = index; 
+            }
+            localStorage.setItem('bulkWaterData', JSON.stringify(waterData));
+            renderWaterGrid(waterData.count);
+        }
+
+        function resetWater() {
+            let today = new Date().toDateString();
+            let waterData = { date: today, count: 0 };
+            localStorage.setItem('bulkWaterData', JSON.stringify(waterData));
+            renderWaterGrid(0);
+        }
+
+        function renderWaterGrid(count) {
+            const grid = document.getElementById('water-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 14; i++) {
+                const isFull = i <= count;
+                const div = document.createElement('div');
+                div.onclick = () => toggleWater(i);
+                
+                div.className = `w-11 h-14 md:w-12 md:h-16 rounded-xl flex flex-col items-center justify-end cursor-pointer transition-all border-2 overflow-hidden relative
+                    ${isFull ? 'bg-blue-50 border-blue-300 shadow-inner scale-95' : 'bg-white border-blue-100 hover:border-blue-300'}`;
+                
+                if (isFull) {
+                    div.innerHTML = `
+                        <div class="w-full bg-blue-300 absolute bottom-0 transition-all duration-500" style="height: 70%;"></div>
+                        <i class="fa-solid fa-droplet text-white z-10 mb-2 text-xl drop-shadow-md"></i>
+                    `;
+                } else {
+                    div.innerHTML = `<i class="fa-solid fa-droplet text-blue-100 mb-2 text-xl"></i>`;
+                }
+                
+                grid.appendChild(div);
+            }
+            document.getElementById('water-count').textContent = count;
+        }
+
+        // --- 4. 30-DAY TRACKER LOGIC ---
+        function initDayTracker() {
+            let trackerData = JSON.parse(localStorage.getItem('bulk30Days')) || Array(30).fill(false);
+            const grid = document.getElementById('tracker-grid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < 30; i++) {
+                const dayDiv = document.createElement('div');
+                const isChecked = trackerData[i];
+                
+                dayDiv.onclick = () => openDetailModal(i);
+                
+                dayDiv.className = `aspect-square rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all border-2 
+                    ${isChecked ? 'bg-gradient-to-br from-pink-400 to-fuchsia-500 border-transparent shadow-md shadow-pink-200 transform hover:scale-105' : 'bg-white border-pink-100 hover:border-fuchsia-300 hover:bg-pink-50'}`;
+                
+                dayDiv.innerHTML = `
+                    <span class="text-[9px] font-black tracking-widest ${isChecked ? 'text-pink-100' : 'text-gray-300'}">HARI</span>
+                    <span class="text-xl md:text-2xl font-black ${isChecked ? 'text-white' : 'text-gray-700'} leading-none my-0.5">${i + 1}</span>
+                    ${isChecked ? '<i class="fa-solid fa-crown text-yellow-300 mt-1 text-sm drop-shadow-sm"></i>' : ''}
+                `;
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        // --- 5. HISTORY & SAVING LOGIC ---
+        function openSaveModal() {
+            let foodData = JSON.parse(localStorage.getItem('bulkFoodData'));
+            let waterData = JSON.parse(localStorage.getItem('bulkWaterData'));
+            let totalCals = 0;
+            
+            if (foodData && foodData.items) {
+                totalCals = foodData.items.reduce((sum, item) => sum + item.cal, 0);
+            }
+            let waterCount = waterData ? waterData.count : 0;
+
+            document.getElementById('save-summary-cal').innerHTML = `${totalCals} <span class="text-sm font-bold text-gray-400">kcal</span>`;
+            document.getElementById('save-summary-water').innerHTML = `${waterCount} <span class="text-sm font-bold text-gray-400">gelas</span>`;
+
+            let trackerData = JSON.parse(localStorage.getItem('bulk30Days')) || Array(30).fill(false);
+            let firstUnchecked = trackerData.indexOf(false);
+            
+            let daySelect = document.getElementById('save-day-select');
+            daySelect.innerHTML = '';
+            
+            for (let i = 1; i <= 30; i++) {
+                let opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `Hari ke-${i} ${trackerData[i-1] ? ' (Sudah Selesai - Akan Ditimpa)' : ''}`;
+                daySelect.appendChild(opt);
+            }
+            
+            if (firstUnchecked !== -1) {
+                daySelect.value = firstUnchecked + 1;
+            } else {
+                daySelect.value = 30; 
+            }
+
+            const modal = document.getElementById('save-modal');
+            const content = document.getElementById('save-modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeSaveModal() {
+            const modal = document.getElementById('save-modal');
+            const content = document.getElementById('save-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        function confirmSaveDay() {
+            let dayStr = document.getElementById('save-day-select').value;
+            let dayIndex = parseInt(dayStr) - 1;
+
+            let foodData = JSON.parse(localStorage.getItem('bulkFoodData'));
+            let waterData = JSON.parse(localStorage.getItem('bulkWaterData'));
+            
+            let historyData = JSON.parse(localStorage.getItem('bulkHistoryData')) || Array(30).fill(null);
+            let trackerData = JSON.parse(localStorage.getItem('bulk30Days')) || Array(30).fill(false);
+
+            let totalCals = 0;
+            let items = [];
+            if (foodData && foodData.items) {
+                totalCals = foodData.items.reduce((sum, item) => sum + item.cal, 0);
+                items = [...foodData.items];
+            }
+            let waterCount = waterData ? waterData.count : 0;
+
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = new Date().toLocaleDateString('id-ID', dateOptions);
+
+            historyData[dayIndex] = {
+                date: dateString,
+                totalCals: totalCals,
+                waterCount: waterCount,
+                items: items
+            };
+
+            trackerData[dayIndex] = true;
+
+            localStorage.setItem('bulkHistoryData', JSON.stringify(historyData));
+            localStorage.setItem('bulk30Days', JSON.stringify(trackerData));
+
+            closeSaveModal();
+            initDayTracker(); 
+            
+            showMsg("Progres Tersimpan! 👑", `Data jurnalmu berhasil dikunci di Hari ke-${dayIndex + 1}. Teruskan makannya, 10 Kg tidak akan terbentuk sendiri!`, "success");
+        }
+
+        // --- 6. DETAIL HISTORY LOGIC ---
+        function openDetailModal(dayIndex) {
+            currentDetailDayIndex = dayIndex;
+            let historyData = JSON.parse(localStorage.getItem('bulkHistoryData')) || Array(30).fill(null);
+            let trackerData = JSON.parse(localStorage.getItem('bulk30Days')) || Array(30).fill(false);
+            
+            let dayData = historyData[dayIndex];
+            let isDone = trackerData[dayIndex];
+
+            document.getElementById('detail-title').textContent = `Jurnal Hari ${dayIndex + 1}`;
+            
+            let statusContainer = document.getElementById('detail-status-container');
+            if (isDone) {
+                statusContainer.innerHTML = '<span class="bg-fuchsia-100 text-fuchsia-600 px-3 py-1 rounded-md text-[10px] font-black border border-fuchsia-200 uppercase tracking-widest"><i class="fa-solid fa-crown mr-1"></i> Misi Selesai</span>';
+            } else {
+                statusContainer.innerHTML = '<span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-md text-[10px] font-black border border-gray-200 uppercase tracking-widest"><i class="fa-solid fa-hourglass-half mr-1"></i> Sedang Berjalan</span>';
+            }
+
+            const contentDiv = document.getElementById('detail-content');
+            const emptyDiv = document.getElementById('detail-empty');
+
+            if (dayData && (dayData.items.length > 0 || dayData.waterCount > 0)) {
+                document.getElementById('detail-date').textContent = dayData.date || "Tanggal Tidak Tersedia";
+                document.getElementById('detail-cal').innerHTML = `${dayData.totalCals} <span class="text-sm font-bold text-gray-400">kcal</span>`;
+                document.getElementById('detail-water').innerHTML = `${dayData.waterCount} <span class="text-sm font-bold text-gray-400">gelas</span>`;
+                
+                let list = document.getElementById('detail-food-list');
+                list.innerHTML = '';
+                
+                if (dayData.items.length === 0) {
+                    list.innerHTML = '<li class="text-sm text-gray-400 text-center py-4 italic">Tidak ada makanan tercatat.</li>';
+                } else {
+                    dayData.items.forEach(item => {
+                        list.innerHTML += `
+                            <li class="flex justify-between items-center text-sm p-3">
+                                <span class="text-gray-700 font-bold">${item.name} <span class="text-xs text-pink-400 font-black ml-1">x${item.qty}</span></span> 
+                                <span class="font-black text-pink-600">${item.cal} kcal</span>
+                            </li>`;
+                    });
+                }
+                
+                contentDiv.classList.remove('hidden');
+                emptyDiv.classList.add('hidden');
+                emptyDiv.classList.remove('flex');
+            } else {
+                contentDiv.classList.add('hidden');
+                emptyDiv.classList.remove('hidden');
+                emptyDiv.classList.add('flex');
+            }
+
+            let toggleBtn = document.getElementById('detail-toggle-btn');
+            if (isDone) {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-rotate-left mr-2"></i> Batal Tandai Selesai';
+                toggleBtn.className = "w-full bg-white text-rose-500 font-bold py-3 rounded-xl border-2 border-rose-200 hover:bg-rose-50 transition shadow-sm";
+            } else {
+                toggleBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Tandai Selesai (Manual)';
+                toggleBtn.className = "w-full bg-gradient-to-r from-fuchsia-400 to-pink-500 text-white font-black py-3 rounded-xl hover:from-fuchsia-500 hover:to-pink-600 transition shadow-md shadow-pink-200";
+            }
+
+            const modal = document.getElementById('detail-modal');
+            const modalContent = document.getElementById('detail-modal-content');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detail-modal');
+            const content = document.getElementById('detail-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        function toggleDayStatus() {
+            let trackerData = JSON.parse(localStorage.getItem('bulk30Days')) || Array(30).fill(false);
+            trackerData[currentDetailDayIndex] = !trackerData[currentDetailDayIndex];
+            localStorage.setItem('bulk30Days', JSON.stringify(trackerData));
+            
+            initDayTracker(); 
+            openDetailModal(currentDetailDayIndex); 
+        }
+
+        // --- DOWNLOAD WEB LOGIC ---
+        function downloadHTML() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'GlowUp_Bulking_Princess_Extreme.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            const guideText = "File App berhasil disimpan ke HP/Laptop kamu.\n\nLangkah selanjutnya:\n1. Buka file 'GlowUp_Bulking_Princess_Extreme.html' di Browser.\n2. Tekan tombol Ctrl + D (Atau klik ikon Bintang ⭐ di pojok atas)\n3. App ini akan tersimpan abadi di Bookmark!";
+            
+            showMsg("App Berhasil Diunduh! ✨", guideText, "success");
+        }
+    </script>
+</body>
+</html>

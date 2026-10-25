@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WDD Creator Pro - Gen Z Edition</title>
+    
+    <!-- Fonts: Plus Jakarta Sans (UI), Space Grotesk (Modern Headers), Inter (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        docBody: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366f1', // Indigo 500
+                        secondary: '#ec4899', // Pink 500
+                        surface: '#0f172a', // Slate 900
+                        surfaceLight: '#1e293b', // Slate 800
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.15)',
+                        'neon': '0 0 15px rgba(99, 102, 241, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        body { background-color: #0b0f19; color: #f8fafc; }
+        
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Form Inputs */
+        .input-modern {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #f8fafc;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        .input-modern:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            background: rgba(15, 23, 42, 0.9);
+        }
+        .input-label { display: block; font-size: 0.875rem; font-weight: 600; color: #94a3b8; margin-bottom: 0.5rem; }
+
+        /* Accordion Animations */
+        .accordion-content {
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            max-height: 3000px; /* arbitrary large */
+            opacity: 1;
+            overflow: hidden;
+        }
+        .accordion-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            border: none;
+        }
+        .accordion-icon { transition: transform 0.3s ease; }
+        .collapsed .accordion-icon { transform: rotate(-90deg); }
+
+        /* A4 Document Preview Styles (Strictly for the right pane & printing) */
+        .a4-canvas {
+            background: #ffffff;
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
+        .doc-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #0f172a; }
+        .doc-h2 { 
+            font-family: 'Space Grotesk', sans-serif; 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            color: #0f172a; 
+            border-bottom: 2px solid #e2e8f0; 
+            padding-bottom: 0.5rem; 
+            margin-top: 2.5rem; 
+            margin-bottom: 1.25rem; 
+        }
+        .doc-h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.125rem; font-weight: 600; color: #334155; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .doc-p { font-size: 0.95rem; line-height: 1.7; color: #475569; margin-bottom: 1rem; white-space: pre-wrap; }
+        
+        .priority-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .prio-high { background: #fee2e2; color: #b91c1c; }
+        .prio-med { background: #fef3c7; color: #b45309; }
+        .prio-low { background: #e0e7ff; color: #4338ca; }
+
+        /* Print Settings */
+        @media print {
+            /* 1. Reset root constraints (Wajib agar halaman bisa lebih dari 1) */
+            html, body { 
+                height: auto !important; 
+                overflow: visible !important; 
+                background: white !important;
+                display: block !important;
+            }
+            
+            /* 2. Sembunyikan elemen UI Editor & Dekorasi */
+            nav, aside, .no-print { 
+                display: none !important; 
+            }
+            
+            /* 3. Lepaskan batasan layout dari wrapper utama */
+            .flex-1, main {
+                display: block !important;
+                overflow: visible !important;
+                height: auto !important;
+                width: 100% !important;
+                padding: 0 !important;
+                background: white !important;
+                box-shadow: none !important;
+            }
+            
+            /* 4. Normalisasi Canvas A4 untuk ekspor PDF */
+            #live-preview { 
+                position: static !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                min-height: auto !important;
+                margin: 0 !important; 
+                padding: 0 !important; /* Gunakan margin dari @page agar rapi */
+                border: none !important; 
+                box-shadow: none !important;
+            }
+            
+            @page { 
+                margin: 15mm; 
+                size: A4 portrait; 
+            }
+            
+            * { 
+                -webkit-print-color-adjust: exact !important; 
+                print-color-adjust: exact !important; 
+            }
+            
+            /* 5. Manajemen Pagination (Agar tabel/teks tidak terpotong canggung antar halaman) */
+            .doc-section, .bg-slate-50, table { 
+                page-break-inside: avoid; 
+                break-inside: avoid; 
+            }
+            h1, h2, h3, thead { 
+                page-break-after: avoid; 
+                break-after: avoid; 
+            }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden font-sans selection:bg-primary selection:text-white">
+
+    <nav class="glass-panel h-16 flex items-center justify-between px-6 shrink-0 z-20 border-b border-white/10 no-print">
+        <div class="flex items-center gap-3">
+            <div class="bg-gradient-to-tr from-primary to-secondary w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-neon">
+                <i class="fa-solid fa-layer-group text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-white text-lg leading-tight tracking-tight">WDD<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Pro</span></h1>
+                <p class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Gen-Z Document Builder</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2 md:gap-3">
+            <!-- File IO -->
+            <input type="file" id="importFile" accept=".json" class="hidden" onchange="importProject(event)">
+            <button onclick="document.getElementById('importFile').click()" class="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2" title="Import JSON">
+                <i class="fa-solid fa-folder-open"></i> <span class="hidden md:inline">Buka</span>
+            </button>
+            <button onclick="exportProject()" class="px-3 py-2 text-sm font-medium text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-2" title="Export JSON">
+                <i class="fa-solid fa-download"></i> <span class="hidden md:inline">Simpan Data</span>
+            </button>
+            
+            <div class="w-px h-6 bg-gray-700 mx-1"></div>
+            
+            <!-- Actions -->
+            <button onclick="loadTemplate()" class="px-3 py-2 text-sm font-medium text-indigo-300 hover:text-indigo-100 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> <span class="hidden md:inline">Auto Fill</span>
+            </button>
+            <button onclick="clearData()" class="px-3 py-2 text-sm font-medium text-red-400 hover:text-red-200 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+            
+            <button onclick="window.print()" class="ml-2 px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-neon rounded-lg transition-all flex items-center gap-2 transform hover:scale-105">
+                <i class="fa-solid fa-print"></i> Export PDF
+            </button>
+        </div>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <!-- Background decorative blobs -->
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] pointer-events-none -z-10 no-print"></div>
+        <div class="absolute bottom-[-10%] right-[40%] w-[30%] h-[30%] bg-secondary/20 rounded-full blur-[100px] pointer-events-none -z-10 no-print"></div>
+
+        <!-- Left Pane: Editor Form -->
+        <aside class="w-full md:w-1/2 lg:w-[45%] overflow-y-auto no-print border-r border-white/5 custom-scroll pb-24">
+            <div class="p-4 md:p-6 space-y-4">
+                
+                <!-- Section 1: Informasi Proyek -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <button class="w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 text-left font-semibold text-white" onclick="toggleSection('sec-general', this)">
+                        <span class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center"><i class="fa-solid fa-rocket"></i></div> 1. Detail Proyek</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500 accordion-icon"></i>
+                    </button>
+                    <div id="sec-general" class="accordion-content px-5 pb-5 pt-2">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="input-label">Nama Website / Proyek</label>
+                                <input type="text" id="in-projectName" class="input-modern" placeholder="Cth: Numa - Next Gen E-Commerce">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="input-label">Nama Klien</label>
+                                    <input type="text" id="in-clientName" class="input-modern" placeholder="PT. Inovasi Digital">
+                                </div>
+                                <div>
+                                    <label class="input-label">Status Proyek</label>
+                                    <select id="in-status" class="input-modern">
+                                        <option value="Draft">Draft (Perencanaan)</option>
+                                        <option value="Approved">Approved (Disetujui)</option>
+                                        <option value="In Progress">In Progress (Berjalan)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="input-label">Penulis Dokumen</label>
+                                    <input type="text" id="in-author" class="input-modern" placeholder="Nama Kamu">
+                                </div>
+                                <div>
+                                    <label class="input-label">Tanggal Rilis</label>
+                                    <input type="date" id="in-date" class="input-modern">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="input-label">Executive Summary</label>
+                                <textarea id="in-summary" rows="3" class="input-modern" placeholder="Deskripsikan visi utama dan masalah apa yang dipecahkan oleh website ini..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Pasar & Audiens -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <button class="w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 text-left font-semibold text-white" onclick="toggleSection('sec-market', this)">
+                        <span class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-pink-500/20 text-pink-400 flex items-center justify-center"><i class="fa-solid fa-users-rays"></i></div> 2. Pasar & Audiens</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500 accordion-icon"></i>
+                    </button>
+                    <div id="sec-market" class="accordion-content px-5 pb-5 pt-2 collapsed">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="input-label">Target Audiens (User Persona)</label>
+                                <textarea id="in-audience" rows="2" class="input-modern" placeholder="Usia 18-35 tahun, tech-savvy, mencari kemudahan berbelanja..."></textarea>
+                            </div>
+                            <div>
+                                <label class="input-label flex justify-between">
+                                    Referensi / Kompetitor
+                                    <button onclick="addItem('competitors')" class="text-xs text-secondary hover:text-pink-300">+ Tambah</button>
+                                </label>
+                                <div id="list-competitors" class="space-y-2 mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Fitur Utama -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <button class="w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 text-left font-semibold text-white" onclick="toggleSection('sec-features', this)">
+                        <span class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fa-solid fa-wand-magic-sparkles"></i></div> 3. Spesifikasi Fitur</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500 accordion-icon"></i>
+                    </button>
+                    <div id="sec-features" class="accordion-content px-5 pb-5 pt-2 collapsed">
+                        <div class="space-y-3">
+                            <label class="input-label flex justify-between">
+                                Daftar Fitur Website
+                                <button onclick="addItem('features')" class="text-xs text-emerald-400 hover:text-emerald-200">+ Tambah Fitur</button>
+                            </label>
+                            <div id="list-features" class="space-y-3 mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Branding & Visual -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <button class="w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 text-left font-semibold text-white" onclick="toggleSection('sec-branding', this)">
+                        <span class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center"><i class="fa-solid fa-palette"></i></div> 4. Desain & Visual</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500 accordion-icon"></i>
+                    </button>
+                    <div id="sec-branding" class="accordion-content px-5 pb-5 pt-2 collapsed">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="input-label">Palet Warna (Hex/RGB)</label>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-surfaceLight/50 p-3 rounded-xl border border-white/5">
+                                    <div class="flex flex-col items-center gap-1">
+                                        <input type="color" id="in-color1" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0">
+                                        <span class="text-[10px] text-gray-400">Primary</span>
+                                    </div>
+                                    <div class="flex flex-col items-center gap-1">
+                                        <input type="color" id="in-color2" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0">
+                                        <span class="text-[10px] text-gray-400">Secondary</span>
+                                    </div>
+                                    <div class="flex flex-col items-center gap-1">
+                                        <input type="color" id="in-color3" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0">
+                                        <span class="text-[10px] text-gray-400">Accent</span>
+                                    </div>
+                                    <div class="flex flex-col items-center gap-1">
+                                        <input type="color" id="in-color4" class="w-10 h-10 rounded cursor-pointer bg-transparent border-0 p-0" value="#ffffff">
+                                        <span class="text-[10px] text-gray-400">Background</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="input-label">Font Heading</label>
+                                    <select id="in-fontHead" class="input-modern">
+                                        <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                                        <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+                                        <option value="'Inter', sans-serif">Inter</option>
+                                        <option value="Arial, sans-serif">Arial</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="input-label">Font Body</label>
+                                    <select id="in-fontBody" class="input-modern">
+                                        <option value="'Inter', sans-serif">Inter</option>
+                                        <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+                                        <option value="'Roboto', sans-serif">Roboto</option>
+                                        <option value="Arial, sans-serif">Arial</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Sitemap -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <button class="w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 text-left font-semibold text-white" onclick="toggleSection('sec-sitemap', this)">
+                        <span class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center"><i class="fa-solid fa-sitemap"></i></div> 5. Arsitektur Informasi</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500 accordion-icon"></i>
+                    </button>
+                    <div id="sec-sitemap" class="accordion-content px-5 pb-5 pt-2 collapsed">
+                        <div class="space-y-3">
+                            <label class="input-label flex justify-between">
+                                Struktur Halaman (Sitemap)
+                                <button onclick="addItem('sitemap')" class="text-xs text-orange-400 hover:text-orange-200">+ Tambah Halaman</button>
+                            </label>
+                            <div id="list-sitemap" class="space-y-3 mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6: Tech Stack -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <button class="w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 text-left font-semibold text-white" onclick="toggleSection('sec-tech', this)">
+                        <span class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center"><i class="fa-solid fa-microchip"></i></div> 6. Teknologi (Tech Stack)</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500 accordion-icon"></i>
+                    </button>
+                    <div id="sec-tech" class="accordion-content px-5 pb-5 pt-2 collapsed">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="input-label">Frontend</label>
+                                <input type="text" id="in-techFront" class="input-modern" placeholder="Next.js, Tailwind">
+                            </div>
+                            <div>
+                                <label class="input-label">Backend</label>
+                                <input type="text" id="in-techBack" class="input-modern" placeholder="Node.js, Express">
+                            </div>
+                            <div>
+                                <label class="input-label">Database</label>
+                                <input type="text" id="in-techDb" class="input-modern" placeholder="PostgreSQL">
+                            </div>
+                            <div>
+                                <label class="input-label">Hosting/Cloud</label>
+                                <input type="text" id="in-techHost" class="input-modern" placeholder="Vercel, AWS">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 7: Timeline -->
+                <div class="glass-panel rounded-2xl overflow-hidden border border-white/10">
+                    <button class="w-full px-5 py-4 flex items-center justify-between hover:bg-white/5 text-left font-semibold text-white" onclick="toggleSection('sec-timeline', this)">
+                        <span class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-yellow-500/20 text-yellow-400 flex items-center justify-center"><i class="fa-solid fa-timeline"></i></div> 7. Milestone Proyek</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500 accordion-icon"></i>
+                    </button>
+                    <div id="sec-timeline" class="accordion-content px-5 pb-5 pt-2 collapsed">
+                        <div class="space-y-3">
+                            <label class="input-label flex justify-between">
+                                Tahapan Pengerjaan
+                                <button onclick="addItem('timeline')" class="text-xs text-yellow-400 hover:text-yellow-200">+ Tambah Tahap</button>
+                            </label>
+                            <div id="list-timeline" class="space-y-3 mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Sticky auto-save info -->
+            <div class="fixed bottom-0 left-0 w-full md:w-1/2 lg:w-[45%] p-3 text-center text-xs text-gray-500 bg-surface/80 backdrop-blur-sm border-t border-white/10 z-10">
+                <i class="fa-solid fa-cloud-arrow-up text-green-400 mr-1"></i> Data disinkronisasi ke browser secara real-time.
+            </div>
+        </aside>
+
+        <!-- Right Pane: Live Document Preview -->
+        <main class="hidden md:flex w-full md:w-1/2 lg:w-[55%] bg-slate-200 overflow-y-auto justify-center p-8 custom-scroll relative group shadow-[inset_10px_0_20px_-10px_rgba(0,0,0,0.2)]">
+            
+            <!-- Floating Zoom Info -->
+            <div class="fixed top-20 right-8 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 no-print">
+                <i class="fa-solid fa-magnifying-glass mr-1"></i> A4 Preview (Ctrl+P to Print)
+            </div>
+
+            <!-- The A4 Canvas -->
+            <div id="live-preview" class="a4-canvas w-[210mm] min-h-[297mm] shadow-2xl rounded-sm p-[15mm] relative box-border">
+                
+                <!-- Document Header -->
+                <header class="border-b-[3px] border-slate-800 pb-6 mb-8 flex justify-between items-end doc-section">
+                    <div>
+                        <h1 class="doc-title text-4xl leading-tight mb-2" id="out-projectName">Nama Proyek</h1>
+                        <p class="text-lg text-slate-500 font-medium">Prepared for: <span class="text-slate-800" id="out-clientName">Client Name</span></p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Web Design Document</div>
+                        <div class="inline-block bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded text-sm mb-1 border border-slate-200" id="out-status">Draft</div>
+                        <div class="text-sm text-slate-500" id="out-date">DD/MM/YYYY</div>
+                    </div>
+                </header>
+
+                <!-- 1. Executive Summary -->
+                <section class="mb-8 doc-section">
+                    <h2 class="doc-h2 mt-0">1. Executive Summary</h2>
+                    <p class="doc-p" id="out-summary">Ringkasan eksekutif proyek akan muncul di sini.</p>
+                </section>
+
+                <!-- 2. Market & Audience -->
+                <section class="mb-8 doc-section">
+                    <h2 class="doc-h2">2. Target Audience & Market</h2>
+                    <h3 class="doc-h3 mt-0">2.1 User Persona</h3>
+                    <p class="doc-p" id="out-audience">-</p>
+                    
+                    <h3 class="doc-h3">2.2 Competitor / Reference Links</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-slate-600 text-sm" id="out-competitors">
+                        <li class="italic text-slate-400">Belum ada referensi.</li>
+                    </ul>
+                </section>
+
+                <!-- 3. Features Matrix -->
+                <section class="mb-8 doc-section">
+                    <h2 class="doc-h2">3. Feature Requirements</h2>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 border-b border-slate-200">
+                                    <th class="p-3 font-semibold text-slate-700 w-2/3">Feature Description</th>
+                                    <th class="p-3 font-semibold text-slate-700 w-1/3">Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody id="out-features" class="divide-y divide-slate-100">
+                                <tr><td colspan="2" class="p-3 italic text-slate-400">Belum ada fitur ditambahkan.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 4. Design Guidelines -->
+                <section class="mb-8 doc-section">
+                    <h2 class="doc-h2">4. Design Guidelines</h2>
+                    <div class="flex gap-8">
+                        <div class="w-1/2">
+                            <h3 class="doc-h3 mt-0">Color Palette</h3>
+                            <div class="flex h-16 rounded-lg overflow-hidden border border-slate-200 shadow-sm mt-3">
+                                <div class="flex-1" id="out-bg-color1"></div>
+                                <div class="flex-1" id="out-bg-color2"></div>
+                                <div class="flex-1" id="out-bg-color3"></div>
+                                <div class="flex-1" id="out-bg-color4"></div>
+                            </div>
+                            <div class="flex mt-2 text-[10px] text-center font-mono text-slate-500 uppercase">
+                                <div class="flex-1" id="out-hex-color1">#</div>
+                                <div class="flex-1" id="out-hex-color2">#</div>
+                                <div class="flex-1" id="out-hex-color3">#</div>
+                                <div class="flex-1" id="out-hex-color4">#</div>
+                            </div>
+                        </div>
+                        <div class="w-1/2">
+                            <h3 class="doc-h3 mt-0">Typography</h3>
+                            <div class="mt-3">
+                                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Heading Font</div>
+                                <div class="text-2xl" id="out-fontHead-preview">Aa Bb Cc</div>
+                                <div class="text-xs text-slate-500 font-mono mt-1 mb-4" id="out-fontHead-name">-</div>
+                                
+                                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Body Font</div>
+                                <div class="text-base" id="out-fontBody-preview">The quick brown fox jumps over the lazy dog.</div>
+                                <div class="text-xs text-slate-500 font-mono mt-1" id="out-fontBody-name">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Sitemap -->
+                <section class="mb-8 doc-section">
+                    <h2 class="doc-h2">5. Information Architecture (Sitemap)</h2>
+                    <div class="grid grid-cols-2 gap-4" id="out-sitemap">
+                        <p class="italic text-slate-400 text-sm col-span-2">Belum ada struktur halaman.</p>
+                    </div>
+                </section>
+
+                <!-- 6. Tech Stack & 7. Timeline -->
+                <section class="mb-8 doc-section">
+                    <div class="flex gap-8">
+                        <div class="w-1/2">
+                            <h2 class="doc-h2">6. Tech Stack</h2>
+                            <ul class="space-y-3 mt-4 text-sm">
+                                <li class="flex border-b border-slate-100 pb-2"><span class="w-24 font-semibold text-slate-600">Frontend</span> <span class="font-medium text-slate-900" id="out-techFront">-</span></li>
+                                <li class="flex border-b border-slate-100 pb-2"><span class="w-24 font-semibold text-slate-600">Backend</span> <span class="font-medium text-slate-900" id="out-techBack">-</span></li>
+                                <li class="flex border-b border-slate-100 pb-2"><span class="w-24 font-semibold text-slate-600">Database</span> <span class="font-medium text-slate-900" id="out-techDb">-</span></li>
+                                <li class="flex border-b border-slate-100 pb-2"><span class="w-24 font-semibold text-slate-600">Hosting</span> <span class="font-medium text-slate-900" id="out-techHost">-</span></li>
+                            </ul>
+                        </div>
+                        <div class="w-1/2">
+                            <h2 class="doc-h2">7. Project Timeline</h2>
+                            <div class="relative border-l-2 border-slate-200 ml-3 mt-4 space-y-4" id="out-timeline">
+                                <p class="italic text-slate-400 text-sm ml-4">Belum ada tahapan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <div class="mt-12 pt-4 border-t border-slate-200 text-xs text-slate-400 flex justify-between font-mono doc-section">
+                    <span id="out-footerAuthor">Generated by WDD Pro</span>
+                    <span>Page 1 of 1</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- 1. State Management ---
+        const initialState = {
+            general: { projectName: '', clientName: '', status: 'Draft', author: '', date: '', summary: '' },
+            market: { audience: '', competitors: [{id: 1, name: '', url: ''}] },
+            features: [{id: 1, text: '', priority: 'Medium'}],
+            design: { color1: '#6366f1', color2: '#ec4899', color3: '#0f172a', color4: '#ffffff', fontHead: "'Space Grotesk', sans-serif", fontBody: "'Inter', sans-serif" },
+            sitemap: [{id: 1, title: 'Home', desc: 'Landing page utama'}],
+            tech: { front: '', back: '', db: '', host: '' },
+            timeline: [{id: 1, phase: 'Phase 1: Design', duration: '2 Weeks'}]
+        };
+
+        let appState = JSON.parse(JSON.stringify(initialState));
+
+        // --- 2. Core Functions (Render & Sync) ---
+        function initApp() {
+            loadFromStorage();
+            bindStaticInputs();
+            renderDynamicLists();
+            updatePreview();
+        }
+
+        // Bind single string/static inputs to State
+        function bindStaticInputs() {
+            const mappings = [
+                { id: 'in-projectName', path: ['general', 'projectName'] },
+                { id: 'in-clientName', path: ['general', 'clientName'] },
+                { id: 'in-status', path: ['general', 'status'] },
+                { id: 'in-author', path: ['general', 'author'] },
+                { id: 'in-date', path: ['general', 'date'] },
+                { id: 'in-summary', path: ['general', 'summary'] },
+                { id: 'in-audience', path: ['market', 'audience'] },
+                { id: 'in-color1', path: ['design', 'color1'] },
+                { id: 'in-color2', path: ['design', 'color2'] },
+                { id: 'in-color3', path: ['design', 'color3'] },
+                { id: 'in-color4', path: ['design', 'color4'] },
+                { id: 'in-fontHead', path: ['design', 'fontHead'] },
+                { id: 'in-fontBody', path: ['design', 'fontBody'] },
+                { id: 'in-techFront', path: ['tech', 'front'] },
+                { id: 'in-techBack', path: ['tech', 'back'] },
+                { id: 'in-techDb', path: ['tech', 'db'] },
+                { id: 'in-techHost', path: ['tech', 'host'] }
+            ];
+
+            mappings.forEach(m => {
+                const el = document.getElementById(m.id);
+                if(!el) return;
+                
+                // Set initial value from state
+                el.value = appState[m.path[0]][m.path[1]];
+                
+                // Add event listener
+                el.addEventListener('input', (e) => {
+                    appState[m.path[0]][m.path[1]] = e.target.value;
+                    updatePreview();
+                    saveToStorage();
+                });
+            });
+        }
+
+        // --- 3. Dynamic Lists Controllers ---
+        window.addItem = (type) => {
+            const id = Date.now();
+            if(type === 'competitors') appState.market.competitors.push({id, name: '', url: ''});
+            if(type === 'features') appState.features.push({id, text: '', priority: 'Medium'});
+            if(type === 'sitemap') appState.sitemap.push({id, title: '', desc: ''});
+            if(type === 'timeline') appState.timeline.push({id, phase: '', duration: ''});
+            
+            renderDynamicLists();
+            updatePreview();
+            saveToStorage();
+        };
+
+        window.updateItem = (type, id, field, value) => {
+            let collection = [];
+            if(type === 'competitors') collection = appState.market.competitors;
+            if(type === 'features') collection = appState.features;
+            if(type === 'sitemap') collection = appState.sitemap;
+            if(type === 'timeline') collection = appState.timeline;
+
+            const item = collection.find(i => i.id === id);
+            if(item) {
+                item[field] = value;
+                updatePreview();
+                saveToStorage();
+            }
+        };
+
+        window.removeItem = (type, id) => {
+            if(type === 'competitors') appState.market.competitors = appState.market.competitors.filter(i => i.id !== id);
+            if(type === 'features') appState.features = appState.features.filter(i => i.id !== id);
+            if(type === 'sitemap') appState.sitemap = appState.sitemap.filter(i => i.id !== id);
+            if(type === 'timeline') appState.timeline = appState.timeline.filter(i => i.id !== id);
+            
+            renderDynamicLists();
+            updatePreview();
+            saveToStorage();
+        };
+
+        // Render HTML for Forms based on State
+        function renderDynamicLists() {
+            // Competitors
+            document.getElementById('list-competitors').innerHTML = appState.market.competitors.map(c => `
+                <div class="flex gap-2 items-center bg-surfaceLight/30 p-2 rounded-lg border border-white/5">
+                    <input type="text" class="input-modern !py-1 !px-2 !text-xs flex-1" placeholder="Nama..." value="${c.name}" oninput="updateItem('competitors', ${c.id}, 'name', this.value)">
+                    <input type="text" class="input-modern !py-1 !px-2 !text-xs flex-1" placeholder="URL..." value="${c.url}" oninput="updateItem('competitors', ${c.id}, 'url', this.value)">
+                    <button onclick="removeItem('competitors', ${c.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+
+            // Features
+            document.getElementById('list-features').innerHTML = appState.features.map(f => `
+                <div class="flex flex-col gap-2 bg-surfaceLight/30 p-3 rounded-lg border border-white/5 relative group">
+                    <button onclick="removeItem('features', ${f.id})" class="absolute top-2 right-2 text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-xmark"></i></button>
+                    <input type="text" class="input-modern !py-1.5 !px-3 !text-sm w-[90%]" placeholder="Deskripsi fitur..." value="${f.text}" oninput="updateItem('features', ${f.id}, 'text', this.value)">
+                    <div class="flex gap-2">
+                        <select class="input-modern !py-1 !px-2 !text-xs w-auto" onchange="updateItem('features', ${f.id}, 'priority', this.value)">
+                            <option value="High" ${f.priority === 'High' ? 'selected' : ''}>High Priority</option>
+                            <option value="Medium" ${f.priority === 'Medium' ? 'selected' : ''}>Medium Priority</option>
+                            <option value="Low" ${f.priority === 'Low' ? 'selected' : ''}>Low Priority</option>
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+
+            // Sitemap
+            document.getElementById('list-sitemap').innerHTML = appState.sitemap.map(s => `
+                <div class="flex flex-col gap-2 bg-surfaceLight/30 p-3 rounded-lg border border-white/5 relative group">
+                    <button onclick="removeItem('sitemap', ${s.id})" class="absolute top-2 right-2 text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"><i class="fa-solid fa-xmark"></i></button>
+                    <input type="text" class="input-modern !py-1.5 !px-3 !text-sm w-[90%]" placeholder="Nama Halaman (cth: Tentang Kami)" value="${s.title}" oninput="updateItem('sitemap', ${s.id}, 'title', this.value)">
+                    <textarea class="input-modern !py-1.5 !px-3 !text-xs" rows="1" placeholder="Deskripsi ringkas..." oninput="updateItem('sitemap', ${s.id}, 'desc', this.value)">${s.desc}</textarea>
+                </div>
+            `).join('');
+
+            // Timeline
+            document.getElementById('list-timeline').innerHTML = appState.timeline.map(t => `
+                <div class="flex gap-2 items-center bg-surfaceLight/30 p-2 rounded-lg border border-white/5">
+                    <input type="text" class="input-modern !py-1 !px-2 !text-xs flex-1" placeholder="Nama Fase..." value="${t.phase}" oninput="updateItem('timeline', ${t.id}, 'phase', this.value)">
+                    <input type="text" class="input-modern !py-1 !px-2 !text-xs w-24" placeholder="Durasi (2 Mgg)" value="${t.duration}" oninput="updateItem('timeline', ${t.id}, 'duration', this.value)">
+                    <button onclick="removeItem('timeline', ${t.id})" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            `).join('');
+        }
+
+        // --- 4. Main Preview Renderer ---
+        function updatePreview() {
+            const s = appState;
+            const getVal = (val, ph) => (val && val.trim() !== '') ? val : `<span class="opacity-40 italic">${ph}</span>`;
+            
+            // Text Replacements
+            document.getElementById('out-projectName').innerHTML = getVal(s.general.projectName, 'Project Name');
+            document.getElementById('out-clientName').innerHTML = getVal(s.general.clientName, 'Client Name');
+            document.getElementById('out-status').innerText = s.general.status;
+            
+            // Date formatter
+            let dateStr = s.general.date;
+            if(dateStr) dateStr = new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('out-date').innerHTML = getVal(dateStr, 'Date TBD');
+            
+            document.getElementById('out-summary').innerHTML = getVal(s.general.summary, 'Provide a brief executive summary here.');
+            document.getElementById('out-audience').innerHTML = getVal(s.market.audience, 'Target audience description.');
+            document.getElementById('out-footerAuthor').innerHTML = getVal(s.general.author, 'Author') + ' | Generated by WDD Pro';
+            
+            // Tech Stack
+            document.getElementById('out-techFront').innerHTML = getVal(s.tech.front, 'TBD');
+            document.getElementById('out-techBack').innerHTML = getVal(s.tech.back, 'TBD');
+            document.getElementById('out-techDb').innerHTML = getVal(s.tech.db, 'TBD');
+            document.getElementById('out-techHost').innerHTML = getVal(s.tech.host, 'TBD');
+
+            // Colors
+            for(let i=1; i<=4; i++) {
+                const color = s.design[`color${i}`];
+                document.getElementById(`out-bg-color${i}`).style.backgroundColor = color;
+                document.getElementById(`out-hex-color${i}`).innerText = color;
+            }
+
+            // Fonts & Preview Styles applying
+            const parseFont = val => val.split(',')[0].replace(/'/g, '');
+            document.getElementById('out-fontHead-name').innerText = parseFont(s.design.fontHead);
+            document.getElementById('out-fontHead-preview').style.fontFamily = s.design.fontHead;
+            document.getElementById('out-fontBody-name').innerText = parseFont(s.design.fontBody);
+            document.getElementById('out-fontBody-preview').style.fontFamily = s.design.fontBody;
+
+            // Apply fonts globally to preview doc
+            const doc = document.getElementById('live-preview');
+            doc.style.fontFamily = s.design.fontBody;
+            doc.querySelectorAll('.doc-title, .doc-h2, .doc-h3').forEach(el => el.style.fontFamily = s.design.fontHead);
+
+            // Lists Renders
+            const compHtml = s.market.competitors.filter(c => c.name.trim() !== '').map(c => `<li><strong>${c.name}</strong> - <a href="${c.url}" class="text-blue-500 underline text-xs break-all">${c.url}</a></li>`).join('');
+            document.getElementById('out-competitors').innerHTML = compHtml || '<li class="italic text-slate-400">None defined.</li>';
+
+            const getPrioClass = (p) => p==='High' ? 'prio-high' : (p==='Medium' ? 'prio-med' : 'prio-low');
+            const featHtml = s.features.filter(f => f.text.trim() !== '').map(f => `
+                <tr class="border-b border-slate-100"><td class="p-3 align-top">${f.text}</td><td class="p-3 align-top"><span class="priority-badge ${getPrioClass(f.priority)}">${f.priority}</span></td></tr>
+            `).join('');
+            document.getElementById('out-features').innerHTML = featHtml || '<tr><td colspan="2" class="p-3 italic text-slate-400">No features specified.</td></tr>';
+
+            const siteHtml = s.sitemap.filter(sm => sm.title.trim() !== '').map(sm => `
+                <div class="border border-slate-200 p-3 rounded bg-white shadow-sm">
+                    <h4 class="font-bold text-slate-800 text-sm mb-1">${sm.title}</h4>
+                    <p class="text-xs text-slate-500 leading-relaxed">${sm.desc || '-'}</p>
+                </div>
+            `).join('');
+            document.getElementById('out-sitemap').innerHTML = siteHtml || '<p class="italic text-slate-400 text-sm col-span-2">No pages defined.</p>';
+
+            const timeHtml = s.timeline.filter(t => t.phase.trim() !== '').map(t => `
+                <div class="ml-4 relative">
+                    <div class="absolute -left-[23px] top-1 w-3 h-3 bg-indigo-500 rounded-full border-2 border-white shadow-sm"></div>
+                    <h4 class="font-bold text-sm text-slate-800">${t.phase}</h4>
+                    <p class="text-xs text-slate-500 font-medium">${t.duration}</p>
+                </div>
+            `).join('');
+            document.getElementById('out-timeline').innerHTML = timeHtml || '<p class="italic text-slate-400 text-sm ml-4">Timeline not set.</p>';
+        }
+
+        // --- 5. Utilities (Accordion, LocalStorage, Import/Export) ---
+        window.toggleSection = (id, btn) => {
+            const el = document.getElementById(id);
+            el.classList.toggle('collapsed');
+            btn.classList.toggle('bg-white/5'); // visual feedback active state
+        };
+
+        function saveToStorage() {
+            localStorage.setItem('wddProGenZ', JSON.stringify(appState));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('wddProGenZ');
+            if(saved) {
+                try { 
+                    appState = JSON.parse(saved); 
+                    // ensure all arrays exist in case of old data version
+                    if(!appState.timeline) appState.timeline = [];
+                    if(!appState.market.competitors) appState.market.competitors = [];
+                } 
+                catch(e) { console.error('Data corrupt, using init.'); }
+            }
+        }
+
+        window.clearData = () => {
+            if(confirm('Yakin ingin mereset semua data dokumen?')) {
+                appState = JSON.parse(JSON.stringify(initialState));
+                saveToStorage();
+                initApp(); // re-bind & re-render
+            }
+        };
+
+        window.loadTemplate = () => {
+            appState = {
+                general: { projectName: 'Numa - NextGen E-Commerce', clientName: 'PT. Numa Retail', status: 'Approved', author: 'Alex (Lead Prod)', date: new Date().toISOString().split('T')[0], summary: 'Numa adalah platform e-commerce modern yang berfokus pada pengalaman belanja 3D/AR untuk produk fashion lokal premium. Website ini bertujuan untuk meningkatkan konversi anak muda melalui UI interaktif.' },
+                market: { 
+                    audience: 'Gen Z dan Milenial (18-35 thn). Middle to high income. Menyukai brand lokal eksklusif dan pengalaman digital yang mulus.', 
+                    competitors: [{id: 1, name: 'Zalora', url: 'zalora.co.id'}, {id: 2, name: 'Love Bonito', url: 'lovebonito.com'}] 
+                },
+                features: [
+                    {id: 1, text: '3D Product Viewer (GLTF Support)', priority: 'High'},
+                    {id: 2, text: 'One-click Guest Checkout via Apple/Google Pay', priority: 'High'},
+                    {id: 3, text: 'Personalized AI Product Recommendations', priority: 'Medium'},
+                    {id: 4, text: 'Dark Mode Toggle', priority: 'Low'}
+                ],
+                design: { color1: '#6366f1', color2: '#0ea5e9', color3: '#f43f5e', color4: '#0f172a', fontHead: "'Space Grotesk', sans-serif", fontBody: "'Plus Jakarta Sans', sans-serif" },
+                sitemap: [
+                    {id: 1, title: 'Homepage / Discovery', desc: 'Hero slider 3D, trending products, kategori.'},
+                    {id: 2, title: 'Product Detail Page (PDP)', desc: 'Galeri, 3D viewer, ulasan, add to cart.'},
+                    {id: 3, title: 'Checkout & Cart', desc: 'Ringkasan belanja, form alamat, payment gateway.'}
+                ],
+                tech: { front: 'Next.js 14 (App Router), Tailwind, Three.js', back: 'Node.js, NestJS', db: 'PostgreSQL, Redis', host: 'Vercel (Front) + AWS EC2 (Back)' },
+                timeline: [
+                    {id: 1, phase: 'Wireframing & UI/UX', duration: '3 Weeks'},
+                    {id: 2, phase: 'Frontend + 3D Engine', duration: '4 Weeks'},
+                    {id: 3, phase: 'Backend API & Integration', duration: '3 Weeks'},
+                    {id: 4, phase: 'UAT & Deployment', duration: '1 Week'}
+                ]
+            };
+            saveToStorage();
+            initApp();
+        };
+
+        // Export State to JSON
+        window.exportProject = () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            let fileName = appState.general.projectName ? appState.general.projectName.replace(/\s+/g, '-').toLowerCase() : 'wdd-project';
+            downloadAnchorNode.setAttribute("download", fileName + ".json");
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        };
+
+        // Import State from JSON
+        window.importProject = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if(imported.general && imported.features) { // basic validation
+                        appState = imported;
+                        saveToStorage();
+                        initApp();
+                        alert("Data proyek berhasil diimpor!");
+                    } else {
+                        alert("File JSON tidak valid / format salah.");
+                    }
+                } catch(err) {
+                    alert("Error saat membaca file JSON.");
+                }
+            };
+            reader.readAsText(file);
+            // reset file input
+            event.target.value = '';
+        };
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

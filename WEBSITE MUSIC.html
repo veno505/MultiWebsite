@@ -1,0 +1,4829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+
+  <meta
+    name="theme-color"
+    content="#030303"
+  />
+
+  <title>NOIR — Spatial Experience</title>
+
+  <style>
+    /* =========================================================
+       ROOT / RESET
+    ========================================================== */
+
+    :root {
+      --bg: #030303;
+      --text: #f3f3ef;
+      --muted: rgba(243, 243, 239, 0.58);
+      --dim: rgba(243, 243, 239, 0.32);
+      --line: rgba(255, 255, 255, 0.11);
+      --accent: #b8ddf1;
+
+      --progress: 0;
+
+      --pad: clamp(22px, 4vw, 72px);
+
+      color-scheme: dark;
+      font-family:
+        Inter,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+
+      width: 100%;
+      min-width: 320px;
+
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      overflow-x: hidden;
+
+      font-family:
+        Inter,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body.is-loading {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    a {
+      font: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::selection {
+      color: #000;
+      background: #fff;
+    }
+
+    /* =========================================================
+       BACKGROUND
+    ========================================================== */
+
+    .background {
+      position: fixed;
+      z-index: -10;
+
+      inset: 0;
+
+      pointer-events: none;
+
+      background:
+        radial-gradient(
+          circle at 72% 28%,
+          rgba(67, 105, 129, 0.16),
+          transparent 31%
+        ),
+        radial-gradient(
+          circle at 12% 80%,
+          rgba(57, 68, 104, 0.12),
+          transparent 31%
+        ),
+        linear-gradient(
+          180deg,
+          #090b0c 0%,
+          #030303 39%,
+          #010101 71%,
+          #081016 100%
+        );
+    }
+
+    .background::before {
+      position: absolute;
+      inset: 0;
+
+      content: "";
+
+      opacity: 0.8;
+
+      background:
+        linear-gradient(
+          90deg,
+
+          transparent 24.95%,
+          rgba(255,255,255,0.025) 25%,
+          transparent 25.05%,
+
+          transparent 49.95%,
+          rgba(255,255,255,0.018) 50%,
+          transparent 50.05%,
+
+          transparent 74.95%,
+          rgba(255,255,255,0.025) 75%,
+          transparent 75.05%
+        );
+    }
+
+    .background::after {
+      position: absolute;
+      inset: 0;
+
+      content: "";
+
+      opacity: 0.025;
+
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* =========================================================
+       LOADER
+    ========================================================== */
+
+    #loader {
+      position: fixed;
+      z-index: 9999;
+
+      inset: 0;
+
+      display: grid;
+
+      grid-template-rows:
+        auto
+        1fr
+        auto;
+
+      padding:
+        clamp(25px, 4vw, 62px);
+
+      background:
+        radial-gradient(
+          circle at 50% 44%,
+          rgba(76, 112, 135, 0.12),
+          transparent 28%
+        ),
+        #030303;
+
+      opacity: 1;
+      visibility: visible;
+
+      transition:
+        opacity 0.75s cubic-bezier(.76,0,.24,1),
+        visibility 0.75s cubic-bezier(.76,0,.24,1);
+    }
+
+    #loader.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-top,
+    .loader-bottom {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 25px;
+    }
+
+    .loader-brand {
+      font-size: 11px;
+      font-weight: 600;
+
+      letter-spacing: 0.22em;
+    }
+
+    .loader-label {
+      color: var(--dim);
+
+      font-size: 9px;
+      font-weight: 500;
+
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .loader-center {
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loader-number {
+      display: flex;
+
+      align-items: flex-end;
+
+      color: #f5f5f1;
+
+      font-size:
+        clamp(90px, 16vw, 230px);
+
+      font-weight: 400;
+
+      line-height: 0.8;
+
+      letter-spacing: -0.09em;
+
+      font-variant-numeric: tabular-nums;
+    }
+
+    .loader-number small {
+      margin:
+        0 0 0.05em
+        12px;
+
+      color: var(--dim);
+
+      font-size: 0.13em;
+
+      letter-spacing: 0;
+    }
+
+    .loader-track {
+      position: relative;
+
+      width:
+        min(430px, 38vw);
+
+      height: 1px;
+
+      overflow: hidden;
+
+      background:
+        rgba(255,255,255,0.12);
+    }
+
+    .loader-bar {
+      position: absolute;
+
+      inset: 0;
+
+      background: #fff;
+
+      transform: scaleX(0);
+      transform-origin: left;
+
+      transition:
+        transform 0.1s linear;
+    }
+
+    /* =========================================================
+       ERROR FALLBACK
+    ========================================================== */
+
+    #bootError {
+      position: fixed;
+
+      z-index: 9000;
+
+      right: 20px;
+      bottom: 20px;
+
+      display: none;
+
+      max-width: 410px;
+
+      padding: 15px 17px;
+
+      border:
+        1px solid
+        rgba(255,255,255,0.14);
+
+      border-radius: 12px;
+
+      color:
+        rgba(255,255,255,0.8);
+
+      background:
+        rgba(10,10,10,0.86);
+
+      font-size: 12px;
+      line-height: 1.6;
+
+      backdrop-filter:
+        blur(15px);
+    }
+
+    /* =========================================================
+       WEBGL
+    ========================================================== */
+
+    #webgl {
+      position: fixed;
+
+      z-index: 4;
+
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      pointer-events: none;
+    }
+
+    /* =========================================================
+       NAVIGATION
+    ========================================================== */
+
+    .nav {
+      position: fixed;
+
+      z-index: 500;
+
+      top: 0;
+      right: 0;
+      left: 0;
+
+      display: grid;
+
+      grid-template-columns:
+        1fr
+        auto
+        1fr;
+
+      align-items: center;
+
+      height: 82px;
+
+      padding:
+        0
+        var(--pad);
+
+      border-bottom:
+        1px solid transparent;
+
+      transition:
+        background 0.3s ease,
+        border-color 0.3s ease,
+        backdrop-filter 0.3s ease;
+    }
+
+    body.scrolled .nav {
+      border-color:
+        rgba(255,255,255,0.055);
+
+      background:
+        rgba(4,4,4,0.52);
+
+      backdrop-filter:
+        blur(20px)
+        saturate(120%);
+
+      -webkit-backdrop-filter:
+        blur(20px)
+        saturate(120%);
+    }
+
+    .logo {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 11px;
+
+      justify-self: start;
+    }
+
+    .logo-symbol {
+      position: relative;
+
+      width: 9px;
+      height: 9px;
+
+      border-radius: 50%;
+
+      background: #d8edf8;
+
+      box-shadow:
+        0 0 22px
+        rgba(177,221,244,0.85);
+    }
+
+    .logo-name {
+      font-size: 11px;
+      font-weight: 600;
+
+      letter-spacing: 0.21em;
+    }
+
+    .nav-links {
+      display: flex;
+
+      align-items: center;
+
+      gap:
+        clamp(22px, 2.8vw, 45px);
+    }
+
+    .nav-links a {
+      position: relative;
+
+      padding:
+        10px 0;
+
+      color:
+        rgba(255,255,255,0.52);
+
+      font-size: 11px;
+
+      transition:
+        color 0.2s ease;
+    }
+
+    .nav-links a::after {
+      position: absolute;
+
+      right: 0;
+      bottom: 5px;
+      left: 0;
+
+      height: 1px;
+
+      content: "";
+
+      background: #fff;
+
+      transform: scaleX(0);
+      transform-origin: right;
+
+      transition:
+        transform 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .nav-links a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 13px;
+
+      justify-self: end;
+
+      padding:
+        10px 15px;
+
+      border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+      border-radius: 999px;
+
+      font-size: 10px;
+
+      transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .nav-cta:hover {
+      color: #050505;
+      background: #fff;
+
+      transform:
+        translateY(-2px);
+    }
+
+    /* =========================================================
+       SIDE PROGRESS
+    ========================================================== */
+
+    .progress {
+      position: fixed;
+
+      z-index: 450;
+
+      top: 50%;
+      right: 23px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 10px;
+
+      transform:
+        translateY(-50%);
+
+      pointer-events: none;
+    }
+
+    .progress-num {
+      color:
+        rgba(255,255,255,0.35);
+
+      font-size: 8px;
+      font-weight: 600;
+
+      letter-spacing: 0.1em;
+    }
+
+    .progress-num.current {
+      color: #fff;
+    }
+
+    .progress-track {
+      position: relative;
+
+      width: 1px;
+      height: 115px;
+
+      background:
+        rgba(255,255,255,0.12);
+    }
+
+    .progress-fill {
+      position: absolute;
+
+      inset: 0;
+
+      background: #fff;
+
+      transform:
+        scaleY(var(--progress));
+
+      transform-origin: top;
+    }
+
+    /* =========================================================
+       EXPERIENCE
+    ========================================================== */
+
+    main {
+      position: relative;
+      z-index: 10;
+    }
+
+    .scene {
+      position: relative;
+
+      width: 100%;
+    }
+
+    #hero {
+      min-height: 125vh;
+    }
+
+    #about {
+      min-height: 175vh;
+    }
+
+    #features {
+      min-height: 285vh;
+    }
+
+    #technology {
+      min-height: 190vh;
+    }
+
+    #work {
+      min-height: 170vh;
+    }
+
+    #contact {
+      min-height: 145vh;
+    }
+
+    .sticky {
+      position: sticky;
+
+      top: 0;
+
+      display: flex;
+
+      width: 100%;
+      height: 100vh;
+
+      padding:
+        105px
+        var(--pad)
+        45px;
+    }
+
+    .left {
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .right {
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    /* =========================================================
+       COMMON TYPOGRAPHY
+    ========================================================== */
+
+    .copy {
+      width:
+        min(46vw, 690px);
+
+      will-change:
+        transform,
+        opacity,
+        filter;
+    }
+
+    .kicker {
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      margin:
+        0 0 26px;
+
+      color:
+        rgba(255,255,255,0.43);
+
+      font-size: 9px;
+      font-weight: 600;
+
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .kicker::before {
+      width: 29px;
+      height: 1px;
+
+      content: "";
+
+      background:
+        rgba(255,255,255,0.34);
+    }
+
+    .kicker strong {
+      color:
+        rgba(173,218,241,0.75);
+
+      font-weight: 600;
+    }
+
+    .copy h2,
+    .feature-heading h2 {
+      max-width: 13ch;
+
+      margin: 0;
+
+      font-size:
+        clamp(48px, 5.7vw, 95px);
+
+      font-weight: 500;
+
+      line-height: 0.92;
+
+      letter-spacing: -0.066em;
+    }
+
+    .body-copy {
+      max-width: 530px;
+
+      margin:
+        30px 0 0;
+
+      color:
+        var(--muted);
+
+      font-size:
+        clamp(14px, 1.08vw, 17px);
+
+      line-height: 1.72;
+
+      letter-spacing: -0.01em;
+    }
+
+    .scene-label {
+      position: absolute;
+
+      right: var(--pad);
+      bottom: 35px;
+
+      color:
+        rgba(255,255,255,0.25);
+
+      font-size: 8px;
+
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+    }
+
+    /* =========================================================
+       HERO
+    ========================================================== */
+
+    .hero-sticky {
+      position: sticky;
+
+      top: 0;
+
+      display: flex;
+
+      flex-direction: column;
+
+      justify-content: center;
+
+      width: 100%;
+      height: 100vh;
+
+      padding:
+        105px
+        var(--pad)
+        42px;
+    }
+
+    .hero-meta {
+      position: absolute;
+
+      top: 110px;
+      right: var(--pad);
+      left: var(--pad);
+
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      color:
+        rgba(255,255,255,0.35);
+
+      font-size: 8px;
+
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .hero-live {
+      display: flex;
+
+      align-items: center;
+
+      gap: 9px;
+    }
+
+    .hero-live i {
+      display: block;
+
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      background: #a9d9f1;
+
+      box-shadow:
+        0 0 13px
+        rgba(169,217,241,0.8);
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 20;
+
+      pointer-events: none;
+
+      will-change:
+        opacity,
+        transform,
+        filter;
+    }
+
+    .hero-copy a {
+      pointer-events: auto;
+    }
+
+    .hero-title {
+      display: flex;
+
+      flex-direction: column;
+
+      margin: 0;
+
+      font-size:
+        clamp(72px, 10.8vw, 180px);
+
+      font-weight: 500;
+
+      line-height: 0.76;
+
+      letter-spacing: -0.088em;
+    }
+
+    .hero-title .second {
+      padding-left: 14vw;
+    }
+
+    .hero-title .third {
+      align-self: flex-end;
+    }
+
+    .hero-bottom {
+      display: flex;
+
+      align-items: flex-end;
+      justify-content: space-between;
+
+      gap: 30px;
+
+      margin-top:
+        clamp(50px, 7vh, 90px);
+    }
+
+    .hero-bottom p {
+      max-width: 340px;
+
+      margin: 0;
+
+      color:
+        rgba(255,255,255,0.5);
+
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .scroll-link {
+      display: inline-flex;
+
+      align-items: center;
+
+      gap: 15px;
+
+      padding-bottom: 8px;
+
+      border-bottom:
+        1px solid
+        rgba(255,255,255,0.28);
+
+      font-size: 10px;
+
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .scroll-link span {
+      transition:
+        transform 0.2s ease;
+    }
+
+    .scroll-link:hover span {
+      transform:
+        translateY(4px);
+    }
+
+    /* =========================================================
+       ABOUT
+    ========================================================== */
+
+    .micro-list {
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 18px;
+
+      margin-top: 35px;
+    }
+
+    .micro-list span {
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      color:
+        rgba(255,255,255,0.31);
+
+      font-size: 9px;
+
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .micro-list span::before {
+      width: 4px;
+      height: 4px;
+
+      content: "";
+
+      border-radius: 50%;
+
+      background: #9bcce5;
+    }
+
+    /* =========================================================
+       FEATURES
+    ========================================================== */
+
+    .features-layout {
+      display: grid;
+
+      grid-template-columns:
+        minmax(320px, 0.9fr)
+        minmax(340px, 0.75fr);
+
+      gap:
+        clamp(65px, 9vw, 150px);
+
+      width:
+        min(1280px, 100%);
+    }
+
+    .feature-heading {
+      will-change:
+        opacity,
+        transform;
+    }
+
+    .feature-heading h2 {
+      max-width: 11ch;
+    }
+
+    .feature-stack {
+      position: relative;
+
+      align-self: end;
+
+      min-height: 340px;
+    }
+
+    .feature {
+      position: absolute;
+
+      inset: 0;
+
+      max-width: 500px;
+
+      opacity: 0;
+
+      will-change:
+        transform,
+        opacity,
+        filter;
+    }
+
+    .feature-index {
+      display: inline-block;
+
+      margin-bottom: 19px;
+
+      color:
+        rgba(168,214,237,0.7);
+
+      font-size: 9px;
+      font-weight: 600;
+
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .feature h3 {
+      margin: 0;
+
+      font-size:
+        clamp(40px, 4.3vw, 72px);
+
+      font-weight: 500;
+
+      line-height: 0.92;
+
+      letter-spacing: -0.06em;
+    }
+
+    .feature p {
+      max-width: 455px;
+
+      margin:
+        24px 0 0;
+
+      color:
+        var(--muted);
+
+      font-size: 14px;
+      line-height: 1.72;
+    }
+
+    .feature small {
+      display: block;
+
+      margin-top: 27px;
+
+      color:
+        rgba(255,255,255,0.27);
+
+      font-size: 8px;
+
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    /* =========================================================
+       TECHNOLOGY
+    ========================================================== */
+
+    .technology-list {
+      max-width: 530px;
+
+      margin-top: 40px;
+    }
+
+    .technology-row {
+      display: grid;
+
+      grid-template-columns:
+        46px
+        1fr
+        auto;
+
+      align-items: center;
+
+      gap: 10px;
+
+      padding:
+        15px 0;
+
+      border-top:
+        1px solid
+        var(--line);
+    }
+
+    .technology-row:last-child {
+      border-bottom:
+        1px solid
+        var(--line);
+    }
+
+    .technology-row > span {
+      color:
+        rgba(168,214,237,0.5);
+
+      font-size: 9px;
+    }
+
+    .technology-row p {
+      margin: 0;
+
+      color:
+        rgba(255,255,255,0.62);
+
+      font-size: 12px;
+    }
+
+    .technology-row small {
+      color:
+        rgba(255,255,255,0.26);
+
+      font-size: 8px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.08em;
+    }
+
+    /* =========================================================
+       STATISTICS
+    ========================================================== */
+
+    .stats-copy {
+      width:
+        min(57vw, 820px);
+    }
+
+    .stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3,1fr);
+
+      gap:
+        clamp(18px,3vw,48px);
+
+      margin-top: 55px;
+    }
+
+    .stat {
+      padding-top: 18px;
+
+      border-top:
+        1px solid
+        var(--line);
+    }
+
+    .stat strong {
+      display: block;
+
+      font-size:
+        clamp(48px,5.5vw,90px);
+
+      font-weight: 400;
+
+      line-height: 1;
+
+      letter-spacing: -0.07em;
+
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat span {
+      display: block;
+
+      max-width: 150px;
+
+      margin-top: 11px;
+
+      color:
+        rgba(255,255,255,0.31);
+
+      font-size: 9px;
+
+      line-height: 1.45;
+
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* =========================================================
+       FINAL CTA
+    ========================================================== */
+
+    .final-sticky {
+      align-items: center;
+    }
+
+    .final-copy {
+      width: 100%;
+
+      will-change:
+        opacity,
+        transform,
+        filter;
+    }
+
+    .final-title {
+      margin: 0;
+
+      font-size:
+        clamp(62px, 9.8vw, 165px);
+
+      font-weight: 500;
+
+      line-height: 0.78;
+
+      letter-spacing: -0.084em;
+    }
+
+    .final-row {
+      display: flex;
+
+      align-items: flex-end;
+      justify-content: space-between;
+
+      gap: 40px;
+
+      margin-top:
+        clamp(45px,7vh,85px);
+    }
+
+    .final-row p {
+      max-width: 450px;
+
+      margin: 0;
+
+      color: var(--muted);
+
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .big-button {
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 50px;
+
+      min-width: 270px;
+
+      padding:
+        12px
+        12px
+        12px
+        18px;
+
+      border:
+        1px solid
+        rgba(255,255,255,0.2);
+
+      border-radius: 999px;
+
+      font-size: 10px;
+
+      transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .big-button i {
+      display: grid;
+
+      width: 35px;
+      height: 35px;
+
+      place-items: center;
+
+      border-radius: 50%;
+
+      color: #000;
+      background: #fff;
+
+      font-style: normal;
+
+      transition:
+        transform 0.3s ease;
+    }
+
+    .big-button:hover {
+      color: #050505;
+      background: #fff;
+
+      transform:
+        translateY(-2px);
+    }
+
+    .big-button:hover i {
+      color: #fff;
+      background: #050505;
+
+      transform:
+        rotate(45deg);
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================== */
+
+    footer {
+      position: relative;
+      z-index: 20;
+
+      padding:
+        0
+        var(--pad)
+        38px;
+    }
+
+    .footer-line {
+      height: 1px;
+
+      background:
+        var(--line);
+    }
+
+    .footer-content {
+      display: flex;
+
+      align-items: flex-start;
+      justify-content: space-between;
+
+      gap: 30px;
+
+      padding-top: 23px;
+
+      color:
+        rgba(255,255,255,0.28);
+
+      font-size: 8px;
+
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================== */
+
+    @media (max-width: 900px) {
+
+      .nav {
+        grid-template-columns:
+          1fr
+          auto;
+
+        height: 70px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .sticky {
+        padding:
+          92px
+          22px
+          40px;
+      }
+
+      .left,
+      .right {
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
+
+      .copy,
+      .stats-copy {
+        width:
+          min(100%,560px);
+
+        margin-top: 7vh;
+      }
+
+      .copy h2,
+      .feature-heading h2 {
+        font-size:
+          clamp(46px, 10.5vw, 78px);
+      }
+
+      .hero-sticky {
+        justify-content: space-between;
+
+        padding:
+          94px
+          22px
+          35px;
+      }
+
+      .hero-meta {
+        top: 88px;
+        right: 22px;
+        left: 22px;
+      }
+
+      .hero-title {
+        margin-top: auto;
+        margin-bottom: auto;
+
+        font-size:
+          clamp(60px,17vw,112px);
+
+        line-height: 0.8;
+      }
+
+      .hero-title .second {
+        padding-left: 0;
+      }
+
+      .hero-title .third {
+        align-self: flex-start;
+      }
+
+      .hero-bottom p {
+        max-width: 245px;
+
+        font-size: 11px;
+      }
+
+      .scroll-link {
+        display: none;
+      }
+
+      .features-layout {
+        display: block;
+      }
+
+      .feature-stack {
+        min-height: 310px;
+
+        margin-top: 50px;
+      }
+
+      .progress {
+        top: auto;
+
+        right: 22px;
+        bottom: 17px;
+        left: 22px;
+
+        flex-direction: row;
+
+        transform: none;
+      }
+
+      .progress-track {
+        flex: 1;
+
+        width: auto;
+        height: 1px;
+      }
+
+      .progress-fill {
+        transform:
+          scaleX(var(--progress));
+
+        transform-origin: left;
+      }
+
+      .final-title {
+        font-size:
+          clamp(60px,15vw,110px);
+      }
+
+      .final-row {
+        flex-direction: column;
+
+        align-items: flex-start;
+      }
+
+      .big-button {
+        width:
+          min(100%,370px);
+      }
+
+      footer {
+        padding-bottom: 60px;
+      }
+
+    }
+
+    @media (max-width: 560px) {
+
+      .logo-name {
+        display: none;
+      }
+
+      .hero-meta > span:last-child {
+        display: none;
+      }
+
+      .body-copy {
+        font-size: 14px;
+      }
+
+      .feature h3 {
+        font-size:
+          clamp(40px, 11vw, 62px);
+      }
+
+      .technology-row {
+        grid-template-columns:
+          40px
+          1fr;
+      }
+
+      .technology-row small {
+        display: none;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+
+        max-width: 280px;
+      }
+
+      .stat {
+        display: grid;
+
+        grid-template-columns:
+          110px
+          1fr;
+
+        align-items: end;
+      }
+
+      .stat span {
+        margin-bottom: 7px;
+      }
+
+      .footer-content {
+        flex-direction: column;
+
+        gap: 8px;
+      }
+
+      .loader-label {
+        display: none;
+      }
+
+      .loader-track {
+        width: 100%;
+      }
+
+      .loader-bottom {
+        display: block;
+      }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+      }
+
+    }
+  </style>
+</head>
+
+<body class="is-loading">
+
+  <div class="background"></div>
+
+  <!-- =========================================================
+       LOADER
+  ========================================================== -->
+
+  <div id="loader">
+
+    <div class="loader-top">
+
+      <span class="loader-brand">
+        NOIR®
+      </span>
+
+      <span
+        class="loader-label"
+        id="loaderStatus"
+      >
+        Preparing the experience
+      </span>
+
+    </div>
+
+    <div class="loader-center">
+
+      <div class="loader-number">
+
+        <span id="loaderNumber">
+          000
+        </span>
+
+        <small>
+          %
+        </small>
+
+      </div>
+
+    </div>
+
+    <div class="loader-bottom">
+
+      <div class="loader-track">
+        <span
+          class="loader-bar"
+          id="loaderBar"
+        ></span>
+      </div>
+
+      <span class="loader-label">
+        Spatial system / 2026
+      </span>
+
+    </div>
+
+  </div>
+
+  <div id="bootError"></div>
+
+  <!-- =========================================================
+       THREE CANVAS
+  ========================================================== -->
+
+  <canvas id="webgl"></canvas>
+
+  <!-- =========================================================
+       NAVIGATION
+  ========================================================== -->
+
+  <header class="nav">
+
+    <a
+      href="#hero"
+      class="logo"
+    >
+
+      <span class="logo-symbol"></span>
+
+      <span class="logo-name">
+        NOIR
+      </span>
+
+    </a>
+
+    <nav class="nav-links">
+
+      <a href="#about">
+        About
+      </a>
+
+      <a href="#features">
+        System
+      </a>
+
+      <a href="#technology">
+        Technology
+      </a>
+
+      <a href="#work">
+        Work
+      </a>
+
+    </nav>
+
+    <a
+      href="#contact"
+      class="nav-cta"
+    >
+      Start a project
+      <span>↗</span>
+    </a>
+
+  </header>
+
+  <!-- =========================================================
+       PROGRESS
+  ========================================================== -->
+
+  <aside class="progress">
+
+    <span
+      class="progress-num current"
+      id="sceneNumber"
+    >
+      01
+    </span>
+
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+
+    <span class="progress-num">
+      06
+    </span>
+
+  </aside>
+
+  <!-- =========================================================
+       WEBSITE
+  ========================================================== -->
+
+  <main id="experience">
+
+    <!-- =======================================================
+         HERO
+    ======================================================== -->
+
+    <section
+      id="hero"
+      class="scene"
+    >
+
+      <div class="hero-sticky">
+
+        <div class="hero-meta">
+
+          <span class="hero-live">
+
+            <i></i>
+
+            Live spatial object
+
+          </span>
+
+          <span>
+            Interactive experience / 2026
+          </span>
+
+        </div>
+
+        <div
+          class="hero-copy"
+          id="heroCopy"
+        >
+
+          <h1 class="hero-title">
+
+            <span>
+              BEYOND
+            </span>
+
+            <span class="second">
+              THE
+            </span>
+
+            <span class="third">
+              INTERFACE.
+            </span>
+
+          </h1>
+
+          <div class="hero-bottom">
+
+            <p>
+              One digital object transformed through
+              movement, perspective, light and depth.
+              Your scroll becomes the cinematic timeline.
+            </p>
+
+            <a
+              href="#about"
+              class="scroll-link"
+            >
+              Scroll to explore
+
+              <span>
+                ↓
+              </span>
+            </a>
+
+          </div>
+
+        </div>
+
+        <span class="scene-label">
+          01 — Introduction
+        </span>
+
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+         ABOUT
+    ======================================================== -->
+
+    <section
+      id="about"
+      class="scene"
+    >
+
+      <div class="sticky left">
+
+        <div class="copy reveal">
+
+          <p class="kicker">
+
+            Manifesto
+
+            <strong>
+              / 02
+            </strong>
+
+          </p>
+
+          <h2>
+            One object.
+            Infinite
+            perspectives.
+          </h2>
+
+          <p class="body-copy">
+            The experience is built around one persistent
+            three-dimensional object. Instead of changing
+            pages, the camera, composition and object evolve
+            continuously around the story.
+          </p>
+
+          <div class="micro-list">
+
+            <span>
+              Spatial
+            </span>
+
+            <span>
+              Reversible
+            </span>
+
+            <span>
+              Scroll controlled
+            </span>
+
+          </div>
+
+        </div>
+
+        <span class="scene-label">
+          02 — Philosophy
+        </span>
+
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+         FEATURES
+    ======================================================== -->
+
+    <section
+      id="features"
+      class="scene"
+    >
+
+      <div class="sticky left">
+
+        <div class="features-layout">
+
+          <div class="feature-heading">
+
+            <p class="kicker">
+
+              Anatomy
+
+              <strong>
+                / 03
+              </strong>
+
+            </p>
+
+            <h2>
+              Nothing
+              stays
+              hidden.
+            </h2>
+
+          </div>
+
+          <div class="feature-stack">
+
+            <article class="feature">
+
+              <span class="feature-index">
+                Feature 01
+              </span>
+
+              <h3>
+                Outer
+                Architecture
+              </h3>
+
+              <p>
+                Layered metallic structures define the
+                silhouette and continuously transform
+                around the object as the camera moves.
+              </p>
+
+              <small>
+                Chrome / Geometry / Motion
+              </small>
+
+            </article>
+
+            <article class="feature">
+
+              <span class="feature-index">
+                Feature 02
+              </span>
+
+              <h3>
+                Exposed
+                Core
+              </h3>
+
+              <p>
+                Scroll separates the entire system into
+                a cinematic exploded view, exposing the
+                central mechanism without interrupting
+                the story.
+              </p>
+
+              <small>
+                Exploded view / Scroll driven
+              </small>
+
+            </article>
+
+            <article class="feature">
+
+              <span class="feature-index">
+                Feature 03
+              </span>
+
+              <h3>
+                Light
+                Field
+              </h3>
+
+              <p>
+                Highlights move across the surface as
+                camera distance changes, helping each
+                scene feel physical rather than simply
+                animated.
+              </p>
+
+              <small>
+                Dynamic lighting / Contrast
+              </small>
+
+            </article>
+
+          </div>
+
+        </div>
+
+        <span class="scene-label">
+          03 — Deconstruction
+        </span>
+
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+         TECHNOLOGY
+    ======================================================== -->
+
+    <section
+      id="technology"
+      class="scene"
+    >
+
+      <div class="sticky right">
+
+        <div class="copy reveal">
+
+          <p class="kicker">
+
+            Precision
+
+            <strong>
+              / 04
+            </strong>
+
+          </p>
+
+          <h2>
+            Motion
+            with
+            intention.
+          </h2>
+
+          <p class="body-copy">
+            Camera motion, object rotation, lighting,
+            typography and depth are controlled through
+            one reversible scroll timeline.
+          </p>
+
+          <div class="technology-list">
+
+            <div class="technology-row">
+
+              <span>
+                01
+              </span>
+
+              <p>
+                Camera choreography
+              </p>
+
+              <small>
+                Dynamic
+              </small>
+
+            </div>
+
+            <div class="technology-row">
+
+              <span>
+                02
+              </span>
+
+              <p>
+                Scroll synchronized timeline
+              </p>
+
+              <small>
+                Reversible
+              </small>
+
+            </div>
+
+            <div class="technology-row">
+
+              <span>
+                03
+              </span>
+
+              <p>
+                Adaptive rendering
+              </p>
+
+              <small>
+                Responsive
+              </small>
+
+            </div>
+
+            <div class="technology-row">
+
+              <span>
+                04
+              </span>
+
+              <p>
+                Pointer parallax
+              </p>
+
+              <small>
+                Subtle
+              </small>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <span class="scene-label">
+          04 — Close inspection
+        </span>
+
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+         NUMBERS
+    ======================================================== -->
+
+    <section
+      id="work"
+      class="scene"
+    >
+
+      <div class="sticky left">
+
+        <div class="copy stats-copy reveal">
+
+          <p class="kicker">
+
+            Impact
+
+            <strong>
+              / 05
+            </strong>
+
+          </p>
+
+          <h2>
+            Detail
+            changes the
+            impression.
+          </h2>
+
+          <div class="stats">
+
+            <div class="stat">
+
+              <strong
+                data-count="120"
+                data-suffix="+"
+              >
+                0+
+              </strong>
+
+              <span>
+                Digital experiences
+              </span>
+
+            </div>
+
+            <div class="stat">
+
+              <strong
+                data-count="98"
+                data-suffix="%"
+              >
+                0%
+              </strong>
+
+              <span>
+                Client satisfaction
+              </span>
+
+            </div>
+
+            <div class="stat">
+
+              <strong
+                data-count="15"
+                data-suffix="+"
+              >
+                0+
+              </strong>
+
+              <span>
+                Years combined craft
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <span class="scene-label">
+          05 — Perspective
+        </span>
+
+      </div>
+
+    </section>
+
+    <!-- =======================================================
+         FINAL
+    ======================================================== -->
+
+    <section
+      id="contact"
+      class="scene"
+    >
+
+      <div class="sticky final-sticky">
+
+        <div
+          class="final-copy reveal"
+          data-final
+        >
+
+          <p class="kicker">
+
+            Final frame
+
+            <strong>
+              / 06
+            </strong>
+
+          </p>
+
+          <h2 class="final-title">
+            MAKE
+            <br>
+            SOMETHING
+            <br>
+            UNFORGETTABLE.
+          </h2>
+
+          <div class="final-row">
+
+            <p>
+              Great digital experiences are not about
+              adding more effects. They are about making
+              every movement feel deliberate.
+            </p>
+
+            <a
+              href="mailto:hello@example.com"
+              class="big-button"
+            >
+
+              <span>
+                Start something
+              </span>
+
+              <i>
+                ↗
+              </i>
+
+            </a>
+
+          </div>
+
+        </div>
+
+        <span class="scene-label">
+          06 — New beginning
+        </span>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+
+  <footer>
+
+    <div class="footer-line"></div>
+
+    <div class="footer-content">
+
+      <span>
+        NOIR® — Spatial digital experience
+      </span>
+
+      <span>
+        Three.js / GSAP / Lenis
+      </span>
+
+    </div>
+
+  </footer>
+
+  <!-- =========================================================
+       BOOT SCRIPT
+       CDN FALLBACK + ANTI-STUCK LOADER
+  ========================================================== -->
+
+  <script>
+    (() => {
+
+      "use strict";
+
+      /* =======================================================
+         LOADER
+      ======================================================== */
+
+      const loader =
+        document.getElementById("loader");
+
+      const loaderNumber =
+        document.getElementById("loaderNumber");
+
+      const loaderBar =
+        document.getElementById("loaderBar");
+
+      const loaderStatus =
+        document.getElementById("loaderStatus");
+
+      const bootError =
+        document.getElementById("bootError");
+
+      let loaderValue = 0;
+
+      function setLoader(value, text) {
+
+        loaderValue =
+          Math.max(
+            loaderValue,
+            Math.min(100, value)
+          );
+
+        loaderNumber.textContent =
+          String(
+            Math.round(loaderValue)
+          ).padStart(3, "0");
+
+        loaderBar.style.transform =
+          `scaleX(${loaderValue / 100})`;
+
+        if (text) {
+          loaderStatus.textContent = text;
+        }
+
+      }
+
+      function hideLoader() {
+
+        setLoader(
+          100,
+          "Experience ready"
+        );
+
+        setTimeout(() => {
+
+          loader.classList.add(
+            "hide"
+          );
+
+          document.body.classList.remove(
+            "is-loading"
+          );
+
+        }, 350);
+
+      }
+
+      function showError(message) {
+
+        console.error(message);
+
+        bootError.style.display =
+          "block";
+
+        bootError.textContent =
+          message;
+
+        loader.classList.add(
+          "hide"
+        );
+
+        document.body.classList.remove(
+          "is-loading"
+        );
+
+      }
+
+      /* =======================================================
+         SCRIPT LOADER WITH FALLBACK
+      ======================================================== */
+
+      function loadScript(urls, globalName) {
+
+        return new Promise(
+          (resolve, reject) => {
+
+            let index = 0;
+
+            const attempt = () => {
+
+              if (
+                globalName &&
+                window[globalName]
+              ) {
+
+                resolve(
+                  window[globalName]
+                );
+
+                return;
+              }
+
+              if (
+                index >= urls.length
+              ) {
+
+                reject(
+                  new Error(
+                    `Failed loading ${globalName || urls[0]}`
+                  )
+                );
+
+                return;
+              }
+
+              const url =
+                urls[index++];
+
+              const script =
+                document.createElement(
+                  "script"
+                );
+
+              script.src =
+                url;
+
+              script.async =
+                true;
+
+              script.onload =
+                () => {
+
+                  if (
+                    !globalName ||
+                    window[globalName]
+                  ) {
+
+                    resolve(
+                      globalName
+                        ? window[globalName]
+                        : true
+                    );
+
+                  } else {
+
+                    script.remove();
+
+                    attempt();
+
+                  }
+
+                };
+
+              script.onerror =
+                () => {
+
+                  script.remove();
+
+                  attempt();
+
+                };
+
+              document.head.appendChild(
+                script
+              );
+
+            };
+
+            attempt();
+
+          }
+        );
+
+      }
+
+      /* =======================================================
+         BOOT
+      ======================================================== */
+
+      async function boot() {
+
+        try {
+
+          setLoader(
+            8,
+            "Loading Three.js"
+          );
+
+          await loadScript(
+            [
+              "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
+              "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js",
+              "https://unpkg.com/three@0.128.0/build/three.min.js"
+            ],
+            "THREE"
+          );
+
+          setLoader(
+            30,
+            "Loading animation system"
+          );
+
+          await loadScript(
+            [
+              "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js",
+              "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js",
+              "https://unpkg.com/gsap@3.13.0/dist/gsap.min.js"
+            ],
+            "gsap"
+          );
+
+          setLoader(
+            48,
+            "Loading ScrollTrigger"
+          );
+
+          await loadScript(
+            [
+              "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js",
+              "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js",
+              "https://unpkg.com/gsap@3.13.0/dist/ScrollTrigger.min.js"
+            ],
+            "ScrollTrigger"
+          );
+
+          setLoader(
+            66,
+            "Loading smooth scrolling"
+          );
+
+          try {
+
+            await loadScript(
+              [
+                "https://cdn.jsdelivr.net/npm/lenis@1.3.25/dist/lenis.min.js",
+                "https://unpkg.com/lenis@1.3.25/dist/lenis.min.js"
+              ],
+              "Lenis"
+            );
+
+          } catch (error) {
+
+            console.warn(
+              "Lenis unavailable. Native scrolling will be used."
+            );
+
+          }
+
+          setLoader(
+            82,
+            "Building spatial scene"
+          );
+
+          initializeExperience();
+
+          setLoader(
+            96,
+            "Finalizing"
+          );
+
+          requestAnimationFrame(
+            () => {
+
+              requestAnimationFrame(
+                hideLoader
+              );
+
+            }
+          );
+
+        } catch (error) {
+
+          showError(
+            "Library 3D gagal dimuat. Pastikan internet aktif lalu refresh halaman. Tekan Ctrl + R."
+          );
+
+        }
+
+      }
+
+      /* =======================================================
+         MAIN EXPERIENCE
+      ======================================================== */
+
+      function initializeExperience() {
+
+        const THREE =
+          window.THREE;
+
+        const gsap =
+          window.gsap;
+
+        const ScrollTrigger =
+          window.ScrollTrigger;
+
+        gsap.registerPlugin(
+          ScrollTrigger
+        );
+
+        const reducedMotion =
+          window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+          ).matches;
+
+        const mobile =
+          window.innerWidth < 900;
+
+        /* =====================================================
+           LENIS
+        ====================================================== */
+
+        let lenis = null;
+
+        if (
+          window.Lenis &&
+          !reducedMotion
+        ) {
+
+          try {
+
+            lenis =
+              new window.Lenis({
+                autoRaf: false,
+
+                lerp: 0.085,
+
+                smoothWheel: true,
+
+                wheelMultiplier: 0.9,
+
+                touchMultiplier: 1
+              });
+
+            lenis.on(
+              "scroll",
+              ScrollTrigger.update
+            );
+
+            gsap.ticker.add(
+              time => {
+
+                lenis.raf(
+                  time * 1000
+                );
+
+              }
+            );
+
+            gsap.ticker.lagSmoothing(
+              0
+            );
+
+          } catch (error) {
+
+            console.warn(
+              "Lenis initialization failed.",
+              error
+            );
+
+          }
+
+        }
+
+        /* =====================================================
+           ANCHORS
+        ====================================================== */
+
+        document
+          .querySelectorAll(
+            'a[href^="#"]'
+          )
+          .forEach(
+            link => {
+
+              link.addEventListener(
+                "click",
+                event => {
+
+                  const selector =
+                    link.getAttribute(
+                      "href"
+                    );
+
+                  const target =
+                    document.querySelector(
+                      selector
+                    );
+
+                  if (!target) {
+                    return;
+                  }
+
+                  event.preventDefault();
+
+                  if (lenis) {
+
+                    lenis.scrollTo(
+                      target,
+                      {
+                        duration: 1.2
+                      }
+                    );
+
+                  } else {
+
+                    target.scrollIntoView({
+                      behavior:
+                        reducedMotion
+                          ? "auto"
+                          : "smooth"
+                    });
+
+                  }
+
+                }
+              );
+
+            }
+          );
+
+        /* =====================================================
+           THREE SETUP
+        ====================================================== */
+
+        const canvas =
+          document.getElementById(
+            "webgl"
+          );
+
+        const renderer =
+          new THREE.WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+            powerPreference:
+              "high-performance"
+          });
+
+        renderer.setSize(
+          window.innerWidth,
+          window.innerHeight
+        );
+
+        renderer.setPixelRatio(
+          Math.min(
+            window.devicePixelRatio || 1,
+            mobile
+              ? 1.45
+              : 1.8
+          )
+        );
+
+        renderer.outputEncoding =
+          THREE.sRGBEncoding;
+
+        renderer.toneMapping =
+          THREE.ACESFilmicToneMapping;
+
+        renderer.toneMappingExposure =
+          1.15;
+
+        renderer.setClearColor(
+          0x000000,
+          0
+        );
+
+        const scene =
+          new THREE.Scene();
+
+        scene.fog =
+          new THREE.Fog(
+            0x040506,
+            7,
+            20
+          );
+
+        /* =====================================================
+           CAMERA
+        ====================================================== */
+
+        const camera =
+          new THREE.PerspectiveCamera(
+            mobile
+              ? 40
+              : 34,
+
+            window.innerWidth /
+              window.innerHeight,
+
+            0.1,
+            100
+          );
+
+        camera.position.set(
+          0,
+          0,
+          mobile
+            ? 6.85
+            : 6.2
+        );
+
+        /* =====================================================
+           ROOT OBJECT
+        ====================================================== */
+
+        const object =
+          new THREE.Group();
+
+        scene.add(
+          object
+        );
+
+        /*
+          =======================================================
+          REPLACE WITH YOUR GLB MODEL
+          =======================================================
+
+          Semua animasi scroll diterapkan ke "object".
+
+          Kalau nanti memakai GLB/GLTF, pertahankan group object
+          sebagai parent model.
+        */
+
+        /* =====================================================
+           MATERIALS
+        ====================================================== */
+
+        const chrome =
+          new THREE.MeshPhysicalMaterial({
+            color:
+              new THREE.Color(
+                0xa2b4be
+              ),
+
+            metalness:
+              0.95,
+
+            roughness:
+              0.16,
+
+            clearcoat:
+              1,
+
+            clearcoatRoughness:
+              0.08
+          });
+
+        const brightChrome =
+          new THREE.MeshPhysicalMaterial({
+            color:
+              new THREE.Color(
+                0xe0e9ed
+              ),
+
+            metalness:
+              0.92,
+
+            roughness:
+              0.11,
+
+            clearcoat:
+              1,
+
+            clearcoatRoughness:
+              0.05
+          });
+
+        const darkChrome =
+          new THREE.MeshPhysicalMaterial({
+            color:
+              new THREE.Color(
+                0x262f34
+              ),
+
+            metalness:
+              0.97,
+
+            roughness:
+              0.2,
+
+            clearcoat:
+              0.85
+          });
+
+        /* =====================================================
+           CENTRAL BODY
+        ====================================================== */
+
+        const core =
+          new THREE.Mesh(
+
+            new THREE.IcosahedronGeometry(
+              0.76,
+              4
+            ),
+
+            chrome
+          );
+
+        object.add(
+          core
+        );
+
+        const energyCore =
+          new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+              0.54,
+              48,
+              48
+            ),
+
+            new THREE.MeshPhysicalMaterial({
+              color:
+                0x85bdd9,
+
+              emissive:
+                0x173f55,
+
+              emissiveIntensity:
+                0.55,
+
+              metalness:
+                0.35,
+
+              roughness:
+                0.08,
+
+              transparent:
+                true,
+
+              opacity:
+                0.42
+            })
+          );
+
+        object.add(
+          energyCore
+        );
+
+        /* =====================================================
+           ORBIT RINGS
+        ====================================================== */
+
+        const ring1 =
+          new THREE.Mesh(
+
+            new THREE.TorusGeometry(
+              1.13,
+              0.055,
+              18,
+              150
+            ),
+
+            brightChrome
+          );
+
+        ring1.rotation.set(
+          1.02,
+          0.25,
+          0.12
+        );
+
+        object.add(
+          ring1
+        );
+
+        const ring2 =
+          new THREE.Mesh(
+
+            new THREE.TorusGeometry(
+              1.34,
+              0.034,
+              18,
+              150
+            ),
+
+            darkChrome
+          );
+
+        ring2.rotation.set(
+          0.12,
+          1.08,
+          0.48
+        );
+
+        object.add(
+          ring2
+        );
+
+        const ring3 =
+          new THREE.Mesh(
+
+            new THREE.TorusGeometry(
+              1.52,
+              0.016,
+              12,
+              170
+            ),
+
+            new THREE.MeshBasicMaterial({
+              color:
+                0xb5def1,
+
+              transparent:
+                true,
+
+              opacity:
+                0.45
+            })
+          );
+
+        ring3.rotation.set(
+          0.66,
+          0.52,
+          1.12
+        );
+
+        object.add(
+          ring3
+        );
+
+        const ring4 =
+          new THREE.Mesh(
+
+            new THREE.TorusGeometry(
+              1.67,
+              0.007,
+              8,
+              180
+            ),
+
+            new THREE.MeshBasicMaterial({
+              color:
+                0x7286ff,
+
+              transparent:
+                true,
+
+              opacity:
+                0.22
+            })
+          );
+
+        ring4.rotation.set(
+          1.18,
+          0.1,
+          0.7
+        );
+
+        object.add(
+          ring4
+        );
+
+        /* =====================================================
+           WIREFRAME SHELL
+        ====================================================== */
+
+        const wire =
+          new THREE.Mesh(
+
+            new THREE.IcosahedronGeometry(
+              1.06,
+              2
+            ),
+
+            new THREE.MeshBasicMaterial({
+              color:
+                0xb8d9e9,
+
+              wireframe:
+                true,
+
+              transparent:
+                true,
+
+              opacity:
+                0.07,
+
+              depthWrite:
+                false
+            })
+          );
+
+        object.add(
+          wire
+        );
+
+        /* =====================================================
+           SATELLITES
+        ====================================================== */
+
+        const satellites =
+          new THREE.Group();
+
+        object.add(
+          satellites
+        );
+
+        const satelliteData = [
+          [ 1.30,  0.28,  0.45, 0.100 ],
+          [-1.08, -0.64,  0.55, 0.075 ],
+          [ 0.08,  1.38, -0.22, 0.062 ],
+          [-0.22, -1.34, -0.18, 0.052 ],
+          [ 0.90, -1.00, -0.75, 0.048 ],
+          [-0.82,  0.96,  0.68, 0.044 ]
+        ];
+
+        satelliteData.forEach(
+          (data, index) => {
+
+            const satellite =
+              new THREE.Mesh(
+
+                new THREE.SphereGeometry(
+                  1,
+                  20,
+                  20
+                ),
+
+                index % 2 === 0
+                  ? brightChrome
+                  : darkChrome
+              );
+
+            satellite.position.set(
+              data[0],
+              data[1],
+              data[2]
+            );
+
+            satellite.scale.setScalar(
+              data[3]
+            );
+
+            satellites.add(
+              satellite
+            );
+
+          }
+        );
+
+        /* =====================================================
+           MECHANICAL SHARDS
+        ====================================================== */
+
+        const shards =
+          new THREE.Group();
+
+        object.add(
+          shards
+        );
+
+        const shardPositions = [
+          [ 1.55,  0.62,  0.10 ],
+          [-1.48,  0.50, -0.34 ],
+          [ 0.82, -1.46,  0.34 ],
+          [-0.68,  1.48, -0.40 ]
+        ];
+
+        shardPositions.forEach(
+          (position, index) => {
+
+            const shard =
+              new THREE.Mesh(
+
+                new THREE.TetrahedronGeometry(
+                  index % 2 === 0
+                    ? 0.13
+                    : 0.095,
+                  0
+                ),
+
+                index % 2 === 0
+                  ? brightChrome
+                  : chrome
+              );
+
+            shard.position.set(
+              position[0],
+              position[1],
+              position[2]
+            );
+
+            shard.rotation.set(
+              index * 0.8,
+              index * 1.1,
+              index * 0.5
+            );
+
+            shards.add(
+              shard
+            );
+
+          }
+        );
+
+        /* =====================================================
+           PARTICLES
+        ====================================================== */
+
+        const particleCount =
+          mobile
+            ? 30
+            : 82;
+
+        const particleArray =
+          new Float32Array(
+            particleCount * 3
+          );
+
+        for (
+          let i = 0;
+          i < particleCount;
+          i++
+        ) {
+
+          const radius =
+            3.7 +
+            Math.random() * 6;
+
+          const angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+          particleArray[
+            i * 3
+          ] =
+            Math.cos(angle) *
+            radius;
+
+          particleArray[
+            i * 3 + 1
+          ] =
+            (
+              Math.random() -
+              0.5
+            ) * 7;
+
+          particleArray[
+            i * 3 + 2
+          ] =
+            Math.sin(angle) *
+            radius -
+            2;
+
+        }
+
+        const particleGeometry =
+          new THREE.BufferGeometry();
+
+        particleGeometry.setAttribute(
+
+          "position",
+
+          new THREE.BufferAttribute(
+            particleArray,
+            3
+          )
+        );
+
+        const particleField =
+          new THREE.Points(
+
+            particleGeometry,
+
+            new THREE.PointsMaterial({
+              color:
+                0x9ecce4,
+
+              size:
+                0.021,
+
+              transparent:
+                true,
+
+              opacity:
+                0.22,
+
+              depthWrite:
+                false
+            })
+          );
+
+        scene.add(
+          particleField
+        );
+
+        /* =====================================================
+           LIGHTING
+        ====================================================== */
+
+        scene.add(
+          new THREE.AmbientLight(
+            0x8ea1aa,
+            0.4
+          )
+        );
+
+        const keyLight =
+          new THREE.DirectionalLight(
+            0xe7f4fb,
+            2.7
+          );
+
+        keyLight.position.set(
+          4,
+          5,
+          5
+        );
+
+        scene.add(
+          keyLight
+        );
+
+        const blueLight =
+          new THREE.PointLight(
+            0x68bae5,
+            18,
+            12,
+            2
+          );
+
+        blueLight.position.set(
+          3,
+          1.4,
+          3
+        );
+
+        scene.add(
+          blueLight
+        );
+
+        const violetLight =
+          new THREE.PointLight(
+            0x6374ff,
+            10,
+            12,
+            2
+          );
+
+        violetLight.position.set(
+          -4,
+          1,
+          1
+        );
+
+        scene.add(
+          violetLight
+        );
+
+        const lowerLight =
+          new THREE.PointLight(
+            0x316b89,
+            8,
+            10,
+            2
+          );
+
+        lowerLight.position.set(
+          0,
+          -4,
+          1
+        );
+
+        scene.add(
+          lowerLight
+        );
+
+        /* =====================================================
+           STATE
+        ====================================================== */
+
+        const state = {
+
+          x: 0,
+          y: 0,
+          z: 0,
+
+          rotX: 0.06,
+          rotY: 0,
+          rotZ: 0,
+
+          scale: 1,
+
+          explode: 0,
+          ringShift: 0,
+
+          cameraX: 0,
+          cameraY: 0,
+
+          cameraZ:
+            mobile
+              ? 6.85
+              : 6.2,
+
+          lookX: 0,
+          lookY: 0,
+          lookZ: 0,
+
+          blue:
+            18,
+
+          violet:
+            10
+        };
+
+        /* =====================================================
+           POINTER
+        ====================================================== */
+
+        const pointer = {
+          x: 0,
+          y: 0
+        };
+
+        const pointerSmooth = {
+          x: 0,
+          y: 0
+        };
+
+        if (!reducedMotion) {
+
+          window.addEventListener(
+            "pointermove",
+            event => {
+
+              pointer.x =
+                (
+                  event.clientX /
+                  window.innerWidth
+                ) * 2 - 1;
+
+              pointer.y =
+                (
+                  event.clientY /
+                  window.innerHeight
+                ) * 2 - 1;
+
+            },
+            {
+              passive: true
+            }
+          );
+
+        }
+
+        /* =====================================================
+           MASTER SCROLL TIMELINE
+        ====================================================== */
+
+        const horizontal =
+          reducedMotion
+            ? 0.15
+            : mobile
+              ? 0.5
+              : 1;
+
+        const explosion =
+          reducedMotion
+            ? 0.15
+            : mobile
+              ? 0.65
+              : 1;
+
+        const master =
+          gsap.timeline({
+
+            defaults: {
+              ease:
+                "none"
+            },
+
+            scrollTrigger: {
+
+              trigger:
+                "#experience",
+
+              start:
+                "top top",
+
+              end:
+                "bottom bottom",
+
+              scrub:
+                reducedMotion
+                  ? 0.15
+                  : 1.05,
+
+              invalidateOnRefresh:
+                true,
+
+              onUpdate:
+                self => {
+
+                  document.documentElement
+                    .style
+                    .setProperty(
+                      "--progress",
+                      self.progress
+                    );
+
+                  document.body
+                    .classList
+                    .toggle(
+                      "scrolled",
+                      self.progress > 0.012
+                    );
+
+                  const markers = [
+                    0,
+                    0.16,
+                    0.31,
+                    0.56,
+                    0.75,
+                    0.9
+                  ];
+
+                  let current =
+                    0;
+
+                  markers.forEach(
+                    (marker, index) => {
+
+                      if (
+                        self.progress >= marker
+                      ) {
+
+                        current =
+                          index;
+
+                      }
+
+                    }
+                  );
+
+                  document
+                    .getElementById(
+                      "sceneNumber"
+                    )
+                    .textContent =
+                      String(
+                        current + 1
+                      ).padStart(
+                        2,
+                        "0"
+                      );
+
+                }
+            }
+          });
+
+        /* =====================================================
+           HERO -> INTRO
+        ====================================================== */
+
+        master.to(
+          state,
+          {
+            rotY:
+              0.76,
+
+            rotX:
+              0.18,
+
+            x:
+              1.05 *
+              horizontal,
+
+            y:
+              0.05,
+
+            scale:
+              mobile
+                ? 0.94
+                : 1.02,
+
+            cameraX:
+              -0.16 *
+              horizontal,
+
+            cameraZ:
+              mobile
+                ? 6.2
+                : 5.25,
+
+            lookX:
+              0.16 *
+              horizontal,
+
+            ringShift:
+              0.65,
+
+            blue:
+              20,
+
+            duration:
+              20
+          },
+          0
+        );
+
+        /* =====================================================
+           INTRO -> ORBIT
+        ====================================================== */
+
+        master.to(
+          state,
+          {
+            rotY:
+              2.02,
+
+            rotX:
+              0.39,
+
+            rotZ:
+              -0.12,
+
+            x:
+              0.8 *
+              horizontal,
+
+            y:
+              -0.05,
+
+            cameraX:
+              -0.5 *
+              horizontal,
+
+            cameraY:
+              0.15,
+
+            cameraZ:
+              mobile
+                ? 5.82
+                : 4.72,
+
+            lookX:
+              0.2 *
+              horizontal,
+
+            ringShift:
+              1.5,
+
+            blue:
+              24,
+
+            violet:
+              14,
+
+            duration:
+              20
+          },
+          20
+        );
+
+        /* =====================================================
+           EXPLODED VIEW
+        ====================================================== */
+
+        master.to(
+          state,
+          {
+            rotY:
+              3.25,
+
+            rotX:
+              -0.22,
+
+            rotZ:
+              0.16,
+
+            x:
+              0.42 *
+              horizontal,
+
+            y:
+              0.06,
+
+            scale:
+              mobile
+                ? 1.08
+                : 1.24,
+
+            explode:
+              explosion,
+
+            cameraX:
+              0.25 *
+              horizontal,
+
+            cameraY:
+              -0.13,
+
+            cameraZ:
+              mobile
+                ? 5.25
+                : 4,
+
+            lookX:
+              0.12 *
+              horizontal,
+
+            ringShift:
+              2.65,
+
+            blue:
+              30,
+
+            violet:
+              18,
+
+            duration:
+              20
+          },
+          40
+        );
+
+        /* =====================================================
+           MACRO DETAIL
+        ====================================================== */
+
+        master.to(
+          state,
+          {
+            rotY:
+              4.15,
+
+            rotX:
+              0.3,
+
+            rotZ:
+              0.04,
+
+            x:
+              -0.3 *
+              horizontal,
+
+            scale:
+              mobile
+                ? 1.15
+                : 1.43,
+
+            explode:
+              explosion *
+              0.7,
+
+            cameraX:
+              0.45 *
+              horizontal,
+
+            cameraY:
+              0.08,
+
+            cameraZ:
+              mobile
+                ? 4.75
+                : 3.05,
+
+            lookX:
+              -0.08 *
+              horizontal,
+
+            ringShift:
+              3.18,
+
+            blue:
+              32,
+
+            violet:
+              20,
+
+            duration:
+              15
+          },
+          60
+        );
+
+        /* =====================================================
+           CINEMATIC PASS
+        ====================================================== */
+
+        master.to(
+          state,
+          {
+            rotY:
+              5.2,
+
+            rotX:
+              -0.05,
+
+            rotZ:
+              -0.2,
+
+            x:
+              -0.96 *
+              horizontal,
+
+            scale:
+              mobile
+                ? 1.02
+                : 1.13,
+
+            explode:
+              explosion *
+              0.1,
+
+            cameraX:
+              1.5 *
+              horizontal,
+
+            cameraY:
+              -0.08,
+
+            cameraZ:
+              mobile
+                ? 4.7
+                : 2.55,
+
+            lookX:
+              -0.35 *
+              horizontal,
+
+            ringShift:
+              4.5,
+
+            blue:
+              20,
+
+            violet:
+              21,
+
+            duration:
+              15
+          },
+          75
+        );
+
+        /* =====================================================
+           FINAL ASSEMBLY
+        ====================================================== */
+
+        master.to(
+          state,
+          {
+            rotY:
+              Math.PI * 2 +
+              0.45,
+
+            rotX:
+              0.11,
+
+            rotZ:
+              0,
+
+            x:
+              0,
+
+            y:
+              0,
+
+            z:
+              0,
+
+            scale:
+              mobile
+                ? 0.93
+                : 1,
+
+            explode:
+              0,
+
+            cameraX:
+              0,
+
+            cameraY:
+              0,
+
+            cameraZ:
+              mobile
+                ? 6.7
+                : 6.1,
+
+            lookX:
+              0,
+
+            lookY:
+              0,
+
+            lookZ:
+              0,
+
+            ringShift:
+              Math.PI * 2,
+
+            blue:
+              18,
+
+            violet:
+              10,
+
+            duration:
+              10
+          },
+          90
+        );
+
+        /* =====================================================
+           HERO TYPOGRAPHY
+        ====================================================== */
+
+        gsap.to(
+          "#heroCopy",
+          {
+            opacity:
+              0,
+
+            y:
+              reducedMotion
+                ? -15
+                : -70,
+
+            filter:
+              reducedMotion
+                ? "blur(0px)"
+                : "blur(12px)",
+
+            ease:
+              "none",
+
+            scrollTrigger: {
+
+              trigger:
+                "#hero",
+
+              start:
+                "top top",
+
+              end:
+                "bottom 55%",
+
+              scrub:
+                reducedMotion
+                  ? 0.1
+                  : 0.75
+            }
+          }
+        );
+
+        /* =====================================================
+           GENERAL COPY
+        ====================================================== */
+
+        gsap.utils
+          .toArray(
+            ".reveal"
+          )
+          .forEach(
+            element => {
+
+              const section =
+                element.closest(
+                  ".scene"
+                );
+
+              const final =
+                element.hasAttribute(
+                  "data-final"
+                );
+
+              const timeline =
+                gsap.timeline({
+
+                  scrollTrigger: {
+
+                    trigger:
+                      section,
+
+                    start:
+                      "top 78%",
+
+                    end:
+                      final
+                        ? "center 44%"
+                        : "bottom 22%",
+
+                    scrub:
+                      reducedMotion
+                        ? 0.12
+                        : 0.72
+                  }
+                });
+
+              timeline.fromTo(
+                element,
+                {
+                  opacity:
+                    0,
+
+                  y:
+                    reducedMotion
+                      ? 10
+                      : 55,
+
+                  filter:
+                    reducedMotion
+                      ? "blur(0px)"
+                      : "blur(10px)"
+                },
+                {
+                  opacity:
+                    1,
+
+                  y:
+                    0,
+
+                  filter:
+                    "blur(0px)",
+
+                  duration:
+                    0.3,
+
+                  ease:
+                    "none"
+                }
+              );
+
+              if (!final) {
+
+                timeline.to(
+                  element,
+                  {
+                    opacity:
+                      0,
+
+                    y:
+                      reducedMotion
+                        ? -10
+                        : -35,
+
+                    filter:
+                      reducedMotion
+                        ? "blur(0px)"
+                        : "blur(7px)",
+
+                    duration:
+                      0.18,
+
+                    ease:
+                      "none"
+                  },
+                  0.82
+                );
+
+              }
+
+            }
+          );
+
+        /* =====================================================
+           FEATURE HEADING
+        ====================================================== */
+
+        gsap.fromTo(
+          ".feature-heading",
+          {
+            opacity:
+              0,
+
+            y:
+              reducedMotion
+                ? 10
+                : 35
+          },
+          {
+            opacity:
+              1,
+
+            y:
+              0,
+
+            scrollTrigger: {
+
+              trigger:
+                "#features",
+
+              start:
+                "top 72%",
+
+              end:
+                "top 28%",
+
+              scrub:
+                reducedMotion
+                  ? 0.1
+                  : 0.6
+            }
+          }
+        );
+
+        /* =====================================================
+           FEATURES SEQUENCE
+        ====================================================== */
+
+        const features =
+          gsap.utils.toArray(
+            ".feature"
+          );
+
+        const featureTimeline =
+          gsap.timeline({
+
+            scrollTrigger: {
+
+              trigger:
+                "#features",
+
+              start:
+                "top top",
+
+              end:
+                "bottom bottom",
+
+              scrub:
+                reducedMotion
+                  ? 0.1
+                  : 0.8
+            }
+          });
+
+        features.forEach(
+          (feature, index) => {
+
+            const start =
+              index * 0.33;
+
+            featureTimeline.fromTo(
+              feature,
+              {
+                opacity:
+                  0,
+
+                y:
+                  reducedMotion
+                    ? 10
+                    : 45,
+
+                filter:
+                  reducedMotion
+                    ? "blur(0px)"
+                    : "blur(10px)"
+              },
+              {
+                opacity:
+                  1,
+
+                y:
+                  0,
+
+                filter:
+                  "blur(0px)",
+
+                duration:
+                  0.11,
+
+                ease:
+                  "none"
+              },
+              start
+            );
+
+            featureTimeline.to(
+              feature,
+              {
+                opacity:
+                  0,
+
+                y:
+                  reducedMotion
+                    ? -8
+                    : -30,
+
+                filter:
+                  reducedMotion
+                    ? "blur(0px)"
+                    : "blur(7px)",
+
+                duration:
+                  0.09,
+
+                ease:
+                  "none"
+              },
+              index ===
+              features.length - 1
+                ? 0.92
+                : start + 0.23
+            );
+
+          }
+        );
+
+        /* =====================================================
+           COUNTERS
+        ====================================================== */
+
+        document
+          .querySelectorAll(
+            "[data-count]"
+          )
+          .forEach(
+            element => {
+
+              const target =
+                Number(
+                  element.dataset.count
+                );
+
+              const suffix =
+                element.dataset.suffix ||
+                "";
+
+              const counter = {
+                value: 0
+              };
+
+              gsap.to(
+                counter,
+                {
+                  value:
+                    target,
+
+                  ease:
+                    "none",
+
+                  scrollTrigger: {
+
+                    trigger:
+                      "#work",
+
+                    start:
+                      "top 72%",
+
+                    end:
+                      "center 45%",
+
+                    scrub:
+                      reducedMotion
+                        ? 0.1
+                        : 0.65
+                  },
+
+                  onUpdate:
+                    () => {
+
+                      element.textContent =
+                        Math.round(
+                          counter.value
+                        ) +
+                        suffix;
+
+                    }
+                }
+              );
+
+            }
+          );
+
+        /* =====================================================
+           INITIAL HERO ENTER
+        ====================================================== */
+
+        gsap.from(
+          "#heroCopy",
+          {
+            opacity:
+              0,
+
+            y:
+              reducedMotion
+                ? 0
+                : 45,
+
+            filter:
+              reducedMotion
+                ? "blur(0px)"
+                : "blur(10px)",
+
+            duration:
+              reducedMotion
+                ? 0.2
+                : 1.1,
+
+            ease:
+              "power3.out",
+
+            delay:
+              0.15
+          }
+        );
+
+        /* =====================================================
+           RENDER LOOP
+        ====================================================== */
+
+        const clock =
+          new THREE.Clock();
+
+        const lookTarget =
+          new THREE.Vector3();
+
+        const damp =
+          THREE.MathUtils.damp;
+
+        function render() {
+
+          requestAnimationFrame(
+            render
+          );
+
+          const delta =
+            Math.min(
+              clock.getDelta(),
+              0.05
+            );
+
+          const time =
+            clock.elapsedTime;
+
+          /* POINTER */
+
+          pointerSmooth.x =
+            damp(
+              pointerSmooth.x,
+              reducedMotion
+                ? 0
+                : pointer.x,
+              5,
+              delta
+            );
+
+          pointerSmooth.y =
+            damp(
+              pointerSmooth.y,
+              reducedMotion
+                ? 0
+                : pointer.y,
+              5,
+              delta
+            );
+
+          /* FLOAT */
+
+          const floating =
+            reducedMotion
+              ? 0
+              : Math.sin(
+                  time * 0.75
+                ) * 0.05;
+
+          /* OBJECT POSITION */
+
+          object.position.x =
+            damp(
+              object.position.x,
+
+              state.x +
+              pointerSmooth.x *
+              0.045,
+
+              7,
+              delta
+            );
+
+          object.position.y =
+            damp(
+              object.position.y,
+
+              state.y +
+              floating -
+              pointerSmooth.y *
+              0.025,
+
+              7,
+              delta
+            );
+
+          object.position.z =
+            damp(
+              object.position.z,
+              state.z,
+              7,
+              delta
+            );
+
+          /* OBJECT ROTATION */
+
+          object.rotation.x =
+            damp(
+              object.rotation.x,
+
+              state.rotX -
+              pointerSmooth.y *
+              0.045,
+
+              7,
+              delta
+            );
+
+          object.rotation.y =
+            damp(
+              object.rotation.y,
+
+              state.rotY +
+              pointerSmooth.x *
+              0.06,
+
+              7,
+              delta
+            );
+
+          object.rotation.z =
+            damp(
+              object.rotation.z,
+              state.rotZ,
+              7,
+              delta
+            );
+
+          /* SCALE */
+
+          const currentScale =
+            damp(
+              object.scale.x,
+              state.scale,
+              7,
+              delta
+            );
+
+          object.scale.setScalar(
+            currentScale
+          );
+
+          /* ===================================================
+             EXPLODED VIEW
+          ==================================================== */
+
+          const explode =
+            state.explode;
+
+          ring1.position.x =
+            damp(
+              ring1.position.x,
+              explode * 0.7,
+              8,
+              delta
+            );
+
+          ring1.position.z =
+            damp(
+              ring1.position.z,
+              explode * 0.15,
+              8,
+              delta
+            );
+
+          ring2.position.x =
+            damp(
+              ring2.position.x,
+              -explode * 0.72,
+              8,
+              delta
+            );
+
+          ring2.position.z =
+            damp(
+              ring2.position.z,
+              -explode * 0.18,
+              8,
+              delta
+            );
+
+          ring3.position.y =
+            damp(
+              ring3.position.y,
+              explode * 0.48,
+              8,
+              delta
+            );
+
+          ring4.position.y =
+            damp(
+              ring4.position.y,
+              -explode * 0.5,
+              8,
+              delta
+            );
+
+          core.position.z =
+            damp(
+              core.position.z,
+              explode * 0.22,
+              8,
+              delta
+            );
+
+          const wireScale =
+            damp(
+              wire.scale.x,
+              1 +
+              explode * 0.17,
+              8,
+              delta
+            );
+
+          wire.scale.setScalar(
+            wireScale
+          );
+
+          const satelliteScale =
+            damp(
+              satellites.scale.x,
+              1 +
+              explode * 0.22,
+              8,
+              delta
+            );
+
+          satellites.scale.setScalar(
+            satelliteScale
+          );
+
+          shards.children.forEach(
+            (shard, index) => {
+
+              const direction =
+                index % 2 === 0
+                  ? 1
+                  : -1;
+
+              shard.position.z =
+                damp(
+                  shard.position.z,
+
+                  shardPositions[index][2] +
+                  explode *
+                  0.55 *
+                  direction,
+
+                  8,
+                  delta
+                );
+
+            }
+          );
+
+          /* ===================================================
+             RING MOTION
+          ==================================================== */
+
+          ring1.rotation.x =
+            1.02 +
+            state.ringShift *
+            0.21;
+
+          ring1.rotation.y =
+            0.25 +
+            state.ringShift *
+            0.08;
+
+          ring2.rotation.y =
+            1.08 -
+            state.ringShift *
+            0.17;
+
+          ring2.rotation.z =
+            0.48 +
+            state.ringShift *
+            0.18;
+
+          ring3.rotation.z =
+            1.12 +
+            state.ringShift *
+            0.12;
+
+          ring4.rotation.y =
+            state.ringShift *
+            0.15;
+
+          /* ===================================================
+             PASSIVE MOTION
+          ==================================================== */
+
+          if (!reducedMotion) {
+
+            core.rotation.y +=
+              delta * 0.09;
+
+            core.rotation.x +=
+              delta * 0.02;
+
+            wire.rotation.x +=
+              delta * 0.032;
+
+            wire.rotation.y -=
+              delta * 0.052;
+
+            satellites.rotation.y +=
+              delta * 0.055;
+
+            shards.rotation.y -=
+              delta * 0.025;
+
+            particleField.rotation.y +=
+              delta * 0.006;
+
+            const pulse =
+              1 +
+              Math.sin(
+                time * 1.5
+              ) * 0.018;
+
+            energyCore.scale.setScalar(
+              pulse
+            );
+
+          }
+
+          /* ===================================================
+             CAMERA
+          ==================================================== */
+
+          camera.position.x =
+            damp(
+              camera.position.x,
+
+              state.cameraX +
+              pointerSmooth.x *
+              0.095,
+
+              6,
+              delta
+            );
+
+          camera.position.y =
+            damp(
+              camera.position.y,
+
+              state.cameraY -
+              pointerSmooth.y *
+              0.06,
+
+              6,
+              delta
+            );
+
+          camera.position.z =
+            damp(
+              camera.position.z,
+              state.cameraZ,
+              6,
+              delta
+            );
+
+          lookTarget.x =
+            damp(
+              lookTarget.x,
+
+              state.lookX +
+              pointerSmooth.x *
+              0.025,
+
+              6,
+              delta
+            );
+
+          lookTarget.y =
+            damp(
+              lookTarget.y,
+
+              state.lookY -
+              pointerSmooth.y *
+              0.018,
+
+              6,
+              delta
+            );
+
+          lookTarget.z =
+            damp(
+              lookTarget.z,
+              state.lookZ,
+              6,
+              delta
+            );
+
+          camera.lookAt(
+            lookTarget
+          );
+
+          /* ===================================================
+             LIGHT
+          ==================================================== */
+
+          blueLight.intensity =
+            damp(
+              blueLight.intensity,
+              state.blue,
+              5,
+              delta
+            );
+
+          violetLight.intensity =
+            damp(
+              violetLight.intensity,
+              state.violet,
+              5,
+              delta
+            );
+
+          if (!reducedMotion) {
+
+            blueLight.position.x =
+              3 +
+              Math.sin(
+                time * 0.22
+              ) * 0.35;
+
+            blueLight.position.y =
+              1.4 +
+              Math.cos(
+                time * 0.18
+              ) * 0.2;
+
+            violetLight.position.y =
+              1 +
+              Math.sin(
+                time * 0.2
+              ) * 0.32;
+
+          }
+
+          renderer.render(
+            scene,
+            camera
+          );
+
+        }
+
+        render();
+
+        /* =====================================================
+           RESIZE
+        ====================================================== */
+
+        let resizeTimeout;
+
+        window.addEventListener(
+          "resize",
+          () => {
+
+            clearTimeout(
+              resizeTimeout
+            );
+
+            resizeTimeout =
+              setTimeout(
+                () => {
+
+                  camera.aspect =
+                    window.innerWidth /
+                    window.innerHeight;
+
+                  camera.updateProjectionMatrix();
+
+                  renderer.setSize(
+                    window.innerWidth,
+                    window.innerHeight
+                  );
+
+                  renderer.setPixelRatio(
+                    Math.min(
+                      window.devicePixelRatio || 1,
+
+                      window.innerWidth < 900
+                        ? 1.45
+                        : 1.8
+                    )
+                  );
+
+                  ScrollTrigger.refresh();
+
+                },
+                120
+              );
+
+          }
+        );
+
+        requestAnimationFrame(
+          () => {
+
+            ScrollTrigger.refresh();
+
+          }
+        );
+
+      }
+
+      /* =======================================================
+         SAFETY TIMEOUT
+      ======================================================== */
+
+      setTimeout(
+        () => {
+
+          if (
+            document.body.classList.contains(
+              "is-loading"
+            ) &&
+            loaderValue < 5
+          ) {
+
+            showError(
+              "Website tidak bisa memuat library dari internet. Pastikan koneksi internet aktif lalu refresh halaman."
+            );
+
+          }
+
+        },
+        12000
+      );
+
+      boot();
+
+    })();
+  </script>
+
+</body>
+</html>

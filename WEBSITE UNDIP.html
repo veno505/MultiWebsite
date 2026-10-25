@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Simulasi UM UNDIP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .undip-blue { background-color: #002244; }
+        .undip-text-blue { color: #002244; }
+        .undip-yellow { background-color: #f1c40f; }
+        .undip-text-yellow { color: #f1c40f; }
+        
+        .option-btn { transition: all 0.2s ease-in-out; }
+        .option-btn:hover { border-color: #002244; background-color: #f0f7ff; }
+        .option-selected { border-color: #002244; background-color: #002244; color: white; }
+        
+        .nav-btn { transition: all 0.2s; }
+        .nav-answered { background-color: #10b981; color: white; border-color: #10b981; }
+        .nav-current { border: 2px solid #002244; font-weight: bold; }
+        
+        /* Custom Scrollbar for navigation */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-gray-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="flex-1 flex items-center justify-center bg-gray-100 z-50 absolute inset-0">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border-t-8 border-[#002244]">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-[#002244] rounded-full mx-auto flex items-center justify-center mb-4 shadow-lg">
+                    <i class="fa-solid fa-graduation-cap text-3xl text-[#f1c40f]"></i>
+                </div>
+                <h1 class="text-2xl font-bold undip-text-blue">Portal CBT Mandiri</h1>
+                <p class="text-gray-500 text-sm mt-1">Universitas Diponegoro</p>
+            </div>
+            
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-user"></i></span>
+                        <input id="username" type="text" class="w-full pl-10 pr-3 py-2 rounded-lg border focus:outline-none focus:border-[#002244] focus:ring-1 focus:ring-[#002244]" placeholder="Masukkan username" required>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-lock"></i></span>
+                        <input id="password" type="password" class="w-full pl-10 pr-3 py-2 rounded-lg border focus:outline-none focus:border-[#002244] focus:ring-1 focus:ring-[#002244]" placeholder="Masukkan password" required>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="prodi">Pilihan Program Studi</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><i class="fa-solid fa-building-columns"></i></span>
+                        <select id="prodi" class="w-full pl-10 pr-3 py-2 rounded-lg border focus:outline-none focus:border-[#002244] focus:ring-1 focus:ring-[#002244] appearance-none" required>
+                            <option value="" disabled selected>Pilih Program Studi</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                            <i class="fa-solid fa-chevron-down text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm text-center">
+                    Username atau password salah!
+                </div>
+                
+                <button type="submit" class="w-full undip-blue text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-900 focus:outline-none focus:shadow-outline transition duration-200">
+                    Masuk <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
+                </button>
+            </form>
+            <p class="text-center text-xs text-gray-400 mt-6">&copy; 2026 Simulasi UM UNDIP - Veno</p>
+        </div>
+    </div>
+
+    <!-- MAIN QUIZ UI (Hidden by default) -->
+    <div id="quiz-screen" class="hidden flex-col h-screen w-full">
+        <!-- HEADER -->
+        <header class="undip-blue text-white p-4 shadow-md flex justify-between items-center z-10 shrink-0">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-graduation-cap text-[#f1c40f] text-2xl"></i>
+                <div>
+                    <h1 class="font-bold text-lg md:text-xl leading-tight">Simulasi UM UNDIP</h1>
+                    <p class="text-xs text-blue-200">Peserta: <span class="font-semibold text-white">Veno</span> | Prodi: <span id="header-prodi" class="font-semibold text-[#f1c40f]"></span></p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="bg-blue-900 px-4 py-2 rounded-lg border border-blue-700 flex items-center space-x-2">
+                    <i class="fa-regular fa-clock text-[#f1c40f]"></i>
+                    <span id="timer-display" class="font-mono font-bold text-lg tracking-wider">60:00</span>
+                </div>
+                <button onclick="confirmFinish()" class="hidden md:block bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition">Akhiri Ujian</button>
+            </div>
+        </header>
+
+        <!-- CONTENT AREA -->
+        <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
+            
+            <!-- LEFT PANEL: QUESTION AREA -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50 flex flex-col relative custom-scrollbar">
+                
+                <!-- Kategori Badge -->
+                <div class="mb-4">
+                    <span id="question-category" class="inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wide border border-blue-200">Kategori</span>
+                </div>
+
+                <!-- Question Header -->
+                <div class="flex justify-between items-end mb-6 border-b pb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Soal No. <span id="question-number">1</span></h2>
+                    <span class="text-sm text-gray-500 font-medium"><span id="q-current">1</span> dari <span id="q-total">55</span></span>
+                </div>
+
+                <!-- Question Text -->
+                <div id="question-text" class="text-lg text-gray-700 mb-8 leading-relaxed font-medium">
+                    Loading question...
+                </div>
+
+                <!-- Options -->
+                <div id="options-container" class="space-y-3 mb-10">
+                    <!-- Options will be injected here via JS -->
+                </div>
+
+                <!-- Spacer to push buttons down -->
+                <div class="flex-grow"></div>
+
+                <!-- Navigation Controls -->
+                <div class="flex justify-between items-center mt-auto pt-6 border-t border-gray-200">
+                    <button id="btn-prev" onclick="changeQuestion(-1)" class="flex items-center px-5 py-2.5 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 text-gray-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-chevron-left mr-2"></i> Sebelumnya
+                    </button>
+                    
+                    <button id="btn-next" onclick="changeQuestion(1)" class="flex items-center px-5 py-2.5 undip-blue text-white rounded-lg shadow hover:bg-blue-900 font-medium transition">
+                        Selanjutnya <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                    
+                    <!-- Mobile finish button -->
+                    <button onclick="confirmFinish()" class="md:hidden bg-red-500 text-white px-4 py-2.5 rounded-lg font-medium transition ml-2">Selesai</button>
+                </div>
+            </main>
+
+            <!-- RIGHT PANEL: QUESTION NAVIGATOR -->
+            <aside class="w-full md:w-80 bg-white border-l border-gray-200 flex flex-col shrink-0">
+                <div class="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                    <h3 class="font-bold text-gray-700">Navigasi Soal</h3>
+                    <div class="flex items-center space-x-2 text-xs">
+                        <span class="flex items-center"><span class="w-3 h-3 bg-green-500 rounded-full inline-block mr-1"></span> Dijawab</span>
+                        <span class="flex items-center"><span class="w-3 h-3 border border-gray-300 rounded-full inline-block mr-1"></span> Belum</span>
+                    </div>
+                </div>
+                <div class="p-4 overflow-y-auto custom-scrollbar flex-1">
+                    <div id="question-grid" class="grid grid-cols-5 gap-2">
+                        <!-- Grid items injected via JS -->
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirm-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm text-center transform scale-95 transition-transform duration-200">
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-gray-800">Akhiri Ujian?</h3>
+            <p id="confirm-text" class="text-gray-600 mb-6 text-sm">Masih ada soal yang belum dijawab. Apakah Anda yakin ingin mengakhiri ujian sekarang?</p>
+            <div class="flex space-x-3">
+                <button onclick="closeConfirmModal()" class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-medium transition">Batal</button>
+                <button onclick="processResult()" class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition">Ya, Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN (Hidden by default) -->
+    <div id="result-screen" class="hidden h-screen w-full bg-gray-50 overflow-y-auto">
+        <div class="max-w-3xl mx-auto p-4 md:p-8 py-10">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                
+                <div class="undip-blue p-8 text-center text-white relative">
+                    <h2 class="text-2xl font-bold mb-2">Hasil Simulasi UM UNDIP</h2>
+                    <p class="text-blue-200 mb-6">Atas nama: <span class="font-bold text-white">Veno</span></p>
+                    
+                    <div class="relative w-40 h-40 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-[#f1c40f]">
+                        <div class="text-center">
+                            <span class="block text-sm text-gray-500 font-bold uppercase tracking-wider mb-1">Skor Akhir</span>
+                            <span id="final-score" class="text-4xl font-extrabold undip-text-blue">0</span>
+                            <span class="block text-xs text-gray-400 font-medium">dari 1000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8">
+                    <!-- Hasil Kelulusan Banner -->
+                    <div id="result-status-banner" class="mb-8 rounded-xl p-6 text-center shadow-sm border transition-all duration-700 transform scale-95 opacity-0">
+                        <h3 class="text-lg font-bold text-gray-700 mb-1">Pilihan: <span id="result-prodi-name" class="text-gray-900"></span></h3>
+                        <p class="text-sm text-gray-500 mb-4">Target Skor: <span id="result-passing-grade" class="font-bold"></span></p>
+                        
+                        <div id="status-badge" class="inline-block px-6 py-3 rounded-full text-xl font-bold uppercase tracking-wide shadow-md">
+                            <!-- Status Injected here -->
+                        </div>
+                        <p id="status-message" class="mt-4 text-sm font-medium"></p>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mb-8">
+                        <div class="bg-green-50 p-4 rounded-xl border border-green-100 text-center">
+                            <i class="fa-solid fa-check-circle text-green-500 text-2xl mb-2"></i>
+                            <span class="block text-2xl font-bold text-green-700" id="stat-correct">0</span>
+                            <span class="text-sm text-green-600 font-medium">Benar</span>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100 text-center">
+                            <i class="fa-solid fa-times-circle text-red-500 text-2xl mb-2"></i>
+                            <span class="block text-2xl font-bold text-red-700" id="stat-wrong">0</span>
+                            <span class="text-sm text-red-600 font-medium">Salah</span>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
+                            <i class="fa-solid fa-minus-circle text-gray-400 text-2xl mb-2"></i>
+                            <span class="block text-2xl font-bold text-gray-700" id="stat-empty">0</span>
+                            <span class="text-sm text-gray-500 font-medium">Kosong</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-100 p-5 rounded-xl mb-8">
+                        <h4 class="font-bold text-blue-900 mb-2"><i class="fa-solid fa-chart-pie mr-2"></i>Detail Kategori</h4>
+                        <ul id="category-breakdown" class="text-sm text-blue-800 space-y-2 grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                            <!-- Injected via JS -->
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="location.reload()" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-lg transition shadow-sm">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Ulangi Simulasi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Bank Soal (55 Soal)
+        const questionBank = [
+            // --- PU & PUK (Penalaran Umum & Pengetahuan Kuantitatif) - 15 Soal ---
+            { id: 1, category: "PU & PUK", text: "Semua mahasiswa UNDIP rajin belajar. Sebagian orang yang rajin belajar adalah atlet. Kesimpulan yang paling tepat adalah ...", options: ["Semua mahasiswa UNDIP adalah atlet.", "Tidak ada mahasiswa UNDIP yang atlet.", "Sebagian mahasiswa UNDIP bukan atlet.", "Mungkin ada mahasiswa UNDIP yang merupakan atlet.", "Semua atlet adalah mahasiswa UNDIP."], answer: 3 },
+            { id: 2, category: "PU & PUK", text: "Lanjutkan pola bilangan berikut: 3, 7, 15, 31, 63, ...", options: ["125", "126", "127", "128", "131"], answer: 2 },
+            { id: 3, category: "PU & PUK", text: "Jika 'SEMARANG' dikodekan menjadi 'TFNBSBOH', maka kode untuk 'UNDIP' adalah ...", options: ["VMEHQ", "VOEJQ", "VNEJQ", "UODIP", "WPEKR"], answer: 1 },
+            { id: 4, category: "PU & PUK", text: "Prediksi cuaca menyatakan bahwa jika hari mendung, maka hujan akan turun. Saat ini hujan tidak turun. Kesimpulan yang sah adalah ...", options: ["Hari mendung.", "Hari tidak mendung.", "Hari panas.", "Hujan akan turun nanti.", "Tidak dapat disimpulkan."], answer: 1 },
+            { id: 5, category: "PU & PUK", text: "Semua pohon memiliki daun. Sebagian pohon memiliki bunga. Maka ...", options: ["Semua yang memiliki daun adalah pohon.", "Semua pohon memiliki bunga dan daun.", "Sebagian yang memiliki bunga memiliki daun.", "Pohon yang tidak berbunga tidak berdaun.", "Sebagian daun memiliki bunga."], answer: 2 },
+            { id: 6, category: "PU & PUK", text: "A lebih tinggi dari B. C lebih rendah dari B. D lebih tinggi dari C tetapi lebih rendah dari B. Siapakah yang paling pendek?", options: ["A", "B", "C", "D", "Tidak bisa ditentukan"], answer: 2 },
+            { id: 7, category: "PU & PUK", text: "Jika x adalah bilangan genap dan y adalah bilangan ganjil, manakah pernyataan berikut yang pasti benar?", options: ["x + y adalah genap", "xy adalah ganjil", "x - y adalah genap", "x/y adalah bulat", "xy adalah genap"], answer: 4 },
+            { id: 8, category: "PU & PUK", text: "Manakah yang tidak termasuk kelompoknya?", options: ["Semarang", "Surabaya", "Bandung", "Balikpapan", "Medan"], answer: 3 }, // Balikpapan bukan ibukota provinsi di pulau jawa / medan sumatera, wait: Semarang(Jateng), Surabaya(Jatim), Bandung(Jabar), Medan(Sumut) - Balikpapan (Bukan ibukota Kaltim, Samarinda ibukotanya).
+            { id: 9, category: "PU & PUK", text: "Semua ikan bernapas dengan insang. Paus bernapas dengan paru-paru. Kesimpulan yang tepat adalah ...", options: ["Paus adalah ikan yang bernapas dengan paru-paru.", "Paus bukan termasuk jenis ikan.", "Beberapa ikan bernapas dengan paru-paru.", "Paus dan ikan bernapas dengan cara berbeda.", "Semua yang bernapas dengan insang adalah ikan."], answer: 1 },
+            { id: 10, category: "PU & PUK", text: "Satu klan terdiri dari 5 orang: P, Q, R, S, dan T. P lebih tua dari R. S lebih muda dari T. R lebih tua dari T. Q adalah yang paling muda. Siapa yang berada di urutan ketiga tertua?", options: ["P", "Q", "R", "S", "T"], answer: 4 },
+            { id: 11, category: "PU & PUK", text: "Jika luas sebuah persegi adalah 64 cm², maka kelilingnya adalah ...", options: ["16 cm", "24 cm", "32 cm", "48 cm", "64 cm"], answer: 2 },
+            { id: 12, category: "PU & PUK", text: "Argumen: Penggunaan kendaraan listrik dapat mengurangi polusi udara secara signifikan di perkotaan. Manakah pernyataan berikut yang memperlemah argumen tersebut?", options: ["Kendaraan listrik lebih mahal.", "Listrik untuk kendaraan tersebut masih dihasilkan dari pembangkit batubara yang polutif.", "Baterai kendaraan listrik tahan lama.", "Pemerintah memberikan subsidi untuk mobil listrik.", "Banyak orang mulai beralih ke sepeda."], answer: 1 },
+            { id: 13, category: "PU & PUK", text: "Jika meja adalah kayu, maka paku adalah ...", options: ["Besi", "Palu", "Logam", "Baja", "Keras"], answer: 0 },
+            { id: 14, category: "PU & PUK", text: "Semua mamalia menyusui anaknya. Platipus bertelur tetapi menyusui anaknya. Maka ...", options: ["Platipus bukan mamalia.", "Platipus adalah unggas yang menyusui.", "Ada mamalia yang bertelur.", "Semua hewan yang bertelur menyusui anaknya.", "Mamalia tidak ada yang bertelur."], answer: 2 },
+            { id: 15, category: "PU & PUK", text: "Tentukan nilai x dalam pola berikut: [4, 12, 6], [5, 20, 10], [8, 32, x].", options: ["12", "14", "16", "18", "24"], answer: 2 },
+
+            // --- PBM (Pemahaman Bacaan dan Menulis) - 10 Soal ---
+            { id: 16, category: "PBM", text: "Penulisan kata serapan yang tepat terdapat dalam kalimat ...", options: ["Ia membeli obat di apotik.", "Jadual pertandingannya telah dirilis.", "Pemerintah sedang menggalakkan program revitalisasi pasar.", "Sistim keamanan di perumahan itu sangat ketat.", "Ia sering mempraktekkan teori itu."], answer: 2 },
+            { id: 17, category: "PBM", text: "Kalimat yang menggunakan tanda baca secara benar adalah ...", options: ["Karena hari hujan kami tidak jadi pergi.", "Karena hari hujan, kami tidak jadi pergi.", "Karena hari hujan; kami tidak jadi pergi.", "Kami tidak jadi pergi, karena hari hujan.", "Kami tidak jadi pergi; karena hari hujan."], answer: 1 },
+            { id: 18, category: "PBM", text: "Kata 'memengaruhi' berasal dari bentuk dasar ...", options: ["Pengaruh", "Mengaruh", "Pengaruhi", "Panggaruh", "Arus"], answer: 0 },
+            { id: 19, category: "PBM", text: "Manakah kalimat berikut yang merupakan kalimat efektif?", options: ["Siswa yang berprestasi itu mendapatkan beasiswa.", "Bagi semua siswa diharapkan hadir tepat waktu.", "Di kampus ini mengadakan acara kebudayaan.", "Waktu dan tempat kami persilakan.", "Kepada beliau waktu kami berikan."], answer: 0 },
+            { id: 20, category: "PBM", text: "Penulisan gelar akademik yang benar adalah ...", options: ["Dr. Ir. Budiman M.Sc.", "Dr. Ir. Budiman, M.Sc.", "Dr, Ir. Budiman, M.Sc.", "Dr. Ir, Budiman, M.Sc", "DR. Ir. Budiman. M.Sc."], answer: 1 },
+            { id: 21, category: "PBM", text: "Kalimat yang mengandung kesalahan penulisan huruf kapital adalah ...", options: ["Bapak Joko Widodo adalah Presiden Republik Indonesia.", "Ibu membeli Jeruk Bali di pasar.", "Ia membaca buku Sejarah Indonesia.", "Rombongan berangkat pada hari Minggu.", "Mereka mendaki Gunung Merbabu."], answer: 1 },
+            { id: 22, category: "PBM", text: "Inti kalimat dari 'Mahasiswa kedokteran yang sedang melakukan penelitian itu berhasil menemukan vaksin baru' adalah ...", options: ["Mahasiswa melakukan penelitian.", "Penelitian menemukan vaksin baru.", "Mahasiswa berhasil menemukan vaksin.", "Vaksin baru berhasil ditemukan.", "Mahasiswa kedokteran sedang penelitian."], answer: 2 },
+            { id: 23, category: "PBM", text: "Kata 'di mana' tepat digunakan dalam kalimat ...", options: ["Perusahaan di mana ia bekerja bangkrut.", "Buku di mana saya menulis raib.", "Di mana ia tinggal sekarang?", "Pusat kota di mana banyak toko.", "Momen di mana kita bertemu."], answer: 2 },
+            { id: 24, category: "PBM", text: "Konjungsi yang tepat untuk melengkapi kalimat 'Ia tetap berangkat kuliah ... badannya terasa sangat lemas' adalah ...", options: ["karena", "sehingga", "meskipun", "bahkan", "sedangkan"], answer: 2 },
+            { id: 25, category: "PBM", text: "Penyusunan paragraf yang baik harus memiliki prinsip kohesi dan koherensi. Koherensi berarti ...", options: ["Keterikatan bentuk secara lahiriah antar unsur bahasa.", "Kepaduan makna atau gagasan antarkalimat.", "Penggunaan tanda baca yang tepat.", "Pemilihan diksi yang bervariasi.", "Penggunaan majas dalam kalimat."], answer: 1 },
+
+            // --- PPU (Pengetahuan dan Pemahaman Umum) - 10 Soal ---
+            { id: 26, category: "PPU", text: "Sinonim dari kata 'Insinuasi' adalah ...", options: ["Sanjungan", "Tuduhan langsung", "Sindiran", "Pujian", "Hinaan kasar"], answer: 2 },
+            { id: 27, category: "PPU", text: "Antonim dari kata 'Esoteris' adalah ...", options: ["Khusus", "Rahasia", "Umum", "Internal", "Tertutup"], answer: 2 },
+            { id: 28, category: "PPU", text: "Makna kata 'Apatis' dalam kalimat 'Masyarakat mulai apatis terhadap janji-janji politik' adalah ...", options: ["Sangat peduli", "Acuh tak acuh", "Bersimpati", "Mendukung", "Menolak"], answer: 1 },
+            { id: 29, category: "PPU", text: "Hubungan antara kata Gergaji : Kayu setara dengan ...", options: ["Palu : Paku", "Cangkul : Tanah", "Sendok : Garpu", "Kertas : Pensil", "Pancing : Umpan"], answer: 1 },
+            { id: 30, category: "PPU", text: "Kata 'Filantropi' berkaitan erat dengan kegiatan ...", options: ["Keagamaan", "Pendidikan", "Kemanusiaan", "Ekonomi", "Politik"], answer: 2 },
+            { id: 31, category: "PPU", text: "Kalimat yang menggunakan kata seru secara tepat adalah ...", options: ["Wah, indah sekali pemandangan ini!", "Hai, apa kabar kamu hari ini?", "Aduh, harga barang naik lagi?", "Cis, kamu memang pintar!", "Asyik, mari kita pulang sekarang."], answer: 0 },
+            { id: 32, category: "PPU", text: "Idiom 'Kambing hitam' bermakna ...", options: ["Orang yang sangat jahat.", "Pihak yang dipersalahkan.", "Barang langka.", "Orang yang suka menyendiri.", "Hewan peliharaan favorit."], answer: 1 },
+            { id: 33, category: "PPU", text: "Penggunaan imbuhan pe-an yang menyatakan 'proses' terdapat pada kata ...", options: ["Pemukiman", "Perdesaan", "Pembangunan", "Pegunungan", "Peralatan"], answer: 2 },
+            { id: 34, category: "PPU", text: "Kata yang tidak baku di bawah ini adalah ...", options: ["Apotek", "Ijazah", "Praktek", "Nasihat", "Kualitas"], answer: 2 },
+            { id: 35, category: "PPU", text: "Lawan kata dari 'Dinamis' adalah ...", options: ["Aktif", "Agresif", "Statis", "Kritis", "Apatis"], answer: 2 },
+
+            // --- PK (Penalaran Kuantitatif) - 5 Soal ---
+            { id: 36, category: "PK", text: "Jika 2^x = 32 dan 3^y = 81, maka nilai dari x + y adalah ...", options: ["7", "8", "9", "10", "11"], answer: 2 },
+            { id: 37, category: "PK", text: "Sebuah toko memberikan diskon 20% untuk semua barang. Jika harga sebuah baju setelah diskon adalah Rp160.000,00, berapakah harga awal baju tersebut?", options: ["Rp180.000,00", "Rp192.000,00", "Rp200.000,00", "Rp220.000,00", "Rp240.000,00"], answer: 2 },
+            { id: 38, category: "PK", text: "Nilai rata-rata ujian matematika 10 siswa adalah 75. Jika nilai seorang siswa baru dimasukkan, rata-ratanya menjadi 76. Nilai siswa baru tersebut adalah ...", options: ["80", "82", "84", "86", "88"], answer: 3 },
+            { id: 39, category: "PK", text: "Jika a + b = 10 dan ab = 21, maka nilai dari a² + b² adalah ...", options: ["42", "48", "58", "79", "100"], answer: 2 },
+            { id: 40, category: "PK", text: "Sebuah kotak berisi 5 bola merah dan 3 bola biru. Jika diambil 2 bola sekaligus secara acak, peluang terambilnya keduanya bola merah adalah ...", options: ["5/14", "5/28", "10/28", "15/56", "5/8"], answer: 0 },
+
+            // --- LBIndonesia (Literasi Bahasa Indonesia) - 5 Soal ---
+            { id: 41, category: "LBIndonesia", text: "Bacalah teks berikut!\n'Limbah plastik menjadi masalah serius bagi ekosistem laut. Banyak hewan laut mati karena mengonsumsi plastik yang dikira makanan. Oleh karena itu, pengurangan penggunaan plastik sekali pakai sangat mendesak.'\nIde pokok paragraf di atas adalah ...", options: ["Banyak hewan laut mati akibat plastik.", "Bahaya limbah plastik bagi ekosistem laut.", "Plastik sekali pakai harus dilarang.", "Hewan laut mengonsumsi plastik.", "Program pengurangan plastik sekali pakai."], answer: 1 },
+            { id: 42, category: "LBIndonesia", text: "Kata 'mendesak' dalam teks pada soal nomor 41 bermakna ...", options: ["Mendorong dengan paksa", "Sangat penting dan harus segera dilakukan", "Menghimpit", "Mengganggu", "Menunda-nunda"], answer: 1 },
+            { id: 43, category: "LBIndonesia", text: "Pernyataan yang sesuai dengan isi teks pada soal nomor 41 adalah ...", options: ["Ekosistem laut terancam oleh limbah plastik.", "Semua hewan laut mati karena limbah plastik.", "Penggunaan plastik sekali pakai sudah dilarang.", "Plastik adalah makanan pengganti bagi hewan laut.", "Limbah plastik tidak mempengaruhi ekosistem laut."], answer: 0 },
+            { id: 44, category: "LBIndonesia", text: "Sikap penulis dalam teks pada soal nomor 41 cenderung ...", options: ["Deskriptif dan naratif", "Informatif dan persuasif", "Argumentatif dan subjektif", "Sinikal dan kritis", "Apatis"], answer: 1 },
+            { id: 45, category: "LBIndonesia", text: "Simpulan yang paling tepat dari teks tersebut adalah ...", options: ["Hewan laut terancam punah.", "Limbah plastik mencemari laut.", "Plastik sekali pakai harus segera dikurangi demi keselamatan ekosistem laut.", "Laut penuh dengan plastik sekali pakai.", "Jangan membuang sampah sembarangan di laut."], answer: 2 },
+
+            // --- LBEnglish (Literasi Bahasa Inggris) - 5 Soal ---
+            { id: 46, category: "LBEnglish", text: "Read the text below!\n'Artificial Intelligence (AI) is transforming the way we work. While it increases efficiency, many fear it will replace human jobs. Experts suggest that humans should focus on skills that AI cannot replicate, such as empathy and complex problem-solving.'\nWhat is the main topic of the text?", options: ["The history of AI.", "The impact of AI on work and human skills.", "How to build Artificial Intelligence.", "Why AI is dangerous.", "The benefits of empathy in the workplace."], answer: 1 },
+            { id: 47, category: "LBEnglish", text: "According to the text, why do people fear Artificial Intelligence?", options: ["It is too expensive.", "It makes work less efficient.", "It might take over human roles in jobs.", "It lacks empathy.", "It is difficult to understand."], answer: 2 },
+            { id: 48, category: "LBEnglish", text: "Which of the following skills should humans develop, according to experts?", options: ["Coding and programming.", "Repetitive manual labor.", "Empathy and complex problem-solving.", "Basic mathematics.", "Machine maintenance."], answer: 2 },
+            { id: 49, category: "LBEnglish", text: "The word 'replicate' in the text is closest in meaning to ...", options: ["Destroy", "Understand", "Duplicate", "Improve", "Analyze"], answer: 2 },
+            { id: 50, category: "LBEnglish", text: "What is the author's suggestion regarding the rise of AI?", options: ["Ban the use of AI in workplaces.", "Adapt by focusing on unique human abilities.", "Compete with AI in efficiency.", "Ignore the changes AI brings.", "Stop developing new technologies."], answer: 1 },
+
+            // --- PM (Penalaran Matematika) - 5 Soal ---
+            { id: 51, category: "PM", text: "Sebuah kolam dapat diisi penuh oleh kran A dalam waktu 4 jam, sedangkan kran B dapat mengisi penuh dalam 6 jam. Jika kedua kran dibuka bersamaan, waktu yang dibutuhkan adalah ...", options: ["2 jam", "2,4 jam", "3 jam", "5 jam", "10 jam"], answer: 1 },
+            { id: 52, category: "PM", text: "Sebuah baju dijual dengan harga Rp120.000,00 dan pedagang mendapatkan untung 20%. Berapa harga beli baju tersebut?", options: ["Rp96.000,00", "Rp100.000,00", "Rp104.000,00", "Rp110.000,00", "Rp144.000,00"], answer: 1 },
+            { id: 53, category: "PM", text: "Budi mengendarai mobil dari kota X ke kota Y dengan kecepatan rata-rata 60 km/jam dan sampai dalam waktu 3 jam. Jika ia ingin sampai dalam waktu 2 jam, berapa kecepatannya?", options: ["75 km/jam", "80 km/jam", "90 km/jam", "100 km/jam", "120 km/jam"], answer: 2 },
+            { id: 54, category: "PM", text: "Jumlah dua bilangan adalah 25 dan selisihnya adalah 7. Hasil kali kedua bilangan tersebut adalah ...", options: ["136", "144", "156", "164", "175"], answer: 1 },
+            { id: 55, category: "PM", text: "Dalam sebuah kelas, 20 siswa menyukai Matematika, 15 siswa menyukai Fisika, dan 10 siswa menyukai keduanya. Jika ada 5 siswa tidak menyukai keduanya, total siswa di kelas tersebut adalah ...", options: ["25", "30", "35", "40", "50"], answer: 1 }
+        ];
+
+        let userAnswers = new Array(55).fill(null);
+        let currentIndex = 0;
+        let timeLeft = 3600; // 60 menit dalam detik
+        let timerInterval;
+        let selectedProdi = null;
+
+        const studyPrograms = [
+            { id: "kedokteran", name: "S1 Kedokteran Umum", passingGrade: 850 },
+            { id: "informatika", name: "S1 Informatika", passingGrade: 800 },
+            { id: "hukum", name: "S1 Hukum", passingGrade: 750 },
+            { id: "manajemen", name: "S1 Manajemen", passingGrade: 770 },
+            { id: "ilkom", name: "S1 Ilmu Komunikasi", passingGrade: 760 },
+            { id: "psikologi", name: "S1 Psikologi", passingGrade: 780 },
+            { id: "sipil", name: "S1 Teknik Sipil", passingGrade: 730 },
+            { id: "akuntansi", name: "S1 Akuntansi", passingGrade: 765 },
+            { id: "industri", name: "S1 Teknik Industri", passingGrade: 755 },
+            { id: "keperawatan", name: "S1 Ilmu Keperawatan", passingGrade: 710 }
+        ];
+
+        // Populate Select on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            const select = document.getElementById('prodi');
+            if(select) {
+                studyPrograms.forEach(prodi => {
+                    const option = document.createElement('option');
+                    option.value = prodi.id;
+                    option.textContent = `${prodi.name} (Target Skor: ${prodi.passingGrade})`;
+                    select.appendChild(option);
+                });
+            }
+        });
+
+        // Login Logic
+        function handleLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const prodiId = document.getElementById('prodi').value;
+            
+            if (!prodiId) {
+                const errorEl = document.getElementById('login-error');
+                errorEl.innerText = "Silakan pilih Program Studi terlebih dahulu!";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            if (user === 'veno' && pass === 'venomabaundip') {
+                selectedProdi = studyPrograms.find(p => p.id === prodiId);
+                document.getElementById('header-prodi').innerText = selectedProdi.name;
+                
+                document.getElementById('login-error').classList.add('hidden');
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+                document.getElementById('quiz-screen').classList.add('flex');
+                startQuiz();
+            } else {
+                const errorEl = document.getElementById('login-error');
+                errorEl.innerText = "Username atau password salah!";
+                errorEl.classList.remove('hidden');
+            }
+        }
+
+        // Quiz Logic
+        function startQuiz() {
+            renderGrid();
+            loadQuestion(currentIndex);
+            
+            // Start Timer
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    processResult();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer-display').innerText = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft < 300) { // 5 menit terakhir merah
+                document.getElementById('timer-display').classList.add('text-red-400');
+                document.getElementById('timer-display').classList.remove('text-[#f1c40f]');
+            }
+        }
+
+        function loadQuestion(index) {
+            const q = questionBank[index];
+            document.getElementById('question-number').innerText = q.id;
+            document.getElementById('q-current').innerText = q.id;
+            document.getElementById('question-category').innerText = q.category;
+            
+            // Format text with line breaks
+            let formattedText = q.text.replace(/\n/g, '<br>');
+            document.getElementById('question-text').innerHTML = formattedText;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            const labels = ['A', 'B', 'C', 'D', 'E'];
+            
+            q.options.forEach((opt, idx) => {
+                const isSelected = userAnswers[index] === idx;
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full text-left p-4 rounded-xl border flex items-start space-x-4 ${isSelected ? 'option-selected' : 'border-gray-200 bg-white'}`;
+                btn.onclick = () => selectOption(index, idx);
+                
+                btn.innerHTML = `
+                    <span class="flex-shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm ${isSelected ? 'border-white text-white' : 'border-gray-300 text-gray-500'}">
+                        ${labels[idx]}
+                    </span>
+                    <span class="mt-1">${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+            
+            // Update Buttons
+            document.getElementById('btn-prev').disabled = index === 0;
+            
+            if (index === questionBank.length - 1) {
+                const btnNext = document.getElementById('btn-next');
+                btnNext.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Selesai';
+                btnNext.classList.remove('undip-blue');
+                btnNext.classList.add('bg-green-600', 'hover:bg-green-700');
+                btnNext.onclick = confirmFinish;
+            } else {
+                const btnNext = document.getElementById('btn-next');
+                btnNext.innerHTML = 'Selanjutnya <i class="fa-solid fa-chevron-right ml-2"></i>';
+                btnNext.classList.add('undip-blue');
+                btnNext.classList.remove('bg-green-600', 'hover:bg-green-700');
+                btnNext.onclick = () => changeQuestion(1);
+            }
+            
+            updateGridHighlight();
+        }
+
+        function selectOption(qIndex, optIndex) {
+            userAnswers[qIndex] = optIndex;
+            loadQuestion(qIndex); // re-render to show selection
+            renderGrid(); // update grid color
+        }
+
+        function changeQuestion(step) {
+            const newIndex = currentIndex + step;
+            if (newIndex >= 0 && newIndex < questionBank.length) {
+                currentIndex = newIndex;
+                loadQuestion(currentIndex);
+            }
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('question-grid');
+            grid.innerHTML = '';
+            
+            questionBank.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                const isAnswered = userAnswers[idx] !== null;
+                
+                btn.className = `w-10 h-10 rounded-md flex items-center justify-center text-sm font-semibold nav-btn ${isAnswered ? 'nav-answered' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'}`;
+                btn.innerText = q.id;
+                btn.id = `nav-btn-${idx}`;
+                btn.onclick = () => {
+                    currentIndex = idx;
+                    loadQuestion(currentIndex);
+                };
+                grid.appendChild(btn);
+            });
+            updateGridHighlight();
+        }
+
+        function updateGridHighlight() {
+            // Remove current highlight
+            document.querySelectorAll('.nav-current').forEach(el => el.classList.remove('nav-current'));
+            // Add to active
+            const activeBtn = document.getElementById(`nav-btn-${currentIndex}`);
+            if (activeBtn) {
+                activeBtn.classList.add('nav-current');
+            }
+        }
+
+        // Finish Logic
+        function confirmFinish() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            const textEl = document.getElementById('confirm-text');
+            
+            if (unanswered > 0) {
+                textEl.innerText = `Masih ada ${unanswered} soal yang belum dijawab. Yakin ingin mengakhiri ujian?`;
+            } else {
+                textEl.innerText = "Anda telah menjawab semua soal. Yakin ingin mengakhiri dan melihat nilai?";
+            }
+            
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        function processResult() {
+            clearInterval(timerInterval);
+            document.getElementById('confirm-modal').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('flex');
+            
+            let correct = 0;
+            let wrong = 0;
+            let empty = 0;
+            
+            const categoryStats = {};
+            
+            questionBank.forEach((q, idx) => {
+                if (!categoryStats[q.category]) {
+                    categoryStats[q.category] = { correct: 0, total: 0 };
+                }
+                categoryStats[q.category].total++;
+                
+                if (userAnswers[idx] === null) {
+                    empty++;
+                } else if (userAnswers[idx] === q.answer) {
+                    correct++;
+                    categoryStats[q.category].correct++;
+                } else {
+                    wrong++;
+                }
+            });
+            
+            // Hitung skala 0-1000
+            const totalQuestions = questionBank.length;
+            const finalScore = Math.round((correct / totalQuestions) * 1000);
+            
+            // Evaluasi Kelulusan
+            const banner = document.getElementById('result-status-banner');
+            const badge = document.getElementById('status-badge');
+            const message = document.getElementById('status-message');
+            
+            document.getElementById('result-prodi-name').innerText = selectedProdi.name;
+            document.getElementById('result-passing-grade').innerText = selectedProdi.passingGrade;
+
+            // Reset classes
+            banner.className = 'mb-8 rounded-xl p-6 text-center shadow-sm border transition-all duration-700 transform scale-100 opacity-100';
+            badge.className = 'inline-block px-6 py-3 rounded-full text-xl font-bold uppercase tracking-wide shadow-md';
+            message.className = 'mt-4 text-sm font-medium';
+
+            if (finalScore >= selectedProdi.passingGrade) {
+                banner.classList.add('bg-green-50', 'border-green-300');
+                badge.classList.add('bg-green-500', 'text-white');
+                badge.innerHTML = '<i class="fa-solid fa-circle-check mr-2"></i> Lulus UM UNDIP';
+                message.classList.add('text-green-700');
+                message.innerText = `Selamat Veno! Skor kamu memenuhi standar passing grade prodi ${selectedProdi.name}.`;
+            } else {
+                banner.classList.add('bg-red-50', 'border-red-300');
+                badge.classList.add('bg-red-500', 'text-white');
+                badge.innerHTML = '<i class="fa-solid fa-circle-xmark mr-2"></i> Tidak Lulus';
+                message.classList.add('text-red-700');
+                message.innerText = `Maaf Veno, skor kamu belum mencapai passing grade untuk prodi ${selectedProdi.name}. Tetap semangat dan coba lagi!`;
+            }
+
+            // Animate Score
+            animateValue("final-score", 0, finalScore, 1500);
+            
+            document.getElementById('stat-correct').innerText = correct;
+            document.getElementById('stat-wrong').innerText = wrong;
+            document.getElementById('stat-empty').innerText = empty;
+            
+            const breakdownContainer = document.getElementById('category-breakdown');
+            breakdownContainer.innerHTML = '';
+            
+            for (const [cat, stats] of Object.entries(categoryStats)) {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center border-b border-blue-100 pb-1";
+                const percentage = Math.round((stats.correct / stats.total) * 100);
+                li.innerHTML = `
+                    <span>${cat}</span>
+                    <span class="font-bold ${percentage >= 70 ? 'text-green-600' : 'text-red-500'}">${stats.correct}/${stats.total}</span>
+                `;
+                breakdownContainer.appendChild(li);
+            }
+            
+            document.getElementById('result-screen').classList.remove('hidden');
+        }
+        
+        function animateValue(id, start, end, duration) {
+            if (start === end) return;
+            var range = end - start;
+            var current = start;
+            var increment = end > start? 1 : -1;
+            var stepTime = Math.abs(Math.floor(duration / range));
+            
+            // limit step time to avoid freezing browser for huge numbers
+            if(stepTime < 5) stepTime = 5;
+            increment = Math.ceil(range / (duration / stepTime));
+
+            var obj = document.getElementById(id);
+            var timer = setInterval(function() {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                obj.innerHTML = current;
+            }, stepTime);
+        }
+    </script>
+</body>
+</html>

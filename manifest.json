@@ -1,0 +1,24 @@
+{
+  "name": "Veno App",
+  "short_name": "Veno",
+  "description": "Aplikasi Catatan, Tugas, dan Keuangan Pribadi",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn.phototourl.com/free/2026-07-31-8e352df3-f058-4941-a436-80c670bb7a3e.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn.phototourl.com/free/2026-07-31-8e352df3-f058-4941-a436-80c670bb7a3e.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
