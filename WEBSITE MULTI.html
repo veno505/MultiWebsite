@@ -803,7 +803,7 @@
               </div>
               <div class="col-span-2">
                 <label class="form-label"><i class="fa-solid fa-qrcode text-brand-600 mr-1"></i>URL Gambar QRIS Toko (Manual / Tanpa API)</label>
-                <input type="text" id="setting-store-qris" class="form-input" placeholder="https://... (Link gambar QRIS toko Anda)">
+                <input type="text" id="setting-store-qris" class="form-input" style="background-color: #1e293b !important; color: #f8fafc !important; border-color: #334155 !important;" placeholder="https://... (Link gambar QRIS toko Anda)">
                 <p class="text-[10px] text-slate-400 mt-1">Masukkan link gambar barcode QRIS toko Anda. Gambar ini akan ditampilkan langsung ke pembeli saat memilih pembayaran QRIS Manual tanpa perlu API Midtrans.</p>
               </div>
             </div>
@@ -969,16 +969,16 @@
                   <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[10px] font-semibold">Mudah &amp; Langsung</span>
                 </div>
                 <div>
-                  <label class="form-label text-xs">Link Gambar Barcode QRIS Toko Anda</label>
-                  <input type="text" id="setting-store-qris-section" class="form-input bg-white text-xs" placeholder="https://... (Link gambar barcode QRIS Anda)" oninput="updateQrisPreview()">
+                  <label class="form-label text-xs font-bold text-slate-800">LINK GAMBAR BARCODE QRIS TOKO ANDA</label>
+                  <input type="text" id="setting-store-qris-section" class="form-input text-xs font-medium" style="background-color: #1e293b !important; color: #f8fafc !important; border-color: #334155 !important;" placeholder="https://... (Link gambar barcode QRIS Anda)" oninput="updateQrisPreview()">
                   <p class="text-[10px] text-slate-500 mt-1">Masukkan link gambar barcode QRIS (bisa dari ImgBB, Postimages, atau link gambar WhatsApp/Drive publik). Pembeli tinggal scan dan kirim bukti ke nomor WA Anda.</p>
                 </div>
                 <!-- Preview Box -->
-                <div id="setting-qris-preview-box" class="hidden flex items-center gap-3 p-2.5 bg-white rounded-lg border border-emerald-100">
-                  <img id="setting-qris-preview-img" src="" alt="Preview QRIS" class="w-14 h-14 object-contain border border-slate-200 rounded">
+                <div id="setting-qris-preview-box" class="hidden flex items-center gap-3 p-2.5 rounded-lg border border-slate-700" style="background-color: #1e293b !important;">
+                  <img id="setting-qris-preview-img" src="" alt="Preview QRIS" class="w-14 h-14 object-contain border border-slate-700 rounded bg-slate-900">
                   <div class="text-[11px]">
-                    <span class="font-bold text-emerald-800 block">Preview Gambar QRIS</span>
-                    <span class="text-slate-500">Gambar barcode QRIS terdeteksi dan siap ditampilkan ke pembeli.</span>
+                    <span class="font-bold text-emerald-400 block">Preview Gambar QRIS</span>
+                    <span class="text-slate-300">Gambar barcode QRIS terdeteksi dan siap ditampilkan ke pembeli.</span>
                   </div>
                 </div>
               </div>
